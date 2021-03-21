@@ -1,0 +1,31 @@
+﻿using CompiPascal.AST_.interfaces;
+using CompiPascal.entorno_;
+using CompiPascal.entorno_.simbolos;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+
+namespace CompiPascal.AST_.funcionesPrimitivas
+{
+    public class graficarTS : Instruccion
+    {
+        public int linea { get; set ; }
+        public int columna { get; set; }
+
+
+
+        public graficarTS(int fila, int columna)
+        {
+            this.linea = fila;
+            this.columna = columna;
+        }
+
+
+        public string getC3()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

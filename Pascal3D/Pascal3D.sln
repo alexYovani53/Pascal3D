@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pascal3D", "Pascal3D\Pascal3D.csproj", "{D53FCC2A-1B17-420E-A7CD-39E70FF5AFFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D53FCC2A-1B17-420E-A7CD-39E70FF5AFFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D53FCC2A-1B17-420E-A7CD-39E70FF5AFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D53FCC2A-1B17-420E-A7CD-39E70FF5AFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D53FCC2A-1B17-420E-A7CD-39E70FF5AFFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F4F72592-475A-4589-94D2-8D2D37BF738B}
+	EndGlobalSection
+EndGlobal

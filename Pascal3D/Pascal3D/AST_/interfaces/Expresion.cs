@@ -1,4 +1,5 @@
 ﻿using CompiPascal.entorno_;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,11 +21,11 @@ namespace CompiPascal.AST_.interfaces
     public interface Expresion:NodoAST
     {
 
+        public string etiquetaFalsa { get; set; }
+        public string etiquetaVerdadera { get; set; }
 
+        public result3D obtener3D(Entorno ent);
 
-
-
-
-
+       
     }
 }

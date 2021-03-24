@@ -2,6 +2,8 @@
 using CompiPascal.AST_.interfaces;
 using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,6 +25,26 @@ namespace CompiPascal.AST_.bucles
 
         public string getC3() 
         {
+            
+            string repeatInicio = Generador.pedirEtiqueta();
+
+
+            string codigo = "";
+            //SE CONCATENAN LAS INSTRUCCIONES DEL REPEAT
+
+            codigo += repeatInicio + ":\n";
+            codigo += " /* codigo de instrucciones en repeat*/ \n";
+
+
+            ((Expresion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
+            ((Expresion)exprCondicional).etiquetaVerdadera = repeatInicio;
+            result3D resultadoPrueba = exprCondicional.obtener3D(null);
+
+            codigo += resultadoPrueba.Codigo;
+            codigo += resultadoPrueba.EtiquetaF + ": \n";
+
+
+            Program.getIntefaz().agregarTexto(codigo);
             return "";
         }
     }

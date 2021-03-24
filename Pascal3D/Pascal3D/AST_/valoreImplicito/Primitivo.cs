@@ -1,5 +1,6 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,17 @@ namespace CompiPascal.AST_.valoreImplicito
     public class Primitivo : Expresion
     {
 
+        /*
+         * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaFalsa { get; set; }
+        /*
+         * @param   string      etiquetaVerdadera           Guarda la etiqueta verdadera para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaVerdadera { get; set; }
+
         /**
          * @propiedad   valor
          * @comentario  es el valor de la instancia de primitivo
@@ -24,6 +36,7 @@ namespace CompiPascal.AST_.valoreImplicito
         private object valor { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
+
 
         public Primitivo(object valor, int linea, int columna)
         {
@@ -37,7 +50,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
         public TipoDatos getTipo(Entorno entorno, AST ast)
         {
-            object valor = this.getValorImplicito(entorno,ast);
+            
 
             if (valor is bool)
             {
@@ -66,13 +79,45 @@ namespace CompiPascal.AST_.valoreImplicito
             
         }
 
-        public object getValorImplicito(Entorno ent, AST arbol)
+  
+
+        public result3D obtener3D(Entorno ent)
         {
-            return valor;
+
+            result3D nuevo = new result3D();
+            //string temporal = Generador.pedirTemporal();
+
+            if (valor is int)
+            {
+                //nuevo.Codigo += temporal + " = " + valor.ToString() + ";";
+                //nuevo.Temporal = temporal;
+
+                nuevo.Codigo = "";
+                nuevo.Temporal = valor.ToString();
+                nuevo.TipoResultado = TipoDatos.Integer;
+            }
+            else if( valor is double)
+            {
+                //nuevo.Codigo += temporal + " = " + valor.ToString() + ";";
+                //nuevo.Temporal = temporal;
+
+                nuevo.Codigo = "";
+                nuevo.Temporal = valor.ToString();
+                nuevo.TipoResultado = TipoDatos.Real;
+            }
+            else if(valor is bool)
+            {
+                //CONVERTIMOS EL VALOR TRUE O FALSO EN  1 o 0  RESPECTIVAMENTE
+                int val = (bool)valor == true ? 1 : 0;
+                nuevo.Codigo = "";
+                nuevo.Temporal = val.ToString();
+                nuevo.TipoResultado = TipoDatos.Boolean;
+            }
+
+            return nuevo;
         }
 
-
-        string NodoAST.getC3()
+        public string getC3()
         {
             throw new NotImplementedException();
         }

@@ -2,6 +2,8 @@
 using CompiPascal.AST_.interfaces;
 using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -60,9 +62,56 @@ namespace CompiPascal.AST_.control
             this.columna = columna;
         }
 
-        string NodoAST.getC3()
+        public string getC3()
         {
-            throw new NotImplementedException();
+
+            string etiquetaSalida = Generador.pedirEtiqueta();
+
+
+            ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
+            ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
+            result3D result = exprCondicional.obtener3D(null);
+
+            result.Codigo += result.EtiquetaV+" :\n";
+            result.Codigo += " /*codigo intruscción if superior */ \n";
+
+            result.Codigo += etiquetaSalida + ": \n\n\n";
+
+
+            result.Codigo += result.EtiquetaF+ " :     ";
+
+            foreach (Instruccion item in instruccionesElse_if)
+            {
+                If pivote = (If)item;
+                pivote.exprCondicional.etiquetaFalsa = Generador.pedirEtiqueta();
+                pivote.exprCondicional.etiquetaVerdadera = Generador.pedirEtiqueta();
+                result3D ifElse_result = pivote.exprCondicional.obtener3D(null);
+
+                result.Codigo += ifElse_result.Codigo;
+                result.Codigo += ifElse_result.EtiquetaV + " :\n";
+                result.Codigo += " /*codigo intruscción if_else */ \n ";
+
+                //INSTRUCCIONE DEL ELSE
+
+                result.Codigo += etiquetaSalida + ": \n\n\n";
+
+                result.Codigo += ifElse_result.EtiquetaF + " :     ";
+
+            }
+
+            if (instruccionesElse.Count > 0)
+            {
+
+                result.Codigo += "//INSTRUCCIONES DEL ELSE";
+
+            }
+
+
+            result.Codigo += etiquetaSalida + ": \n";
+
+            Program.getIntefaz().agregarTexto(result.Codigo);
+
+            return "";
         }
     }
 }

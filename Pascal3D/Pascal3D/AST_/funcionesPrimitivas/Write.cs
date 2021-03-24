@@ -50,7 +50,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
         }
 
 
-        string NodoAST.getC3()
+        public string getC3()
         {
             throw new NotImplementedException();
         }

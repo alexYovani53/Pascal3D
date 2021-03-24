@@ -2,6 +2,8 @@
 using CompiPascal.AST_.interfaces;
 using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,9 +29,31 @@ namespace CompiPascal.AST_.bucles
         }
 
 
-        string NodoAST.getC3()
+        public string getC3()
         {
-            throw new NotImplementedException();
+
+
+            string etiquetaInicio = Generador.pedirEtiqueta();        //ETIQUETA DE INICIO
+
+            ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
+            ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
+
+            result3D result = exprCondicional.obtener3D(null);
+
+            string whileCadena = etiquetaInicio + ": \n";
+
+            whileCadena += result.Codigo;
+            whileCadena += result.EtiquetaV +":\n";
+
+            whileCadena += "goto " + etiquetaInicio + ";\n";
+
+            whileCadena += result.EtiquetaF+ ":\n";
+
+
+            Program.getIntefaz().agregarTexto(whileCadena);
+
+            return whileCadena;
+
         }
     }
 }

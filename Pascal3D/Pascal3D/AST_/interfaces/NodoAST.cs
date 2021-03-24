@@ -22,6 +22,6 @@ namespace CompiPascal.AST_.interfaces
         public int columna { get; set; }
 
 
-        string getC3();
+
     }
 }

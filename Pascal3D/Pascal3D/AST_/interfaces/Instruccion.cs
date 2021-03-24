@@ -35,6 +35,6 @@ namespace CompiPascal.AST_.interfaces
         */
 
 
-   
+        public string getC3();
     }
 }

@@ -27,7 +27,7 @@ namespace CompiPascal.entorno_.simbolos
 
         /*@propiedad        LinkedList<Instruccion>     instrucciones
          *@comentario           guardara la lista de instrucciones de la funcion o método*/
-        LinkedList<Instruccion> instrucciones { get; set; }
+        public LinkedList<Instruccion> instrucciones { get; set; }
 
 
 
@@ -122,7 +122,7 @@ namespace CompiPascal.entorno_.simbolos
             }
 
         }
-        string NodoAST.getC3()
+        public string getC3()
         {
             throw new NotImplementedException();
         }

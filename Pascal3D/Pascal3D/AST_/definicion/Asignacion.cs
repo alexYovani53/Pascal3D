@@ -2,6 +2,8 @@
 using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
 using CompiPascal.entorno_.simbolos;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,9 +94,12 @@ namespace CompiPascal.AST_.definicion
 
 
 
-        string NodoAST.getC3()
+        public string getC3()
         {
-            throw new NotImplementedException();
+
+            result3D final =   valor.obtener3D(null);
+            Program.getIntefaz().agregarTexto(final.Codigo);
+            return "";
         }
     }
 }

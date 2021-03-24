@@ -1,6 +1,8 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
 using CompiPascal.entorno_.simbolos;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,12 +21,23 @@ namespace CompiPascal.AST_.valoreImplicito
     public class Identificador:Expresion
     {
 
+
+        /*
+         * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaFalsa { get; set; }
+        /*
+         * @param   string      etiquetaVerdadera           Guarda la etiqueta verdadera para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaVerdadera { get; set; }
+
         /**
          * @propiedad       ide
          * @comentario      Esta variable almacenara la letra del identificador que aparece en el
          *                  codigo fuente de la entrada.
          */
-
         private string ide;
         public int linea { get; set; }
         public int columna { get; set; }
@@ -40,55 +53,11 @@ namespace CompiPascal.AST_.valoreImplicito
         public TipoDatos getTipo(Entorno entorno, AST ast)
         {
 
-            object valor = null;
+            Simbolo encontrar = entorno.obtenerSimbolo(this.ide);
 
-            if (valor == null) return TipoDatos.NULL;
+            if (encontrar == null) return TipoDatos.NULL;
 
-            if (valor is string)
-            {
-                return TipoDatos.String;
-            }
-            else if (valor is char)
-            {
-                return TipoDatos.Char;
-            }
-            else if (valor is bool)
-            {
-                return TipoDatos.Boolean;
-            }
-            else if (valor is int)
-            {
-                return TipoDatos.Integer;
-            }
-            else if (valor is double)
-            {
-                return TipoDatos.Real;
-            }
-            else if (valor is Objeto)
-            {
-                return TipoDatos.Object;
-            }
-            else if( valor is ObjetoArray)
-            {
-                return TipoDatos.Object;
-            }
-            else
-            {
-                try
-                {
-                    if((TipoDatos)valor == TipoDatos.Struct)
-                    {
-                        return TipoDatos.Struct;
-                    }
-                }
-                catch (Exception)
-                {
-                    return TipoDatos.Object;
-                }
-            }
-
-
-            return TipoDatos.Object;
+            return encontrar.Tipo;
 
         }
 
@@ -99,9 +68,27 @@ namespace CompiPascal.AST_.valoreImplicito
             return ide;
         }
 
-        public string getC3()
+        public result3D obtener3D(Entorno ent)
         {
-            throw new NotImplementedException();
+            //OBTENEMOS EL SIMBOLO DEL ENTORNO ACTUAL
+            Simbolo encontrado = ent.obtenerSimbolo(this.ide);
+
+            //SI EL SIMBOLO ES NULL ES PORQUE NO SE ENCONTRO 
+            if(encontrado == null)
+            {
+                Program.getIntefaz().agregarError("No se encontro el identificador " + this.ide, linea, columna);
+                return null;
+            }
+
+            //RETORNAMOS UNA CADENA 3D PARA EL IDENTIFICADOR 
+            result3D nuevo = new result3D
+            {
+                Temporal = this.ide,
+                Codigo = "",
+                TipoResultado = encontrado.Tipo
+            };
+
+            return nuevo;
         }
     }
 }

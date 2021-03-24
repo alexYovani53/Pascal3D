@@ -1,5 +1,6 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,17 @@ namespace CompiPascal.AST_.cambioFlujo
 {
     public class Exit : Expresion,Instruccion
     {
+
+        /*
+         * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaFalsa { get; set; }
+        /*
+         * @param   string      etiquetaVerdadera           Guarda la etiqueta verdadera para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaVerdadera { get; set; }
         public int linea { get ; set ; }
         public int columna { get; set ; }
 
@@ -44,6 +56,11 @@ namespace CompiPascal.AST_.cambioFlujo
 
 
         public string getC3()
+        {
+            throw new NotImplementedException();
+        }
+
+        public result3D obtener3D(Entorno ent)
         {
             throw new NotImplementedException();
         }

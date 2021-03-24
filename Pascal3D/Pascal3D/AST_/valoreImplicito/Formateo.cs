@@ -1,5 +1,6 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,17 @@ namespace CompiPascal.AST_.valoreImplicito
 {
     public class Formateo : Expresion
     {
-        
+
+        /*
+         * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaFalsa { get; set; }
+        /*
+         * @param   string      etiquetaVerdadera           Guarda la etiqueta verdadera para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaVerdadera { get; set; }
         private Expresion valor;
         private Expresion tamano;
         private Expresion decimales;
@@ -60,7 +71,7 @@ namespace CompiPascal.AST_.valoreImplicito
             return TipoDatos.String;
         }
 
-        string NodoAST.getC3()
+        public string getC3()
         {
             throw new NotImplementedException();
         }
@@ -83,5 +94,9 @@ namespace CompiPascal.AST_.valoreImplicito
 
         }
 
+        public result3D obtener3D(Entorno ent)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -47,9 +49,19 @@ namespace CompiPascal.AST_.valoreImplicito
         private Expresion operandoU;
         private Operador operador;
 
-        private object val;
         public int linea { get; set; }
         public int columna { get; set; }
+
+        /*
+         * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaFalsa { get; set; }
+        /*
+         * @param   string      etiquetaVerdadera           Guarda la etiqueta verdadera para una instrucción donde se 
+         *                                                  evalua una expresión condicional
+         */
+        public string etiquetaVerdadera { get; set; }
 
         /**
          * @constructor  public Operacion(Expresion operando1, Expresion operando2, Operador operador)
@@ -61,6 +73,7 @@ namespace CompiPascal.AST_.valoreImplicito
          * @param   operador    Tipo de operación que se esta realizando.
          */
 
+
         public Operacion(Expresion op1, Expresion op2, Operador operador_ , int linea, int columna)
         {
             this.operando1 = op1;
@@ -68,6 +81,7 @@ namespace CompiPascal.AST_.valoreImplicito
             this.operador = operador_;
             this.linea = linea;
             this.columna = columna;
+            this.etiquetaFalsa = "";
         }
 
 
@@ -86,7 +100,7 @@ namespace CompiPascal.AST_.valoreImplicito
             this.operador = operador_;
             this.linea = linea;
             this.columna = columna;
-           
+            this.etiquetaFalsa = "";
         }
 
 
@@ -111,9 +125,7 @@ namespace CompiPascal.AST_.valoreImplicito
                     return Operador.DIVISION;
                 case "div":
                     return Operador.DIVISION;
-                case "DIV":
-                    return Operador.DIVISION;
-                case "%":
+                case "mod":
                     return Operador.MODULO;
                 case "<":
                     return Operador.MENOR;
@@ -140,256 +152,930 @@ namespace CompiPascal.AST_.valoreImplicito
 
         }
 
-        public TipoDatos getTipo(Entorno entorno, AST ast)
-        {
-            object valor;
-            if(val != null)
-            {
-                valor = val;
-            }
-            else
-            {
-                valor = getValorImplicito(entorno, ast);
-            }
-
-
-            if(valor is string)
-            {
-                return TipoDatos.String;
-            }
-            else if (valor is char)
-            {
-                return TipoDatos.Char;
-            }
-            else if (valor is bool)
-            {
-                return TipoDatos.Boolean;
-            }
-            else if (valor is int)
-            {
-                return TipoDatos.Integer;
-            }
-            else if (valor is double)
-            {
-                return TipoDatos.Real;
-            }
-
-            return TipoDatos.String;
-
-        }
-
-
-        public object getValorImplicito(Entorno ent, AST arbol)
+        public result3D obtener3D(Entorno ent)
         {
 
-
-            object op1 = new object(), op2 = new object(), opU = new object();
-           
-
+            result3D resultado = null;
 
             switch (operador)
             {
-
                 case Operador.MAS:
-
-                    if (op1 is int && op2 is double)         val = (int)op1 + (double)op2;
-                    else if (op1 is double && op2 is int)    val = (double)op1 + (int)op2;
-                    else if (op1 is int && op2 is int) val = (int)op1 + (int)op2;
-                    else if (op1 is double && op2 is double) val = (double)op1 + (double)op2;
-                    else if (op1 is string || op2 is string) val = op1.ToString() + op2.ToString();
-                    else
-                    {
-                       
-                    }
-
+                    resultado = SUMA(operando1, operando2, ent);
                     break;
-
                 case Operador.MENOS:
-
-                    if(operandoU != null)
-                    {
-                        if (opU is double)  val = -1 * (double)opU;
-                        else if (opU is int) val = -1 * (int)opU;
-                        else
-                        {
-                           
-                        }
-                        break;
-                    }
-
-                    if (op1 is int && op2 is double) val = (int)op1 - (double)op2;
-                    else if (op1 is double && op2 is int) val = (double)op1 - (int)op2;
-                    else if (op1 is int && op2 is int) val = (int)op1 - (int)op2;
-                    else if (op1 is double && op2 is double) val = (double)op1 - (double)op2;
-                    else
-                    {
-                       
-                    }
-
+                    resultado = RESTA(operando1, operando2, ent);
                     break;
-
                 case Operador.MULTIPLICACION:
-
-                    if (op1 is int && op2 is double) val = (int)op1 * (double)op2;
-                    else if (op1 is double && op2 is int) val = (double)op1 * (int)op2;
-                    else if (op1 is int && op2 is int) val = (int)op1 * (int)op2;
-                    else if (op1 is double && op2 is double) val = (double)op1 * (double)op2;
-                    else
-                    {
-                        
-                    }
-
+                    resultado = MULTIPLICACION(operando1, operando2, ent);
                     break;
-
                 case Operador.DIVISION:
-
-
-                    if (op1 is int && op2 is double)
-                    {
-                        if((double)op2 !=0.0) val = (int)op1 / (double)op2;
-                        else
-                        {
-                         
-                        }
-                    }
-                    else if (op1 is double && op2 is int)
-                    {
-                        if ((int)op2 != 0) val = (double)op1 / (int)op2;
-                        else
-                        {
-                        }
-                    }
-                    else if (op1 is int && op2 is int)
-                    {
-                        if ((int)op2 != 0)
-                        {
-                            double p = 0.0;
-                            p += (int)op1; 
-                            double pivote = p / (int)op2;
-                            val = pivote;
-                        }
-                        else
-                        {
-                        }
-                    }
-                    else if (op1 is double && op2 is double)
-                    {
-                        if ((double)op2 != 0.0) val = (double)op1 / (double)op2;
-                        else
-                        {
-                        }
-                    }
-                    else
-                    {
-                    }
-
+                    resultado = DIVISION(operando1, operando2, ent);
                     break;
-
                 case Operador.MODULO:
-
-                    if (op1 is int && op2 is double) val = (int)op1 % (double)op2;
-                    else if (op1 is double && op2 is int) val = (double)op1 % (int)op2;
-                    else if (op1 is int && op2 is int) val = (int)op1 % (int)op2;
-                    else if (op1 is double && op2 is double) val = (double)op1 % (double)op2;
-                    else
-                    {
-                    }
-
+                    resultado = MODULO(operando1, operando2, ent);
                     break;
-
-
-                case Operador.IGUAL:
-                    if (op1 is int && op2 is double)            val = (int)op1 == (double)op2;
-                    else if (op1 is double && op2 is int)       val = (double)op1 == (int)op2;
-                    else if (op1 is int && op2 is int)          val = (int)op1 == (int)op2;
-                    else if (op1 is double && op2 is double)    val = (double)op1 == (double)op2;
-                    else if (op1 is string && op2 is string)    val = op1.ToString().Equals(op2.ToString());
-                    else if (op1 is char && op2 is char)        val = op1.ToString().Equals(op2.ToString());
-                    else if (op1 is bool && op2 is bool)        val = (bool)op1 == (bool)op2;
+                case Operador.AND:
+                    resultado = LOGIC_AND(operando1, operando2, ent);
                     break;
-
-
-                case Operador.MENOR:
-                    if (op1 is int && op2 is double)            val = (int)op1 < (double)op2;
-                    else if (op1 is double && op2 is int)       val = (double)op1 < (int)op2;
-                    else if (op1 is int && op2 is int)          val = (int)op1 < (int)op2;
-                    else if (op1 is double && op2 is double)    val = (double)op1 < (double)op2;
-
+                case Operador.OR:
+                    resultado = LOGIC_OR(operando1, operando2, ent);
+                    break;
+                case Operador.NOT:
+                    resultado = LOGIC_NOT(operandoU, ent);
                     break;
 
 
                 case Operador.MAYOR:
-                    if      (op1 is int && op2 is double)       val = (int)op1 > (double)op2;
-                    else if (op1 is double && op2 is int)       val = (double)op1 > (int)op2;
-                    else if (op1 is int && op2 is int)          val = (int)op1 > (int)op2;
-                    else if (op1 is double && op2 is double)    val = (double)op1 > (double)op2;
-
-                    break;
-
+                case Operador.MENOR:
                 case Operador.MAYOR_QUE:
-                    if      (op1 is int && op2 is double)       val = (int)op1 >= (double)op2;
-                    else if (op1 is double && op2 is int)       val = (double)op1 >= (int)op2;
-                    else if (op1 is int && op2 is int)          val = (int)op1 >= (int)op2;
-                    else if (op1 is double && op2 is double)    val = (double)op1 >= (double)op2;
-                    break;
-
                 case Operador.MENOR_QUE:
-                    if (op1 is int && op2 is double)            val = (int)op1 <= (double)op2;
-                    else if (op1 is double && op2 is int)    val = (double)op1 <= (int)op2;
-                    else if (op1 is int && op2 is int)          val = (int)op1 <= (int)op2;
-                    else if (op1 is double && op2 is double)    val = (double)op1 <= (double)op2;
-                    break;
-
-
                 case Operador.DIFERENTE:
-                    if (op1 is int && op2 is double)            val = (int)op1 != (double)op2;
-                    else if (op1 is double && op2 is int)       val = (double)op1 != (int)op2;
-                    else if (op1 is int && op2 is int)          val = (int)op1 != (int)op2;
-                    else if (op1 is double && op2 is double)    val = (double)op1 != (double)op2;
+                case Operador.IGUAL:
+                    resultado = RELACION(operando1, operando2, stringOp(), ent);
                     break;
-
-
-                case Operador.AND:
-                    if (op1 is bool && op2 is bool) val = (bool)op1 && (bool)op2;
-                    else
-                    {
-                        return null;
-                    }break;
-
-                case Operador.OR:
-                    if (op1 is bool && op2 is bool) val = (bool)op1 || (bool)op2;
-                    else
-                    {
-                        return null;
-                    }break;
-
-                case Operador.NOT:
-                    if (opU is bool)
-                    {
-                        val = !((bool)opU);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                    break;
-
-
 
                 default:
                     break;
-
             }
 
 
-            return val;
 
+            return resultado;
 
         }
 
-        string NodoAST.getC3()
+        public result3D SUMA(Expresion opIzq, Expresion opDer,Entorno ent)
         {
-            throw new NotImplementedException();
+
+            result3D expreIzq = opIzq.obtener3D(ent);
+            result3D expreDer = opDer.obtener3D(ent);
+            result3D resultado = new result3D(); 
+            string er = "El tipo " + expreIzq.TipoResultado + " no se puede sumar con " + expreDer.TipoResultado;
+
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     INTEGER  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+
+            if (expreIzq.TipoResultado == TipoDatos.Integer)
+            {
+
+                /*
+                 *          TIPOS DEL SEGUNDO OPERANDO      INTEGER ----  X TIPO
+                 */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Integer;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " + " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " + " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     REAL  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.Real)
+            {
+
+                /*
+                *          TIPOS DEL SEGUNDO OPERANDO      REAL ----  X TIPO
+                */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " + " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " + " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     STRING  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.String)
+            {
+
+
+            }            
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     CHAR  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.Char )
+            {
+
+                if (expreDer.TipoResultado != TipoDatos.Char)
+                {
+                    Program.getIntefaz().agregarError("Char solo puede sumarse con char",operando2.linea,operando2.columna);
+                    return new result3D();
+                }
+
+                resultado.Temporal = Generador.pedirTemporal();
+                resultado.TipoResultado = TipoDatos.String;
+
+                resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " + " + expreDer.Temporal + "; \n";
+            }
+            else
+            {
+                //LOS TIPOS NO SON OPERABLES EN PASCAL
+                Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+            }
+
+
+            return resultado;
         }
+        public result3D RESTA(Expresion opIzq, Expresion opDer, Entorno ent)
+        {
+
+            result3D expreIzq = opIzq.obtener3D(ent);
+            result3D expreDer = opDer.obtener3D(ent);
+            result3D resultado = new result3D();
+            string er = "El tipo " + expreIzq.TipoResultado + " no se puede RESTAR con " + expreDer.TipoResultado;
+
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     INTEGER  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+
+            if (expreIzq.TipoResultado == TipoDatos.Integer)
+            {
+
+                /*
+                 *          TIPOS DEL SEGUNDO OPERANDO      INTEGER ----  X TIPO
+                 */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Integer;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " - " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " - " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     REAL  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.Real)
+            {
+
+                /*
+                *          TIPOS DEL SEGUNDO OPERANDO      REAL ----  X TIPO
+                */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " - " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " - " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                        OPERANDOS NO SE PUEDEN RESTAR
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else
+            {
+                //LOS TIPOS NO SON OPERABLES EN PASCAL
+                Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+            }
+
+
+            return resultado;
+        }
+        public result3D MULTIPLICACION(Expresion opIzq, Expresion opDer, Entorno ent)
+        {
+
+            result3D expreIzq = opIzq.obtener3D(ent);
+            result3D expreDer = opDer.obtener3D(ent);
+            result3D resultado = new result3D();
+            string er = "El tipo " + expreIzq.TipoResultado + " no se puede MULTIPLICAR con " + expreDer.TipoResultado;
+
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     INTEGER  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+
+            if (expreIzq.TipoResultado == TipoDatos.Integer)
+            {
+
+                /*
+                 *          TIPOS DEL SEGUNDO OPERANDO      INTEGER ----  X TIPO
+                 */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Integer;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " * " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " * " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     REAL  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.Real)
+            {
+
+                /*
+                *          TIPOS DEL SEGUNDO OPERANDO      REAL ----  X TIPO
+                */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " * " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " * " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                        OPERANDOS NO SE PUEDEN RESTAR
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else
+            {
+                //LOS TIPOS NO SON OPERABLES EN PASCAL
+                Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+            }
+
+
+            return resultado;
+        }
+        public result3D DIVISION(Expresion opIzq, Expresion opDer, Entorno ent)
+        {
+
+            result3D expreIzq = opIzq.obtener3D(ent);
+            result3D expreDer = opDer.obtener3D(ent);
+            result3D resultado = new result3D();
+            string er = "El tipo " + expreIzq.TipoResultado + " no se puede RESTAR con " + expreDer.TipoResultado;
+
+            if (expreDer.Temporal.Equals('0'))
+            {
+                Program.getIntefaz().agregarError("Division entre 0 ", operando1.linea, operando1.columna);
+                return new result3D();
+            }
+
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     INTEGER  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+
+            if (expreIzq.TipoResultado == TipoDatos.Integer)
+            {
+
+                /*
+                 *          TIPOS DEL SEGUNDO OPERANDO      INTEGER ----  X TIPO
+                 */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Integer;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " / " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " / " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     REAL  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.Real)
+            {
+
+                /*
+                *          TIPOS DEL SEGUNDO OPERANDO      REAL ----  X TIPO
+                */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " / " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " / " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                        OPERANDOS NO SE PUEDEN RESTAR
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else
+            {
+                //LOS TIPOS NO SON OPERABLES EN PASCAL
+                Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+            }
+
+
+            return resultado;
+        }
+        public result3D MODULO(Expresion opIzq, Expresion opDer, Entorno ent)
+        {
+
+            result3D expreIzq = opIzq.obtener3D(ent);
+            result3D expreDer = opDer.obtener3D(ent);
+            result3D resultado = new result3D();
+            string er = "El tipo " + expreIzq.TipoResultado + " no se puede MODULAR con " + expreDer.TipoResultado;
+
+
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     INTEGER  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+
+            if (expreIzq.TipoResultado == TipoDatos.Integer)
+            {
+
+                /*
+                 *          TIPOS DEL SEGUNDO OPERANDO      INTEGER ----  X TIPO
+                 */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Integer;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " % " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " % " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                         IZQUIERDO ->     REAL  
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else if (expreIzq.TipoResultado == TipoDatos.Real)
+            {
+
+                /*
+                *          TIPOS DEL SEGUNDO OPERANDO      REAL ----  X TIPO
+                */
+                switch (expreDer.TipoResultado)
+                {
+
+                    case TipoDatos.Integer:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " % " + expreDer.Temporal + "; \n";
+                        break;
+
+                    case TipoDatos.Real:
+
+                        //PEDIMOS UN TEMPORAL QUE GUARDARA EL RESULTADO
+                        resultado.Temporal = Generador.pedirTemporal();
+                        resultado.TipoResultado = TipoDatos.Real;
+
+                        resultado.Codigo = expreIzq.Codigo + expreDer.Codigo + "\n";
+                        resultado.Codigo += resultado.Temporal + " = " + expreIzq.Temporal + " % " + expreDer.Temporal + "; \n";
+                        break;
+
+
+                    default:
+                        Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+                        break;
+                }
+
+
+
+            }
+            /****************************************************************************
+             * ══════════════════════════════════════════════════════════════════════════
+             *                        OPERANDOS NO SE PUEDEN RESTAR
+             * ══════════════════════════════════════════════════════════════════════════
+             ****************************************************************************/
+            else
+            {
+                //LOS TIPOS NO SON OPERABLES EN PASCAL
+                Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+            }
+
+
+            return resultado;
+        }
+        public result3D RELACION(Expresion opIzq, Expresion opDer, string relacion, Entorno ent)
+        {
+
+            /*
+             * if a < b goto B.true
+             * goto B.false
+             * 
+             */
+            result3D resultado = new result3D();
+            result3D resultadoIz = opIzq.obtener3D(ent);
+            result3D resultadoDe = opDer.obtener3D(ent);
+            string er = "El tipo " + resultadoIz.TipoResultado + " no se puede OPERAR con " + resultadoDe.TipoResultado;
+
+            if (resultadoIz.TipoResultado == TipoDatos.Integer && resultadoDe.TipoResultado == TipoDatos.Integer ||
+               resultadoIz.TipoResultado == TipoDatos.Real    && resultadoDe.TipoResultado == TipoDatos.Integer ||
+               resultadoIz.TipoResultado == TipoDatos.Integer && resultadoDe.TipoResultado == TipoDatos.Real    ||
+               resultadoIz.TipoResultado == TipoDatos.Real    && resultadoDe.TipoResultado == TipoDatos.Real      )
+            {
+                //OBTENEMOS LAS ETIQUETAS DE SALIDA Y CONTINUACION
+                string etiquetaV;
+                etiquetaV  = (etiquetaVerdadera == null || etiquetaVerdadera.Equals("")) ? Generador.pedirEtiqueta() : etiquetaVerdadera;
+
+                string etiquetaF;
+                etiquetaF  = (etiquetaFalsa== null || etiquetaFalsa.Equals("")) ? Generador.pedirEtiqueta() :etiquetaFalsa;
+
+
+                resultado.Codigo =  resultadoIz.Codigo + resultadoDe.Codigo +" ";
+                resultado.Codigo += "if " + resultadoIz.Temporal + relacion + resultadoDe.Temporal + " goto "+ etiquetaV + "; \n";
+                resultado.Codigo += "goto " + etiquetaF + ";\n";
+
+                resultado.EtiquetaV = etiquetaV;
+                resultado.EtiquetaF = etiquetaF;
+
+                resultado.TipoResultado = TipoDatos.Boolean;
+            }
+
+            else
+            {
+                Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);
+            }
+
+
+            return resultado;
+        }
+        public result3D LOGIC_AND(Expresion opIzq, Expresion opDer, Entorno ent)
+        {
+            /*
+             * if ( x < 100 || x > 200 && x != y ) x = 0;
+             * 
+             *          if x < 100  goto L2
+             *          goto L3
+             *  L3:     if x > 200  goto L4
+             *          goto L1
+             *  L4:     if x!= y    goto L2
+             *          goto L1
+             *  L2:     x=0
+             *  L1:     
+             *   
+             */
+
+            // OPERADOR IZQUIERDO, EN LA ETIQUETA VERDADERA SI SE GENERA UNA NUEVA ETIQUETA
+            // EN LA FALSA NO
+
+            opIzq.etiquetaFalsa = etiquetaFalsa;
+            opIzq.etiquetaVerdadera = Generador.pedirEtiqueta();
+            result3D resultIzq = opIzq.obtener3D(ent);
+
+            // OPERADOR FALSO, LA ETIQUETA FALSA Y VERDADERA DE ESTE OPERANDO SON LOS MISMOS DEL PADRES
+            // POR ESO QUE SOLO SE COPIAN DE LA OPERACIÓN ACTUAL
+            opDer.etiquetaFalsa = etiquetaFalsa;
+            opDer.etiquetaVerdadera = etiquetaVerdadera;
+            result3D resultDer = opDer.obtener3D(ent);
+
+            result3D resultado = new result3D();
+            string er = "Eror tipo " + resultIzq.TipoResultado + " and " + resultDer.TipoResultado;
+
+            if (resultIzq.TipoResultado != TipoDatos.Boolean || resultDer.TipoResultado != TipoDatos.Boolean)
+            {
+                Program.getIntefaz().agregarError(er, opIzq.linea, opIzq.columna);
+                return resultado;
+            }
+
+            /*  VERIFICAMOS EL TIPO DE EXPRESION, DEL OPERANDO IZQUIERDO. ESTO PARA SABER SI EL CODIGO QUE TRAE
+             *  ESTO PARA SABER SI ESA EXPRESION ES SOL UN TRUE O FALSE     -> O ES UNA OPERACION LOGICA O ARITMETICA QUE 
+             *  LO GENERO. 
+             *  CUANDO ES UN TRU O FALSE EL VALOR LO GUARDAMOS EN EL TEMPORAL DE ESA EXPRESION (result3D.temporal)
+             */
+
+            if (resultIzq.Codigo == "")
+            {
+                string etiquetaV = Generador.pedirEtiqueta();
+                string etiquetaF;
+                if (etiquetaFalsa.Equals("")) etiquetaF = Generador.pedirEtiqueta();
+                else etiquetaF = etiquetaFalsa;
+
+
+                resultado.Codigo = "if " + resultIzq.Temporal + " == 1  goto " + etiquetaV+ "; \n";
+                resultado.Codigo += "goto " + etiquetaF + "; \n";
+
+                resultIzq.EtiquetaV = etiquetaV;
+                resultIzq.EtiquetaF = etiquetaF;
+            }
+            else
+            {
+                // SI ES UNA RELACION QUE GENERO EL BOOLEANO, SOLO SE PEGA EL CODIGO
+                resultado.Codigo = resultIzq.Codigo + "\n";
+            }
+
+            //PEGAMOS LA ETIQUETA VERDADERA PARA EVALUAR EL SIGUIENTE OPERANDO DEL AND
+            resultado.Codigo += resultIzq.EtiquetaV+ ": ";
+
+            if(resultDer.Codigo == "")
+            {
+                string etiquetaV = Generador.pedirEtiqueta();
+
+                resultado.Codigo += "if " + resultDer.Temporal + " == 1 goto " + etiquetaV +"; \n";
+                resultado.Codigo += "goto " + resultIzq.EtiquetaF + "; \n";
+
+                resultDer.EtiquetaV = etiquetaV;
+                resultDer.EtiquetaF = resultIzq.EtiquetaF;
+            }
+            else
+            {
+                resultado.Codigo += resultDer.Codigo +"\n";
+            }
+
+            resultado.EtiquetaV =  resultDer.EtiquetaV;
+            resultado.EtiquetaF =  resultDer.EtiquetaF;
+            resultado.TipoResultado = TipoDatos.Boolean;
+
+            return resultado;
+        }
+        public result3D LOGIC_OR(Expresion opIzq, Expresion opDer, Entorno ent)
+        {
+            /*
+             * if ( x < 100 || x > 200 && x != y ) x = 0;
+             * 
+             *          if x < 100  goto L2
+             *          goto L3
+             *  L3:     if x > 200  goto L4
+             *          goto L1
+             *  L4:     if x!= y    goto L2
+             *          goto L1
+             *  L2:     x=0
+             *  L1:     
+             *   
+             */
+
+
+            // OPERADOR IZQUIERDO, EN LA ETIQUETA FALSA SI SE GENERA UNA NUEVA ETIQUETA
+            // EN LA VERDADERA NO
+            opIzq.etiquetaVerdadera = etiquetaVerdadera;
+            opIzq.etiquetaFalsa = Generador.pedirEtiqueta();
+            result3D resultIzq = opIzq.obtener3D(ent);
+
+
+            // OPERADOR FALSO, LA ETIQUETA FALSA Y VERDADERA DE ESTE OPERANDO SON LOS MISMOS DEL PADRES
+            // POR ESO QUE SOLO SE COPIAN DE LA OPERACIÓN ACTUAL
+            opDer.etiquetaVerdadera = etiquetaVerdadera;
+            opDer.etiquetaFalsa = etiquetaFalsa;
+            result3D resultDer = opDer.obtener3D(ent);
+
+            result3D resultado = new result3D();
+            string er = "Eror tipo " + resultIzq.TipoResultado + " or " + resultDer.TipoResultado;
+
+            if (resultIzq.TipoResultado != TipoDatos.Boolean || resultDer.TipoResultado != TipoDatos.Boolean)
+            {
+                Program.getIntefaz().agregarError(er, opIzq.linea, opIzq.columna);
+                return resultado;
+            }
+
+            /*  VERIFICAMOS EL TIPO DE EXPRESION, DEL OPERANDO IZQUIERDO. ESTO PARA SABER SI EL CODIGO QUE TRAE
+             *  ESTO PARA SABER SI ESA EXPRESION ES SOL UN TRUE O FALSE     -> O ES UNA OPERACION LOGICA O ARITMETICA QUE 
+             *  LO GENERO. 
+             *  CUANDO ES UN TRU O FALSE EL VALOR LO GUARDAMOS EN EL TEMPORAL DE ESA EXPRESION (result3D.temporal)
+             */
+
+            if (resultIzq.Codigo == "")
+            {
+                string etiquetaV = opIzq.etiquetaVerdadera;
+                string etiquetaF = opIzq.etiquetaFalsa;
+
+                resultado.Codigo = "if " + resultIzq.Temporal + " == 1  goto " + etiquetaV + "; \n";
+                resultado.Codigo += "goto " + etiquetaF + "; \n";
+
+                resultIzq.EtiquetaV = etiquetaV;
+                resultIzq.EtiquetaF = etiquetaF;
+            }
+            else
+            {
+                // SI ES UNA RELACION QUE GENERO EL BOOLEANO, SOLO SE PEGA EL CODIGO
+                resultado.Codigo = resultIzq.Codigo + "\n";
+            }
+
+            //PEGAMOS LA ETIQUETA VERDADERA PARA EVALUAR EL SIGUIENTE OPERANDO DEL AND
+            resultado.Codigo += resultIzq.EtiquetaF + ": ";
+
+            if (resultDer.Codigo == "")
+            {
+                string etiquetaV = opDer.etiquetaVerdadera;
+                string etiquetaF = opDer.etiquetaFalsa;
+
+                resultado.Codigo += "if " + resultDer.Temporal + " == 1 goto " + etiquetaV + "; \n";
+                resultado.Codigo += "goto " + resultIzq.EtiquetaF + "; \n";
+
+                resultDer.EtiquetaV = etiquetaV;
+                resultDer.EtiquetaF = etiquetaF;
+            }
+            else
+            {
+                resultado.Codigo += resultDer.Codigo + "\n";
+            }
+
+            resultado.EtiquetaV = resultDer.EtiquetaV;
+            resultado.EtiquetaF = resultDer.EtiquetaF;
+            resultado.TipoResultado = TipoDatos.Boolean;
+
+            return resultado;
+        }
+        public result3D LOGIC_NOT(Expresion opUnico, Entorno ent)
+        {
+
+
+            // OPERADOR FALSO, LA ETIQUETA FALSA Y VERDADERA DE ESTE OPERANDO SON LOS MISMOS DEL PADRES
+            // POR ESO QUE SOLO SE COPIAN DE LA OPERACIÓN ACTUAL
+            opUnico.etiquetaVerdadera = etiquetaFalsa; 
+            opUnico.etiquetaFalsa = etiquetaVerdadera;
+            result3D resultUnico = opUnico.obtener3D(ent);
+
+            result3D resultado = new result3D();
+            string er = "Eror tipo  not " + resultUnico.TipoResultado;
+
+            if (resultUnico.TipoResultado != TipoDatos.Boolean )
+            {
+                Program.getIntefaz().agregarError(er, opUnico.linea, opUnico.columna);
+                return resultado;
+            }
+
+
+
+            if (resultUnico.Codigo == "")
+            {
+                string etiquetaV = opUnico.etiquetaVerdadera;
+                string etiquetaF = opUnico.etiquetaFalsa;
+
+                resultado.Codigo = "if " + resultUnico.Temporal + " == 1  goto " + etiquetaV + "; \n";
+                resultado.Codigo += "goto " + etiquetaF + "; \n";
+
+                resultUnico.EtiquetaV = etiquetaV;
+                resultUnico.EtiquetaF = etiquetaF;
+            }
+            else
+            {
+                // SI ES UNA RELACION QUE GENERO EL BOOLEANO, SOLO SE PEGA EL CODIGO
+                resultado.Codigo = resultUnico.Codigo + "\n";
+            }
+
+
+            resultado.EtiquetaV = resultUnico.EtiquetaF;
+            resultado.EtiquetaF = resultUnico.EtiquetaV;
+            resultado.TipoResultado = TipoDatos.Boolean;
+
+            return resultado;
+        }
+
+        public string stringOp()
+        {
+
+            switch (this.operador)
+            {
+                case Operador.MAS:
+                    return "+";
+                case Operador.MENOS:
+                    return "-";
+                case Operador.MULTIPLICACION:
+                    return "*";
+                case Operador.DIVISION:
+                    return "/";
+                case Operador.MODULO:
+                    return "mod";
+                case Operador.MENOR:
+                    return "<";
+                case Operador.MENOR_QUE:
+                    return "<=";
+                case Operador.MAYOR:
+                    return ">";
+                case Operador.MAYOR_QUE:
+                    return ">=";
+                case Operador.IGUAL :
+                    return "=";
+                case Operador.AND:
+                    return "and";
+                case Operador.OR:
+                    return "or";
+                case Operador.NOT:
+                    return "not";
+                case Operador.DIFERENTE:
+                    return "<>";
+
+                default:
+                    return "";
+            }
+
+        }
+
+
     }
 }

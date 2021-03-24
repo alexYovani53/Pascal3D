@@ -1,5 +1,7 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -163,9 +165,14 @@ namespace CompiPascal.AST_.definicion
             return variables;
         }
 
-        string NodoAST.getC3()
+        public string getC3()
         {
-            throw new NotImplementedException();
+            //result3D final = valorInicializacion.obtener3D(null);
+
+            //Program.getIntefaz().agregarTexto(final.Codigo);
+            return "";
         }
+
+
     }
 }

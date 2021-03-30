@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static CompiPascal.entorno_.Simbolo;
+using CompiPascal.Traductor;
 
 namespace CompiPascal.AST_.valoreImplicito
 {
@@ -19,6 +20,7 @@ namespace CompiPascal.AST_.valoreImplicito
     public class Operacion : Expresion
     {
 
+        public int tamanoPadre { get; set; }
         /**
          * @propiedad    Operador
          * @comentario   Este enumerador servira para contener el tipo de la operacion. 
@@ -798,8 +800,8 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
                 resultado.Codigo =  resultadoIz.Codigo + resultadoDe.Codigo +" ";
-                resultado.Codigo += "if " + resultadoIz.Temporal + relacion + resultadoDe.Temporal + " goto "+ etiquetaV + "; \n";
-                resultado.Codigo += "goto " + etiquetaF + ";\n";
+                resultado.Codigo += "if (" + resultadoIz.Temporal + relacion + resultadoDe.Temporal + ") goto "+ etiquetaV + "; \n";
+                resultado.Codigo += Generador.tabularLinea("goto " + etiquetaF + ";\n",2);
 
                 resultado.EtiquetaV = etiquetaV;
                 resultado.EtiquetaF = etiquetaF;
@@ -867,7 +869,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 else etiquetaF = etiquetaFalsa;
 
 
-                resultado.Codigo = "if " + resultIzq.Temporal + " == 1  goto " + etiquetaV+ "; \n";
+                resultado.Codigo = "if (" + resultIzq.Temporal + " == 1)  goto " + etiquetaV+ "; \n";
                 resultado.Codigo += "goto " + etiquetaF + "; \n";
 
                 resultIzq.EtiquetaV = etiquetaV;
@@ -886,7 +888,7 @@ namespace CompiPascal.AST_.valoreImplicito
             {
                 string etiquetaV = Generador.pedirEtiqueta();
 
-                resultado.Codigo += "if " + resultDer.Temporal + " == 1 goto " + etiquetaV +"; \n";
+                resultado.Codigo += "if (" + resultDer.Temporal + " == 1) goto " + etiquetaV +"; \n";
                 resultado.Codigo += "goto " + resultIzq.EtiquetaF + "; \n";
 
                 resultDer.EtiquetaV = etiquetaV;
@@ -953,7 +955,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 string etiquetaV = opIzq.etiquetaVerdadera;
                 string etiquetaF = opIzq.etiquetaFalsa;
 
-                resultado.Codigo = "if " + resultIzq.Temporal + " == 1  goto " + etiquetaV + "; \n";
+                resultado.Codigo = "if (" + resultIzq.Temporal + " == 1 ) goto " + etiquetaV + "; \n";
                 resultado.Codigo += "goto " + etiquetaF + "; \n";
 
                 resultIzq.EtiquetaV = etiquetaV;
@@ -973,7 +975,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 string etiquetaV = opDer.etiquetaVerdadera;
                 string etiquetaF = opDer.etiquetaFalsa;
 
-                resultado.Codigo += "if " + resultDer.Temporal + " == 1 goto " + etiquetaV + "; \n";
+                resultado.Codigo += "if (" + resultDer.Temporal + " == 1) goto " + etiquetaV + "; \n";
                 resultado.Codigo += "goto " + resultIzq.EtiquetaF + "; \n";
 
                 resultDer.EtiquetaV = etiquetaV;
@@ -1016,7 +1018,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 string etiquetaV = opUnico.etiquetaVerdadera;
                 string etiquetaF = opUnico.etiquetaFalsa;
 
-                resultado.Codigo = "if " + resultUnico.Temporal + " == 1  goto " + etiquetaV + "; \n";
+                resultado.Codigo = "if (" + resultUnico.Temporal + " == 1 ) goto " + etiquetaV + "; \n";
                 resultado.Codigo += "goto " + etiquetaF + "; \n";
 
                 resultUnico.EtiquetaV = etiquetaV;
@@ -1068,7 +1070,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 case Operador.NOT:
                     return "not";
                 case Operador.DIFERENTE:
-                    return "<>";
+                    return "!=";
 
                 default:
                     return "";

@@ -12,6 +12,9 @@ namespace CompiPascal.entorno_.simbolos
     public class Funcion : Simbolo, Instruccion
     {
 
+
+        public int tamanoPadre { get; set; }
+
         /*@propiedad    int     linea
          *@comentario           guardara la linea de inicio de la funcion o procedimiento*/
         public int linea { get; set; }
@@ -122,7 +125,7 @@ namespace CompiPascal.entorno_.simbolos
             }
 
         }
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

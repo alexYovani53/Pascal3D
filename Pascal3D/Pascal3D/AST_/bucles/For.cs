@@ -21,6 +21,7 @@ namespace CompiPascal.AST_.bucles
         public int linea { get; set; }
         public int columna { get; set; }
 
+        public int tamanoPadre { get; set; }
 
         /* @propiedad       valorInicial
          * @comentario      Esta variable almacena una instruccion de asignacion que se ejecuta al ejecutar esta clase
@@ -52,7 +53,7 @@ namespace CompiPascal.AST_.bucles
 
         }
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

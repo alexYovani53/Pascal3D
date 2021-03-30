@@ -15,6 +15,7 @@ namespace CompiPascal.AST_.control
     class If:Condicional, Instruccion
     {
 
+        public int tamanoPadre { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
 
@@ -62,56 +63,55 @@ namespace CompiPascal.AST_.control
             this.columna = columna;
         }
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
+
 
             string etiquetaSalida = Generador.pedirEtiqueta();
 
 
             ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
             ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
-            result3D result = exprCondicional.obtener3D(null);
+            result3D result = exprCondicional.obtener3D(ent);
 
             result.Codigo += result.EtiquetaV+" :\n";
-            result.Codigo += " /*codigo intruscción if superior */ \n";
+            result.Codigo += " /*codigo instrucción if superior Verdadera */ \n";
 
-            result.Codigo += etiquetaSalida + ": \n\n\n";
+            result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";
 
 
-            result.Codigo += result.EtiquetaF+ " :     ";
+            result.Codigo += result.EtiquetaF+ " :    /*Etiqueta falsa*/ \n";
 
             foreach (Instruccion item in instruccionesElse_if)
             {
                 If pivote = (If)item;
                 pivote.exprCondicional.etiquetaFalsa = Generador.pedirEtiqueta();
                 pivote.exprCondicional.etiquetaVerdadera = Generador.pedirEtiqueta();
-                result3D ifElse_result = pivote.exprCondicional.obtener3D(null);
+                result3D ifElse_result = pivote.exprCondicional.obtener3D(ent);
 
                 result.Codigo += ifElse_result.Codigo;
                 result.Codigo += ifElse_result.EtiquetaV + " :\n";
-                result.Codigo += " /*codigo intruscción if_else */ \n ";
+                result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";
 
                 //INSTRUCCIONE DEL ELSE
 
                 result.Codigo += etiquetaSalida + ": \n\n\n";
 
-                result.Codigo += ifElse_result.EtiquetaF + " :     ";
+                result.Codigo += ifElse_result.EtiquetaF + " : \t";
 
             }
 
             if (instruccionesElse.Count > 0)
             {
 
-                result.Codigo += "//INSTRUCCIONES DEL ELSE";
+                result.Codigo += "//INSTRUCCIONES DEL ELSE \n";
 
             }
 
 
             result.Codigo += etiquetaSalida + ": \n";
 
-            Program.getIntefaz().agregarTexto(result.Codigo);
-
-            return "";
+            return result.Codigo;
         }
     }
 }

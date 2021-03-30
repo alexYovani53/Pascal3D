@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Text;
 using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D.Traductor;
 
 namespace CompiPascal.AST_.funcionesPrimitivas
 {
     public class Write : Instruccion
     {
 
+        public int tamanoPadre { get; set; }
         /*
          * @param           linea
          * @comentario      contendra la linea donde aparecio la instruccion
@@ -50,9 +52,61 @@ namespace CompiPascal.AST_.funcionesPrimitivas
         }
 
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
-            throw new NotImplementedException();
+
+            string codigoWrite = "";
+
+            if (saltoLinea)
+            {
+                codigoWrite += "printf(\"%c\", (char)10); /*imprime salto de linea*/ \n";
+            }
+
+            foreach (Expresion item in expr_imprimir)
+            {
+                result3D resultExpr = item.obtener3D(ent);
+
+                if(resultExpr.TipoResultado == Simbolo.TipoDatos.Integer)
+                {
+                    codigoWrite += $"printf(\"%d\", (int){resultExpr.Temporal}); \n";
+                }
+                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Real)
+                {
+                    codigoWrite += $"printf(\"%f\",(float){resultExpr.Temporal});\n";
+                }
+                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Char)
+                {
+                    codigoWrite += $"printf(\"%c\",(char){resultExpr.Temporal});\n";
+                }
+                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.String)
+                {
+                    string indice = Generador.pedirTemporal();
+                    string caracter = Generador.pedirTemporal();
+
+                    string etq1 = Generador.pedirEtiqueta();
+                    string finCad = Generador.pedirEtiqueta();
+
+                    codigoWrite += resultExpr.Codigo;
+                    codigoWrite += $"{indice} = {resultExpr.Temporal}; /*Guardamos el inicio de la cadena */ \n";
+
+                    //CAPTURAMOS EL PRIMER CARACTER 
+                    codigoWrite += $"{etq1}: /*Inicio de ciclo para impresión*/ \n";
+                    codigoWrite += $"{caracter} = Heap[{indice}]; /*Captura del caracter*/ \n";
+
+                    //ESTE IF SIMULA UN CICLO PARA EL RECORRDIO DE LA EXPRESION
+                    codigoWrite += $"if ({caracter}== 0) goto {finCad}; \n";
+
+                    //IMPRESION DE LOS ASCII
+                    codigoWrite += $"printf(\"%c\", (char){caracter}); \n";
+                    codigoWrite += $"{indice} = {indice} + 1 \n";
+                    codigoWrite += $"goto {etq1}; \n";
+
+                    codigoWrite += $"{finCad}: /*Fin de cadena*/ \n";
+                }
+
+            }
+
+            return codigoWrite;
         }
     }
 }

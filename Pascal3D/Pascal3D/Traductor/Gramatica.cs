@@ -7,7 +7,7 @@ using Irony.Parsing;
 
 
 
-namespace CompiPascal.compilador
+namespace CompiPascal.Traductor
 {
 
 

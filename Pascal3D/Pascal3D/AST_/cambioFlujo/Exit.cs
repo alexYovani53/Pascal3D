@@ -11,6 +11,7 @@ namespace CompiPascal.AST_.cambioFlujo
     public class Exit : Expresion,Instruccion
     {
 
+        public int tamanoPadre { get; set; }
         /*
          * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
          *                                                  evalua una expresión condicional
@@ -55,7 +56,7 @@ namespace CompiPascal.AST_.cambioFlujo
 
 
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

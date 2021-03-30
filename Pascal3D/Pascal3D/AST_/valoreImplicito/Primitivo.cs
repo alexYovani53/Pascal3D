@@ -18,6 +18,9 @@ namespace CompiPascal.AST_.valoreImplicito
     public class Primitivo : Expresion
     {
 
+
+
+        public int tamanoPadre { get; set; }
         /*
          * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
          *                                                  evalua una expresión condicional
@@ -112,6 +115,43 @@ namespace CompiPascal.AST_.valoreImplicito
                 nuevo.Codigo = "";
                 nuevo.Temporal = val.ToString();
                 nuevo.TipoResultado = TipoDatos.Boolean;
+            }
+            else if(valor is char)
+            {
+                int val = (char)valor;
+                nuevo.Codigo = "";
+                nuevo.Temporal = val.ToString();
+                nuevo.TipoResultado = TipoDatos.Char;
+            }
+            else if(valor is string)
+            {
+
+                result3D cadena = new result3D();
+
+                //CAPTURANDO LA CADENA
+
+                string temporal = Generador.pedirTemporal();
+
+                //GUARDAMOS EL VALOR DEL PUNTERO (HP) en el temporal de la cadena resultado. 
+                cadena.Temporal = temporal;
+                cadena.Codigo = $"{temporal} = SP; /* inicio de la cadena*/ \n";
+
+                //RECORREMOS TODAS LAS POSICIONES DEL STRING PARA CAPTURAR SU VALOR ASCII 
+                string valString = (string)valor;
+                for (int i = 0; i < valString.Length; i++)
+                {
+                    cadena.Codigo += $"Heap[SP] = {(int)valString[i]}; \n\n";
+                    cadena.Codigo += "SP = SP + 1 ; \n";
+                }
+
+                //AHORA TERMINAMOS LA CADENA CON EL CARACTER \0 PARA INDICAR UN FIN DE CADENA 
+                cadena.Codigo += "Heap[SP] = 0 ; /*Fin de cadena*/ \n";
+                cadena.Codigo += "SP = SP + 1; \n";
+
+                //ASIGNAMOS EL TIPO DE RESULTADO
+                cadena.TipoResultado = TipoDatos.String;
+
+                nuevo = cadena;
             }
 
             return nuevo;

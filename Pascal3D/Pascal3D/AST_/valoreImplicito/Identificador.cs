@@ -41,6 +41,7 @@ namespace CompiPascal.AST_.valoreImplicito
         private string ide;
         public int linea { get; set; }
         public int columna { get; set; }
+        public int tamanoPadre { get ; set; }
 
         public Identificador(String letra, int linea, int columna)
         {
@@ -50,7 +51,7 @@ namespace CompiPascal.AST_.valoreImplicito
         }
 
 
-        public TipoDatos getTipo(Entorno entorno, AST ast)
+        public TipoDatos getTipo(Entorno entorno)
         {
 
             Simbolo encontrar = entorno.obtenerSimbolo(this.ide);
@@ -74,21 +75,33 @@ namespace CompiPascal.AST_.valoreImplicito
             Simbolo encontrado = ent.obtenerSimbolo(this.ide);
 
             //SI EL SIMBOLO ES NULL ES PORQUE NO SE ENCONTRO 
-            if(encontrado == null)
+            if (encontrado == null)
             {
                 Program.getIntefaz().agregarError("No se encontro el identificador " + this.ide, linea, columna);
-                return null;
+                result3D error = new result3D()
+                {
+                    Temporal = "",
+                    Codigo = "",
+                    TipoResultado = TipoDatos.NULL
+                };
+                return error ;
             }
 
             //RETORNAMOS UNA CADENA 3D PARA EL IDENTIFICADOR 
-            result3D nuevo = new result3D
-            {
-                Temporal = this.ide,
-                Codigo = "",
-                TipoResultado = encontrado.Tipo
-            };
+            result3D nuevo = new result3D();
+            string temp1 = Generador.pedirTemporal();
+            string temp2 = Generador.pedirTemporal();
+
+            string codigo = "";
+            codigo += $"{temp1} = SP  + {encontrado.direccion} ;\n";
+            codigo += $"{temp2} = Stack[{temp1}] ;\n";
+
+            nuevo.Codigo = codigo;
+            nuevo.Temporal = temp2;
+            nuevo.TipoResultado = encontrado.Tipo;
 
             return nuevo;
         }
+    
     }
 }

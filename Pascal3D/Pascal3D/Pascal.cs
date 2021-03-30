@@ -2,11 +2,12 @@
 using CompiPascal.AST_.bucles;
 using CompiPascal.AST_.control;
 using CompiPascal.AST_.definicion;
+using CompiPascal.AST_.funcionesPrimitivas;
 using CompiPascal.AST_.interfaces;
-using CompiPascal.compilador;
 using CompiPascal.entorno_;
 using CompiPascal.entorno_.simbolos;
 using CompiPascal.GUI.Archivo;
+using CompiPascal.Traductor;
 using Irony.Parsing;
 using Pascal3D.Traductor;
 using ScintillaNET;
@@ -217,7 +218,9 @@ namespace Pascal3D
                     AST ARBOL =  armado.generarAST(arbolIrony);
 
                     Entorno GLOBAL = new Entorno(null, "GLOBAL");
-
+                    int tamanoPadre = 0;
+                    string codigoDeclaraciones = "";
+                    string codigoMain = "";
                     if(ARBOL != null)
                     {
                         foreach (Instruccion item in ARBOL.obtenerInstrucciones())
@@ -225,31 +228,59 @@ namespace Pascal3D
 
                             if(item is Declaracion)
                             {
-                                item.getC3();
+                                item.tamanoPadre = tamanoPadre;
+                                string codTemp = item.getC3(GLOBAL);
+                                tamanoPadre = item.tamanoPadre;
+
+                                codTemp = Generador.tabular(codTemp);
+                                codigoDeclaraciones += codTemp;
+
                             }
 
                             else if(item is BeginEndPrincipal)
                             {
+
+                                codigoMain = "void main() {\n\n";
+
                                 foreach (Instruccion interna in ((BeginEndPrincipal)item).instrucciones)
                                 {
-                                    if(interna is If)
+                                    if (interna is If)
                                     {
-                                        ((If)interna).getC3();
+                                        string codTemp = ((If)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
                                     }
 
                                     else if (interna is While)
                                     {
-                                        ((While)interna).getC3();
+                                        string codTemp = ((While)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
                                     }
                                     else if (interna is Repeat)
                                     {
-                                        ((Repeat)interna).getC3();
+                                        string codTemp = ((Repeat)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
+
+                                    }
+                                    else if (interna is Write)
+                                    {
+                                        string codTemp = ((Write)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
+
                                     }
                                 }
+
+                                codigoMain += "\treturn 0; \n";
+                                codigoMain += "}\n";
 
                             }
 
                         }
+
+                        SalidaTexto.Text = Generador.cabezera() + codigoDeclaraciones + codigoMain;
 
                     }
 

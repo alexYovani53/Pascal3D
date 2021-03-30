@@ -128,6 +128,7 @@ namespace Pascal3D
             this.ClientSize = new System.Drawing.Size(1197, 627);
             this.Controls.Add(this.splitContainer2);
             this.Name = "Pascal";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Pascal  - 3D";
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);

@@ -11,7 +11,7 @@ namespace CompiPascal.AST_.control
     {
 
 
-
+        public int tamanoPadre { get; set; }
         public Expresion expresionCase { get; set; }
 
         LinkedList<Instruccion> instrucciones;
@@ -26,7 +26,7 @@ namespace CompiPascal.AST_.control
             this.columna = columna;
         }
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

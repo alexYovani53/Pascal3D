@@ -13,7 +13,7 @@ namespace CompiPascal.AST_.bucles
     public class While:Condicional,Instruccion
     {
 
-
+        public int tamanoPadre { get; set; }
         /*@class            while
          *@comentario       Instruccion while, la condicion e instrucion se guardan en la clase de la que hereda
          */
@@ -29,7 +29,7 @@ namespace CompiPascal.AST_.bucles
         }
 
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
 
 
@@ -38,7 +38,7 @@ namespace CompiPascal.AST_.bucles
             ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
             ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
 
-            result3D result = exprCondicional.obtener3D(null);
+            result3D result = exprCondicional.obtener3D(ent);
 
             string whileCadena = etiquetaInicio + ": \n";
 

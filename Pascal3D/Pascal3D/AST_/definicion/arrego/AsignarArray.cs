@@ -11,6 +11,7 @@ namespace CompiPascal.AST_.definicion.arrego
 {
     public class AsignarArray : Instruccion
     {
+        public int tamanoPadre { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
 
@@ -51,7 +52,7 @@ namespace CompiPascal.AST_.definicion.arrego
 
    
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

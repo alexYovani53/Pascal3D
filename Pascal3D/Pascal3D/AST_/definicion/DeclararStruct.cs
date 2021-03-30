@@ -11,6 +11,9 @@ namespace CompiPascal.AST_.definicion
 {
     public class DeclararStruct : Instruccion
     {
+
+
+        public int tamanoPadre { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
 
@@ -42,7 +45,7 @@ namespace CompiPascal.AST_.definicion
             return variables;
         }
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

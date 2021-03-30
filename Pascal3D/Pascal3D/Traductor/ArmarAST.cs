@@ -19,7 +19,7 @@ using System.Linq;
 using System.Collections;
 using CompiPascal.AST_.definicion.arrego;
 
-namespace CompiPascal.compilador
+namespace CompiPascal.Traductor
 {
     public class ArmarAST
     {
@@ -1213,7 +1213,7 @@ namespace CompiPascal.compilador
                     LinkedList<Simbolo> temporal = (LinkedList<Simbolo>)recorrerArbol(nodo.ChildNodes[indiceLista]);
                     foreach (Simbolo item in temporal)
                     {
-                        parametros.AddLast(new Simbolo(tipoParametros, item.Identificador,porReferencia,item.linea,item.columna));
+                        //parametros.AddLast(new Simbolo(tipoParametros, item.Identificador,porReferencia,item.linea,item.columna));
                     }
                 }
                 else
@@ -1224,7 +1224,7 @@ namespace CompiPascal.compilador
                     LinkedList<Simbolo> temporal = (LinkedList<Simbolo>)recorrerArbol(nodo.ChildNodes[indiceLista]);
                     foreach (Simbolo item in temporal)
                     {
-                        parametros.AddLast(new Simbolo(generador, item.Identificador, porReferencia, item.linea, item.columna));
+                        //parametros.AddLast(new Simbolo(generador, item.Identificador, porReferencia, item.linea, item.columna));
                     }
 
                 }

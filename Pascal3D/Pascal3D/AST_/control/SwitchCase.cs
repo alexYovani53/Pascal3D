@@ -13,6 +13,7 @@ namespace CompiPascal.AST_.control
     public class SwitchCase : Instruccion
     {
 
+        public int tamanoPadre { get; set; }
         private Expresion exprValidar { get; set; }
 
         private LinkedList<Case> casos { get; set; }
@@ -43,7 +44,7 @@ namespace CompiPascal.AST_.control
 
 
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

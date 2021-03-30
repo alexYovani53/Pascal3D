@@ -14,6 +14,7 @@ namespace CompiPascal.AST_.bucles
     public class Repeat : Condicional, Instruccion
     {
 
+        public int tamanoPadre { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
         public Repeat(Expresion condicional, LinkedList<Instruccion> instrucciones, int linea, int columna):
@@ -23,7 +24,7 @@ namespace CompiPascal.AST_.bucles
             this.columna = columna;
         }
 
-        public string getC3() 
+        public string getC3(Entorno ent) 
         {
             
             string repeatInicio = Generador.pedirEtiqueta();
@@ -38,7 +39,7 @@ namespace CompiPascal.AST_.bucles
 
             ((Expresion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
             ((Expresion)exprCondicional).etiquetaVerdadera = repeatInicio;
-            result3D resultadoPrueba = exprCondicional.obtener3D(null);
+            result3D resultadoPrueba = exprCondicional.obtener3D(ent);
 
             codigo += resultadoPrueba.Codigo;
             codigo += resultadoPrueba.EtiquetaF + ": \n";

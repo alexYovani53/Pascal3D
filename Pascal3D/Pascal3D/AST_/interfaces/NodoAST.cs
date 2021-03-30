@@ -21,6 +21,7 @@ namespace CompiPascal.AST_.interfaces
 
         public int columna { get; set; }
 
+        public int tamanoPadre { get; set; }
 
 
     }

@@ -4,6 +4,7 @@ using Pascal3D;
 using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using static CompiPascal.entorno_.Simbolo;
 
@@ -23,6 +24,7 @@ namespace CompiPascal.AST_.definicion
     {
 
 
+        public int tamanoPadre { get; set; }
         /**
          * @propiedad       valorInicializacion   
          * @comentario      este representa la expresion con valor incial para la declaracion
@@ -136,7 +138,7 @@ namespace CompiPascal.AST_.definicion
             }
             else if (tipo == TipoDatos.Char)
             {
-                return '\0';
+                return 0;
             }
             else if (tipo == TipoDatos.Integer)
             {
@@ -148,7 +150,7 @@ namespace CompiPascal.AST_.definicion
             }
             else if (tipo == TipoDatos.Boolean)
             {
-                return false;
+                return 0;
             }
             else if (tipo == TipoDatos.Void)
             {
@@ -165,12 +167,88 @@ namespace CompiPascal.AST_.definicion
             return variables;
         }
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
-            //result3D final = valorInicializacion.obtener3D(null);
 
-            //Program.getIntefaz().agregarTexto(final.Codigo);
-            return "";
+            if(esInicializado() && variables.Count > 1)
+            {
+                Program.getIntefaz().agregarError("Pascal solo permite la delcaracion inicializada de una variable a la vez", linea, columna);
+                return "";
+            }
+
+            string codigoSalida = "";
+            if (!esInicializado())
+            {
+                object def = valorDefecto(tipo_variables);
+
+                int posicionRelativa = tamanoPadre;
+                foreach (Simbolo item in variables)
+                {
+                    string temp = Generador.pedirTemporal();
+                    
+                    codigoSalida += temp + " = SP +" + tamanoPadre + ";\n";
+                    codigoSalida += $"Stack[{temp}] = {def} ; \n";
+                    
+                    Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador,1,posicionRelativa,item.linea,item.columna);
+                    ent.agregarSimbolo(item.Identificador, simboloNuevo);
+
+
+                    posicionRelativa ++;
+                    tamanoPadre++;
+                }
+
+                return codigoSalida;
+            }
+
+            else {
+
+                result3D valAsignacion = valorInicializacion.obtener3D(ent);
+
+                if (tipo_variables == TipoDatos.Integer)
+                { 
+                    if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
+                    {
+                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        return "";
+                    }
+                }
+                else if (tipo_variables == TipoDatos.Real)
+                {
+                    if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
+                    {
+                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        return "";
+                    }
+                }
+                else
+                {
+                    if(tipo_variables != valAsignacion.TipoResultado)
+                    {
+                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        return "";
+                    }
+
+                }
+
+
+                codigoSalida += valAsignacion.Codigo;
+
+                int posicionRelativa = tamanoPadre;
+                string temp = Generador.pedirTemporal();
+                
+                codigoSalida += $"{temp} = SP + {tamanoPadre}; \n";
+                codigoSalida += $"Stack[{temp}] = {temp} ;";
+                
+                Simbolo variableUniInicializada = variables.ElementAt(0);
+                Simbolo simboloNuevo = new Simbolo(tipo_variables, variableUniInicializada.Identificador, 1, posicionRelativa, variableUniInicializada.linea, variableUniInicializada.columna);
+
+                ent.agregarSimbolo(variableUniInicializada.Identificador, simboloNuevo);
+
+                tamanoPadre++;
+
+            }
+
+            return codigoSalida;
         }
 
 

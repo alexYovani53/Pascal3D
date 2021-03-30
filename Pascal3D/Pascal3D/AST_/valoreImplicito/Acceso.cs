@@ -12,6 +12,7 @@ namespace CompiPascal.AST_.valoreImplicito
 {
     public class Acceso : Expresion
     {
+        public int tamanoPadre { get; set; }
         /*
          * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
          *                                                  evalua una expresión condicional

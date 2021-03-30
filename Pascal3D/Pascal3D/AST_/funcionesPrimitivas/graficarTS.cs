@@ -11,6 +11,9 @@ namespace CompiPascal.AST_.funcionesPrimitivas
 {
     public class graficarTS : Instruccion
     {
+
+
+        public int tamanoPadre { get; set; }
         public int linea { get; set ; }
         public int columna { get; set; }
 
@@ -23,7 +26,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
         }
 
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
             throw new NotImplementedException();
         }

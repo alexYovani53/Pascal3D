@@ -16,6 +16,7 @@ namespace CompiPascal.AST_.definicion
     {
 
 
+        public int tamanoPadre { get; set; }
         /**
          * @propiedad       bool        esObjeto
          * @comentario      esta bandera dira si la asignación es hacia una variable o a la propiedad 
@@ -35,7 +36,7 @@ namespace CompiPascal.AST_.definicion
          * @propiedad       string      propiedad
          * @comentario      Este almacenara el nombre de una propiedad a la cual se desea acceder
          */
-        private LinkedList<string> oropiedades;
+        private LinkedList<string> propiedades;
 
         /**
          * @propiedad       variable
@@ -68,7 +69,7 @@ namespace CompiPascal.AST_.definicion
         public Asignacion(string idObjeto, LinkedList<string> idPropiedad , Expresion valor, int linea, int columna)
         {
             this.idObjeto = idObjeto;
-            this.oropiedades = idPropiedad;
+            this.propiedades = idPropiedad;
             this.valor = valor;
             this.esobjeto = true;
             this.linea = linea;
@@ -94,11 +95,14 @@ namespace CompiPascal.AST_.definicion
 
 
 
-        public string getC3()
+        public string getC3(Entorno ent)
         {
 
-            result3D final =   valor.obtener3D(null);
-            Program.getIntefaz().agregarTexto(final.Codigo);
+            result3D final =   valor.obtener3D(ent);
+
+
+
+
             return "";
         }
     }

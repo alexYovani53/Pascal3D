@@ -146,7 +146,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 //AHORA TERMINAMOS LA CADENA CON EL CARACTER \0 PARA INDICAR UN FIN DE CADENA 
                 cadena.Codigo += "Heap[HP] = 0 ;\n";
                 cadena.Codigo += "HP = HP + 1; \n";
-                cadena.Codigo += "/************ Fin de cadena ***********/ \n";
+                cadena.Codigo += "/************ Fin de cadena ***********/ \n\n\n";
                 //ASIGNAMOS EL TIPO DE RESULTADO
                 cadena.TipoResultado = TipoDatos.String;
 

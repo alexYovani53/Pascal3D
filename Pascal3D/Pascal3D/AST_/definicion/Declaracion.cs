@@ -50,6 +50,7 @@ namespace CompiPascal.AST_.definicion
         public int linea { get; set; }
         public int columna { get; set; }
 
+
         /**
          *  @funcion        Constructor     
          *  @comentario     Declaración de variables con un valor inicial. 
@@ -170,6 +171,43 @@ namespace CompiPascal.AST_.definicion
         public string getC3(Entorno ent)
         {
 
+            //DECLARACION DE CONSTANTES
+
+            if (ideUnico != null)
+            {
+
+                result3D valAsignacion = valorInicializacion.obtener3D(ent);
+                TipoDatos tipo = valAsignacion.TipoResultado;
+
+                string nombre = ideUnico.Identificador;
+
+                if (ent.existeSimbolo(nombre))
+                {
+                    Program.getIntefaz().agregarError("El simobolo a declarar ya existe en el entorno actual", linea, columna);
+                    return "";
+                }
+
+                string declaracionConstante = "";
+                int posicionRelativa = tamanoPadre;             //CUANDO SE DECLARA, LA POSICION RELATIVA ES JUSTAMENTE EL TAMAÑO DEL ENTORNO ACTUAL
+
+                declaracionConstante += valAsignacion.Codigo;
+
+                string temporalConst = Generador.pedirTemporal();
+
+                declaracionConstante += $"/*Declaracion de la constante {ideUnico.Identificador}*/\n";
+                declaracionConstante += $"{temporalConst}= SP + {tamanoPadre}; \n";
+                declaracionConstante += $"Stack[(int){temporalConst}] = {valAsignacion.Temporal}; \n";
+
+                Simbolo constanteNueva = new Simbolo(tipo, ideUnico.Identificador, true, 1, posicionRelativa, ideUnico.linea, ideUnico.columna);
+                ent.agregarSimbolo(ideUnico.Identificador, constanteNueva);
+
+                tamanoPadre++;
+
+                return declaracionConstante;
+            }
+            
+
+
             if(esInicializado() && variables.Count > 1)
             {
                 Program.getIntefaz().agregarError("Pascal solo permite la delcaracion inicializada de una variable a la vez", linea, columna);
@@ -185,11 +223,12 @@ namespace CompiPascal.AST_.definicion
                 foreach (Simbolo item in variables)
                 {
                     string temp = Generador.pedirTemporal();
-                    
+
+                    codigoSalida += $"/* declaracion de variable {item.Identificador}*/\n";
                     codigoSalida += temp + " = SP +" + tamanoPadre + ";\n";
-                    codigoSalida += $"Stack[{temp}] = {def} \n";
+                    codigoSalida += $"Stack[(int){temp}] = {def} ; \n";
                     
-                    Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador,1,posicionRelativa,item.linea,item.columna);
+                    Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador, false, 1,posicionRelativa,item.linea,item.columna);
                     ent.agregarSimbolo(item.Identificador, simboloNuevo);
 
 
@@ -197,7 +236,7 @@ namespace CompiPascal.AST_.definicion
                     tamanoPadre++;
                 }
 
-                return codigoSalida;
+                return codigoSalida+"\n";
             }
 
             else {
@@ -206,7 +245,7 @@ namespace CompiPascal.AST_.definicion
 
                 if (tipo_variables == TipoDatos.Integer)
                 { 
-                    if (valAsignacion.TipoResultado != TipoDatos.Integer || valAsignacion.TipoResultado != TipoDatos.Real)
+                    if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
                     {
                         Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
                         return "";
@@ -214,7 +253,7 @@ namespace CompiPascal.AST_.definicion
                 }
                 else if (tipo_variables == TipoDatos.Real)
                 {
-                    if (valAsignacion.TipoResultado != TipoDatos.Integer || valAsignacion.TipoResultado != TipoDatos.Real)
+                    if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
                     {
                         Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
                         return "";
@@ -230,17 +269,19 @@ namespace CompiPascal.AST_.definicion
 
                 }
 
+                Simbolo variableUniInicializada = variables.ElementAt(0);
 
                 codigoSalida += valAsignacion.Codigo;
 
                 int posicionRelativa = tamanoPadre;
                 string temp = Generador.pedirTemporal();
-                
+
+                codigoSalida += $"/* declaracion de variable {variableUniInicializada.Identificador}*/\n";
                 codigoSalida += $"{temp} = SP + {tamanoPadre}; \n";
-                codigoSalida += $"Stack[{temp}] = {temp}";
+                codigoSalida += $"Stack[(int){temp}] = {valAsignacion.Temporal};\n";
                 
-                Simbolo variableUniInicializada = variables.ElementAt(0);
-                Simbolo simboloNuevo = new Simbolo(tipo_variables, variableUniInicializada.Identificador, 1, posicionRelativa, variableUniInicializada.linea, variableUniInicializada.columna);
+               
+                Simbolo simboloNuevo = new Simbolo(tipo_variables, variableUniInicializada.Identificador,false, 1, posicionRelativa, variableUniInicializada.linea, variableUniInicializada.columna);
 
                 ent.agregarSimbolo(variableUniInicializada.Identificador, simboloNuevo);
 
@@ -248,7 +289,7 @@ namespace CompiPascal.AST_.definicion
 
             }
 
-            return codigoSalida;
+            return codigoSalida+"\n";
         }
 
           

@@ -15,13 +15,7 @@ namespace CompiPascal.entorno_.simbolos
 
         public int tamanoPadre { get; set; }
 
-        /*@propiedad    int     linea
-         *@comentario           guardara la linea de inicio de la funcion o procedimiento*/
-        public int linea { get; set; }
 
-        /*@propiedad    int     columna
-         *@comentario           guardara la columna de inicio de la funcion o procedimiento*/
-        public int columna { get; set; }
 
         /*@propiedad    string      nombreStruct
         *@comentario                guardara el nombre del struct que debe retornar*/

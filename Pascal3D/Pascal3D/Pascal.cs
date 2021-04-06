@@ -240,7 +240,6 @@ namespace Pascal3D
                             else if(item is BeginEndPrincipal)
                             {
 
-                                codigoMain = "void main() {\n\n";
 
                                 foreach (Instruccion interna in ((BeginEndPrincipal)item).instrucciones)
                                 {
@@ -273,14 +272,17 @@ namespace Pascal3D
                                     }
                                 }
 
-                                codigoMain += "\treturn 0; \n";
-                                codigoMain += "}\n";
 
                             }
 
                         }
 
-                        SalidaTexto.Text = Generador.cabezera() + codigoDeclaraciones + codigoMain;
+                        SalidaTexto.Text = Generador.cabezera();
+                        SalidaTexto.Text += "void main() {\n\n";
+                        SalidaTexto.Text += codigoDeclaraciones + codigoMain;
+                        SalidaTexto.Text += "\treturn 0; \n";
+                        SalidaTexto.Text += "}\n";
+
 
                     }
 

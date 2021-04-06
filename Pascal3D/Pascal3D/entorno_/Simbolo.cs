@@ -115,16 +115,21 @@ namespace CompiPascal.entorno_
             this.linea = linea;
             this.columna = columna;
         }
-        public Simbolo(TipoDatos tipo,  string Identificador, int tamano, int direccion, int linea, int columna)
+
+        /* 
+         *  DECLARACION DE VARIABLES O CONSTANTES 
+         */
+        public Simbolo(TipoDatos tipo,  string Identificador,bool esConstante, int tamano, int direccion, int linea, int columna)
         {
             this.Identificador = Identificador;
             this.Tipo = tipo;
-            this.Constante = false;
+            this.Constante = esConstante;
             this.linea = linea;
             this.columna = columna;
             this.tamano = tamano;
             this.direccion = direccion;
         }
+
 
 
         public Simbolo(TipoDatos tipoD, string nameObjeto, int linea, int columna)

@@ -94,7 +94,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
             string codigo = "";
             codigo += $"{temp1} = SP  + {encontrado.direccion} ;\n";
-            codigo += $"{temp2} = Stack[{temp1}] ;\n";
+            codigo += $"{temp2} = Stack[(int){temp1}] ;\n";
 
             nuevo.Codigo = codigo;
             nuevo.Temporal = temp2;

@@ -93,7 +93,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
 
                     //CAPTURAMOS EL PRIMER CARACTER 
                     codigoWrite += $"{etq1}: /*Inicio de ciclo para impresión*/ \n";
-                    codigoWrite += $"{caracter} = Heap[{indice}]; /*Captura del caracter*/ \n";
+                    codigoWrite += $"{caracter} = Heap[(int){indice}]; /*Captura del caracter*/ \n";
 
                     //ESTE IF SIMULA UN CICLO PARA EL RECORRDIO DE LA EXPRESION
                     codigoWrite += $"if ({caracter}== 0) goto {finCad}; \n";
@@ -101,9 +101,9 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                     //IMPRESION DE LOS ASCII
                     codigoWrite += $"printf(\"%c\", (char){caracter}); \n";
                     codigoWrite += $"{indice} = {indice} + 1 ; \n";
-                    codigoWrite += $"goto {etq1}; \n";
+                    codigoWrite += $"   goto {etq1}; \n";
 
-                    codigoWrite += $"{finCad}: /*Fin de cadena*/ \n";
+                    codigoWrite += $"{finCad}: /*Fin de cadena*/ \n\n";
                 }
                 else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Boolean)
                 {
@@ -111,13 +111,28 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                     if(item is Primitivo)
                     {
                         string true_false = resultExpr.Temporal;
-                        string VALOR = true_false == "0" ? "TRUE" : "FALSE";            //OPERADOR TERNARIO
+                        string VALOR = true_false == "1" ? "TRUE" : "FALSE";            //OPERADOR TERNARIO
                         codigoWrite += imprimirTRUE_FALSE(VALOR);
+                    }
+                    else if (item is Identificador)
+                    {
+                        string etiqTRUE = Generador.pedirEtiqueta();
+                        string etiqFALSE = Generador.pedirEtiqueta();
+                        string etiquetaSalida = Generador.pedirEtiqueta();
+
+                        codigoWrite += $"if({resultExpr.Temporal}==1) goto {etiqTRUE};\n";
+                        codigoWrite += $"goto {etiqFALSE};\n";
+                        codigoWrite += $"{etiqTRUE}: \n";
+                        codigoWrite += imprimirTRUE_FALSE("TRUE");
+                        codigoWrite += $"goto {etiquetaSalida};\n";
+                        codigoWrite += $"{etiqFALSE}:\n";
+                        codigoWrite += imprimirTRUE_FALSE("FLASE");
+                        codigoWrite += $"{etiquetaSalida}:\n\n";
+
                     }
                     else
                     {
                         string tempFinal = Generador.pedirEtiqueta();
-                        codigoWrite += resultExpr.Codigo;
                         codigoWrite += $"{resultExpr.EtiquetaV}: \n";
                         codigoWrite += imprimirTRUE_FALSE("TRUE");
 
@@ -165,14 +180,14 @@ namespace CompiPascal.AST_.funcionesPrimitivas
             cadenaImpresion += $"{indice} = {temp1}; \n";
 
             cadenaImpresion += $"{inicioB}: \n";        //ETIQUETA DE INICO IMPRESION
-            cadenaImpresion += $"{caracter} = Heap[{indice}]; \n";  //CAPTURAMOS EL CARACTER
+            cadenaImpresion += $"{caracter} = Heap[(int){indice}]; \n";  //CAPTURAMOS EL CARACTER
 
             cadenaImpresion += $"if( {caracter} == 0 ) goto {finalB};\n";
             cadenaImpresion += $"printf(\"%c\", (char){caracter}); \n";
             cadenaImpresion += $"{indice} = {indice}+1; \n";
             cadenaImpresion += $"goto {inicioB};\n";
 
-            cadenaImpresion += $"{finalB}: /* FIN IMPRESION BOOLEANO*/\n";
+            cadenaImpresion += $"{finalB}: /* FIN IMPRESION BOOLEANO*/\n\n";
 
             cadenaImpresion = Generador.tabular(cadenaImpresion);
 

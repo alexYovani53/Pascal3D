@@ -88,12 +88,11 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D nuevo = new result3D();
-            //string temporal = Generador.pedirTemporal();
+
 
             if (valor is int)
             {
-                //nuevo.Codigo += temporal + " = " + valor.ToString() + ";";
-                //nuevo.Temporal = temporal;
+
 
                 nuevo.Codigo = "";
                 nuevo.Temporal = valor.ToString();
@@ -101,9 +100,7 @@ namespace CompiPascal.AST_.valoreImplicito
             }
             else if( valor is double)
             {
-                //nuevo.Codigo += temporal + " = " + valor.ToString() + ";";
-                //nuevo.Temporal = temporal;
-
+ 
                 nuevo.Codigo = "";
                 nuevo.Temporal = valor.ToString();
                 nuevo.TipoResultado = TipoDatos.Real;
@@ -134,20 +131,22 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 //GUARDAMOS EL VALOR DEL PUNTERO (HP) en el temporal de la cadena resultado. 
                 cadena.Temporal = temporal;
-                cadena.Codigo = $"{temporal} = SP; /* inicio de la cadena*/ \n";
+
+                cadena.Codigo  = "/************ Inicio de cadena ***********/ \n";
+                cadena.Codigo += $"{temporal} = HP;\n";
 
                 //RECORREMOS TODAS LAS POSICIONES DEL STRING PARA CAPTURAR SU VALOR ASCII 
                 string valString = (string)valor;
                 for (int i = 0; i < valString.Length; i++)
                 {
-                    cadena.Codigo += $"Heap[SP] = {(int)valString[i]}; \n\n";
-                    cadena.Codigo += "SP = SP + 1 ; \n";
+                    cadena.Codigo += $"Heap[HP] = {(int)valString[i]};\n";
+                    cadena.Codigo += "HP = HP + 1 ; \n";
                 }
 
                 //AHORA TERMINAMOS LA CADENA CON EL CARACTER \0 PARA INDICAR UN FIN DE CADENA 
-                cadena.Codigo += "Heap[SP] = 0 ; /*Fin de cadena*/ \n";
-                cadena.Codigo += "SP = SP + 1; \n";
-
+                cadena.Codigo += "Heap[HP] = 0 ;\n";
+                cadena.Codigo += "HP = HP + 1; \n";
+                cadena.Codigo += "/************ Fin de cadena ***********/ \n";
                 //ASIGNAMOS EL TIPO DE RESULTADO
                 cadena.TipoResultado = TipoDatos.String;
 
@@ -157,9 +156,5 @@ namespace CompiPascal.AST_.valoreImplicito
             return nuevo;
         }
 
-        public string getC3()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CompiPascal.AST_.interfaces;
+using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
 using Pascal3D.Traductor;
 
@@ -66,6 +67,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
             {
                 result3D resultExpr = item.obtener3D(ent);
 
+                codigoWrite += resultExpr.Codigo;
                 if(resultExpr.TipoResultado == Simbolo.TipoDatos.Integer)
                 {
                     codigoWrite += $"printf(\"%d\", (int){resultExpr.Temporal}); \n";
@@ -86,7 +88,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                     string etq1 = Generador.pedirEtiqueta();
                     string finCad = Generador.pedirEtiqueta();
 
-                    codigoWrite += resultExpr.Codigo;
+
                     codigoWrite += $"{indice} = {resultExpr.Temporal}; /*Guardamos el inicio de la cadena */ \n";
 
                     //CAPTURAMOS EL PRIMER CARACTER 
@@ -98,15 +100,86 @@ namespace CompiPascal.AST_.funcionesPrimitivas
 
                     //IMPRESION DE LOS ASCII
                     codigoWrite += $"printf(\"%c\", (char){caracter}); \n";
-                    codigoWrite += $"{indice} = {indice} + 1 \n";
+                    codigoWrite += $"{indice} = {indice} + 1 ; \n";
                     codigoWrite += $"goto {etq1}; \n";
 
                     codigoWrite += $"{finCad}: /*Fin de cadena*/ \n";
+                }
+                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Boolean)
+                {
+
+                    if(item is Primitivo)
+                    {
+                        string true_false = resultExpr.Temporal;
+                        string VALOR = true_false == "0" ? "TRUE" : "FALSE";            //OPERADOR TERNARIO
+                        
+                        codigoWrite += imprimirTRUE_FALSE(VALOR);
+                    }
+                    else
+                    {
+                        string tempFinal = Generador.pedirEtiqueta();
+                        codigoWrite += resultExpr.Codigo;
+                        codigoWrite += $"{resultExpr.EtiquetaV}: \n";
+                        codigoWrite += imprimirTRUE_FALSE("TRUE");
+
+                        codigoWrite += $"goto {tempFinal}; \n";
+                        codigoWrite += $"{resultExpr.EtiquetaF}: \n";
+                        codigoWrite += imprimirTRUE_FALSE("FALSE");
+                        codigoWrite += $"goto {tempFinal}; \n";
+                        codigoWrite += $"{tempFinal}:\n";
+
+                    }
                 }
 
             }
 
             return codigoWrite;
         }
+
+
+        public string imprimirTRUE_FALSE(string booleano)
+        {
+
+            string cadenaImpresion = "";
+
+            string temp1 = Generador.pedirTemporal();
+
+            cadenaImpresion += "/*INICIO DE CADENA VALOR BOOLEAN*/ \n";
+            cadenaImpresion += $"{temp1} = HP; \n";          //CAPTURAMOS EL INICO DE LA CADENA 
+
+            for (int i = 0; i < booleano.Length; i++)
+            {
+                cadenaImpresion += $"Heap[HP] = {(int)booleano[i]}; \n";
+                cadenaImpresion += $"HP = HP + 1; \n";
+            }
+            cadenaImpresion += $"Heap[HP] = 0 ; \n";
+            cadenaImpresion += "HP = HP +1 ; \n";
+
+            cadenaImpresion += "/*FIN DE CADENA VALOR BOOLEANO*/ \n";
+
+            string indice = Generador.pedirTemporal();
+            string caracter = Generador.pedirTemporal();
+
+            string inicioB = Generador.pedirEtiqueta();
+            string finalB = Generador.pedirEtiqueta();
+
+            cadenaImpresion += $"{indice} = {temp1}; \n";
+
+            cadenaImpresion += $"{inicioB}: \n";        //ETIQUETA DE INICO IMPRESION
+            cadenaImpresion += $"{caracter} = Heap[{indice}]; \n";  //CAPTURAMOS EL CARACTER
+
+            cadenaImpresion += $"if( {caracter} == 0 ) goto {finalB};\n";
+            cadenaImpresion += $"printf(\"%c\", (char){caracter}); \n";
+            cadenaImpresion += $"{indice} = {indice}+1; \n";
+            cadenaImpresion += $"goto {inicioB};\n";
+
+            cadenaImpresion += $"{finalB}: /* FIN IMPRESION BOOLEANO*/\n";
+
+            cadenaImpresion = Generador.tabular(cadenaImpresion);
+
+            return cadenaImpresion;
+        }
+
+
     }
 }

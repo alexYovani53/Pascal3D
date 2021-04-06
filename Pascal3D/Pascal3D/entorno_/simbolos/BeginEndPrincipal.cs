@@ -27,7 +27,7 @@ namespace CompiPascal.entorno_.simbolos
 
         }
 
-
+ 
 
 
     }

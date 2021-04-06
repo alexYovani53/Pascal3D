@@ -187,7 +187,7 @@ namespace CompiPascal.AST_.definicion
                     string temp = Generador.pedirTemporal();
                     
                     codigoSalida += temp + " = SP +" + tamanoPadre + ";\n";
-                    codigoSalida += $"Stack[{temp}] = {def} ; \n";
+                    codigoSalida += $"Stack[{temp}] = {def} \n";
                     
                     Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador,1,posicionRelativa,item.linea,item.columna);
                     ent.agregarSimbolo(item.Identificador, simboloNuevo);
@@ -206,7 +206,7 @@ namespace CompiPascal.AST_.definicion
 
                 if (tipo_variables == TipoDatos.Integer)
                 { 
-                    if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
+                    if (valAsignacion.TipoResultado != TipoDatos.Integer || valAsignacion.TipoResultado != TipoDatos.Real)
                     {
                         Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
                         return "";
@@ -214,7 +214,7 @@ namespace CompiPascal.AST_.definicion
                 }
                 else if (tipo_variables == TipoDatos.Real)
                 {
-                    if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
+                    if (valAsignacion.TipoResultado != TipoDatos.Integer || valAsignacion.TipoResultado != TipoDatos.Real)
                     {
                         Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
                         return "";
@@ -237,7 +237,7 @@ namespace CompiPascal.AST_.definicion
                 string temp = Generador.pedirTemporal();
                 
                 codigoSalida += $"{temp} = SP + {tamanoPadre}; \n";
-                codigoSalida += $"Stack[{temp}] = {temp} ;";
+                codigoSalida += $"Stack[{temp}] = {temp}";
                 
                 Simbolo variableUniInicializada = variables.ElementAt(0);
                 Simbolo simboloNuevo = new Simbolo(tipo_variables, variableUniInicializada.Identificador, 1, posicionRelativa, variableUniInicializada.linea, variableUniInicializada.columna);
@@ -251,6 +251,6 @@ namespace CompiPascal.AST_.definicion
             return codigoSalida;
         }
 
-
+          
     }
 }

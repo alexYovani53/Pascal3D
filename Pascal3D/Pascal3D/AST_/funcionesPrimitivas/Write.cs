@@ -112,7 +112,6 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                     {
                         string true_false = resultExpr.Temporal;
                         string VALOR = true_false == "0" ? "TRUE" : "FALSE";            //OPERADOR TERNARIO
-                        
                         codigoWrite += imprimirTRUE_FALSE(VALOR);
                     }
                     else

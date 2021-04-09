@@ -139,7 +139,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 string valString = (string)valor;
                 for (int i = 0; i < valString.Length; i++)
                 {
-                    cadena.Codigo += $"Heap[HP] = {(int)valString[i]};\n";
+                    cadena.Codigo += $"Heap[HP] = {(int)valString[i]};  /*CARACTER {valString[i]}*/ \n";
                     cadena.Codigo += "HP = HP + 1 ; \n";
                 }
 

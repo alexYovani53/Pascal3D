@@ -97,13 +97,113 @@ namespace CompiPascal.AST_.definicion
 
         public string getC3(Entorno ent)
         {
-
+            string codigo = "";
             result3D final =   valor.obtener3D(ent);
 
 
+            if(esobjeto)
+            {
 
 
-            return "";
+
+            }
+            else
+            {
+
+                bool existeSimbolo = ent.existeSimbolo(variable.Identificador);
+                if (!existeSimbolo)
+                {
+                    Program.getIntefaz().agregarError("La variable a asignar \"" + variable.Identificador + "\" no se encuentra en ningun entorno", variable.linea,variable.columna);
+                    return "";
+                }
+
+                //CAPTURAMOS EL SIMBOLO
+
+                Simbolo simboloVar = ent.obtenerSimbolo(variable.Identificador);
+
+                if (simboloVar.Constante)
+                {
+                    Program.getIntefaz().agregarError($"La variable {variable.Identificador} es una CONSTANTE, no se puede asignar", variable.linea, variable.columna);
+                    return "";
+                }
+
+
+                // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
+                if (simboloVar.Tipo == TipoDatos.Integer)
+                {
+                    if (final.TipoResultado != TipoDatos.Integer && final.TipoResultado != TipoDatos.Real)
+                    {
+                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        return "";
+                    }
+                }
+                else if (simboloVar.Tipo == TipoDatos.Real)
+                {
+                    if (final.TipoResultado != TipoDatos.Integer && final.TipoResultado != TipoDatos.Real)
+                    {
+                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        return "";
+                    }
+                }
+                else
+                {
+                    if (simboloVar.Tipo != final.TipoResultado)
+                    {
+                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        return "";
+                    }
+
+                }
+
+                //ASIGNACIÓN DEL TIPO IDE := IDE ; 
+                if(simboloVar.Tipo == TipoDatos.Object)
+                {
+
+                }
+                else //ASIGNACIÓN DEL TIPO IDE:= PRIMITIVO
+                {
+
+                    codigo += final.Codigo;
+                    result3D varAsignar = obtenerPosicionVar(ent, simboloVar.Identificador);
+
+                    codigo += varAsignar.Codigo;
+                    codigo += $"Stack[{varAsignar.Temporal}] = {final.Temporal}; \n";
+                }
+
+            }
+
+            return codigo;
+        }
+
+        public result3D obtenerPosicionVar(Entorno ent,string identificador)
+        {
+
+            result3D regresos = new result3D();
+            string tempora1 = Generador.pedirTemporal();
+
+            regresos.Codigo += $" /*BUSCAMOS EL IDE QUE SERA ASIGNADA EN EL ENTORNO ACTUAL O EN LOS ANTERIORES*/\n";
+            regresos.Codigo += $"{tempora1} = SP; \n";
+
+            for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
+            {
+
+                foreach (Simbolo item in actual.TablaSimbolos())
+                {
+                    if (item.Identificador.Equals(identificador))
+                    {
+                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n\n" ;
+                        regresos.Codigo += "/*ENCONTRAMOS LA POSICION ABSOLUTA EN EL STACK DEL IDE QUE SERA ASIGNADO*/\n";
+                        
+                        regresos.Temporal = tempora1;
+                        regresos.TipoResultado = item.Tipo;
+                        return regresos;
+                    }
+                }
+
+                regresos.Codigo += $"{tempora1} = {tempora1} - {actual.tamano};             /*Retrocedemos entre los entornos*/";
+            }
+
+            return regresos;
         }
     }
 }

@@ -89,21 +89,24 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                     string finCad = Generador.pedirEtiqueta();
 
 
-                    codigoWrite += $"{indice} = {resultExpr.Temporal}; /*Guardamos el inicio de la cadena */ \n";
+                    codigoWrite += "/*IMPRIMIENDO UNA CADENA*/\n";
+                    codigoWrite += $"{indice} = {resultExpr.Temporal};                  /*Guardamos el inicio de la cadena */ \n";
 
                     //CAPTURAMOS EL PRIMER CARACTER 
-                    codigoWrite += $"{etq1}: /*Inicio de ciclo para impresión*/ \n";
-                    codigoWrite += $"{caracter} = Heap[(int){indice}]; /*Captura del caracter*/ \n";
+                    codigoWrite += $"{etq1}:                           /*Inicio de ciclo para impresión*/ \n";
+
+                    codigoWrite += $"   {caracter} = Heap[(int){indice}]; /*Captura del caracter*/ \n";
 
                     //ESTE IF SIMULA UN CICLO PARA EL RECORRDIO DE LA EXPRESION
-                    codigoWrite += $"if ({caracter}== 0) goto {finCad}; \n";
+                    codigoWrite += $"   if ({caracter}== 0) goto {finCad}; \n";
 
                     //IMPRESION DE LOS ASCII
-                    codigoWrite += $"printf(\"%c\", (char){caracter}); \n";
-                    codigoWrite += $"{indice} = {indice} + 1 ; \n";
-                    codigoWrite += $"   goto {etq1}; \n";
+                    codigoWrite += $"   printf(\"%c\", (char){caracter}); \n\n";
+                    codigoWrite += $"       {indice} = {indice} + 1 ; \n";
 
-                    codigoWrite += $"{finCad}: /*Fin de cadena*/ \n\n";
+                    codigoWrite += $"       goto {etq1}; \n";
+
+                    codigoWrite += $"{finCad}:      \n/*FIN IMPRESION DE CADENA*/ \n\n";
                 }
                 else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Boolean)
                 {
@@ -126,7 +129,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                         codigoWrite += imprimirTRUE_FALSE("TRUE");
                         codigoWrite += $"goto {etiquetaSalida};\n";
                         codigoWrite += $"{etiqFALSE}:\n";
-                        codigoWrite += imprimirTRUE_FALSE("FLASE");
+                        codigoWrite += imprimirTRUE_FALSE("FALSE");
                         codigoWrite += $"{etiquetaSalida}:\n\n";
 
                     }

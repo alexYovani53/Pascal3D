@@ -64,6 +64,8 @@ namespace Pascal3D.Traductor
         }
 
 
+
+
         public static string cabezera()
         {
 

@@ -18,13 +18,15 @@ namespace CompiPascal.entorno_
 
         public string nombre { get; set; }
 
+        public int tamano { get; set; }
+
         private LinkedList<Entorno> hijos;
 
         /**
          * @property    tabla      
          * @comentario  Esta es la estructura de datos que guardara los objetos Simbolos
          */
-        private Hashtable tabla { get; set; }
+        private ArrayList tabla { get; set; }
 
         /**
          * @property    ent_Anterior      
@@ -49,8 +51,9 @@ namespace CompiPascal.entorno_
         {
             this.nombre = nombre;
             this.hijos = new LinkedList<Entorno>();
-            this.tabla = new Hashtable();
+            this.tabla = new ArrayList();
             this.ent_Anterior = anterior;
+            this.tamano = 0;
             if(this.ent_Anterior != null)
             {
                 this.ent_Anterior.hijos.AddLast(this);
@@ -75,9 +78,9 @@ namespace CompiPascal.entorno_
 
         public void agregarSimbolo(string identificador, Simbolo simbolo)
         {
-            identificador = identificador.ToLower();
-            
-            tabla.Add(identificador, simbolo);
+
+            simbolo.Identificador = identificador.ToLower();
+            tabla.Add(simbolo);
 
         }
 
@@ -100,35 +103,46 @@ namespace CompiPascal.entorno_
 
             for(Entorno actual =  this; actual!=null;actual = actual.ent_Anterior)
             {
-                if (actual.tabla.Contains(identificador)) return true;
+
+                foreach (Simbolo item in actual.tabla)
+                {
+                    if (item.Identificador.Equals(identificador)) return true;
+                }
+
             }
             return false;
 
         }
 
+
         /**
-         * @funcion  bool existeFuncion(string identificador)         * 
-         * @comentario  Esta función busca el identificador de una funcion en los entornos, esto se utiliza en la llamada de funciones
-         *              Clase Llamada
+         * @funcion  bool existeFuncion(string identificador)
          * 
-         * @param   identificador    nombre del simbolo a buscar
-         * @return  devuelve         true -> si se encontro  y false-> si no se encontro
+         * @comentario  Esta función busca la funcion nombrada en el parametro y 
+         *              recorre los entornos anteriores en busqueda del simbolo si no aparece en 
+         *              uno de ellos.
+         * 
+         * @param   identificador       nombre de la funcion a buscar
+         * @return  devuelve            true -> si se encontro  y false-> si no se encontro
          */
 
         public bool existeFuncion(string identificador)
         {
             identificador = identificador.ToLower();
+
             for (Entorno actual = this; actual != null; actual = actual.ent_Anterior)
             {
-                if (actual.tabla.Contains(identificador))
+
+                foreach (Simbolo item in actual.tabla)
                 {
-                    Simbolo actualSimb = (Simbolo)actual.tabla[identificador];
-                    if (actualSimb is Funcion) return true;
+                    if (item.Identificador.Equals(identificador) && item is Funcion) return true;
                 }
+
             }
             return false;
 
         }
+
 
 
         /*
@@ -143,8 +157,13 @@ namespace CompiPascal.entorno_
         public bool existeEnEntornoActual(string identificador)
         {
             identificador = identificador.ToLower();
-            Simbolo simb = (Simbolo)tabla[identificador];
-            return simb != null;
+
+            foreach (Simbolo item in this.tabla)
+            {
+                if (item.Identificador.Equals(identificador)) return true;
+            }
+
+            return false;
         }
 
 
@@ -167,37 +186,42 @@ namespace CompiPascal.entorno_
             for (Entorno actual = this; actual!=null;actual =  actual.ent_Anterior)
             {
 
-                if (actual.tabla.Contains(identificador))
+                foreach (Simbolo item in actual.tabla)
                 {
-                    Simbolo encontrado = (Simbolo)actual.tabla[identificador];
-                    return encontrado;
+                    if (item.Identificador.Equals(identificador))
+                    {
+                        return item;
+                    }
                 }
-
             }
             return null;
         }
 
         /**
-         *  @funcion    Simbolo obtenerFuncion()
-         *  
-         *  @comentario esta funcion devuelve el simbolo que representa una funcion (su definicion)
-         *              
-         *  @param  identificador     nombre de la funcion a buscar   
-         *  @return Simbolo           simbolo encontrado respecto al identificador
-         */
+          *  @funcion    Simbolo obtenerFuncion()
+          *  
+          *  @comentario esta funcion devuelve la funcion correspondiente al identificador pasado
+          *              como parametro. Buscara desde el entorno actual hacia el entorno mas 
+          *              externo. 
+          *              
+          *  @param  identificador     nombre de la funcion a buscar   
+          *  @return Simbolo           simbolo encontrado respecto al identificador
+          */
 
-        public Simbolo obtenerFuncion(string identificador)
+        public Funcion obtenerFuncion(string identificador)
         {
             identificador = identificador.ToLower();
+
             for (Entorno actual = this; actual != null; actual = actual.ent_Anterior)
             {
 
-                if (actual.tabla.Contains(identificador))
+                foreach (Simbolo item in actual.tabla)
                 {
-                    Simbolo actualSimb = (Simbolo)actual.tabla[identificador];
-                    if (actualSimb is Funcion) return actualSimb;
+                    if (item.Identificador.Equals(identificador) && item is Funcion)
+                    {
+                        return (Funcion)item;
+                    }
                 }
-
             }
             return null;
         }
@@ -217,10 +241,14 @@ namespace CompiPascal.entorno_
             identificador = identificador.ToLower();
             for (Entorno actual =this; actual!=null; actual =  actual.ent_Anterior){
 
-                if (actual.tabla.Contains(identificador))
+
+                for (int i = 0; i < actual.tabla.Count; i++)
                 {
-                    actual.tabla[identificador] = nuevo;
-                    return;
+                    if (((Simbolo)actual.tabla[i]).Identificador.Equals(identificador))
+                    {
+                        actual.tabla[i] = nuevo;
+                        return;
+                    }
                 }
 
             }
@@ -240,7 +268,7 @@ namespace CompiPascal.entorno_
         }
 
 
-        public Hashtable TablaSimbolos()
+        public ArrayList TablaSimbolos()
         {
             return tabla;
         }
@@ -249,6 +277,14 @@ namespace CompiPascal.entorno_
         {
             return ent_Anterior;
         }
+
+        public int obtenerUltimaRelativa()
+        {
+            return ((Simbolo)tabla[tabla.Count - 1]).direccion;
+        }
+
+   
+       
 
     }
 }

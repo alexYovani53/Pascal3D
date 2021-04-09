@@ -4,6 +4,7 @@ using CompiPascal.AST_.control;
 using CompiPascal.AST_.definicion;
 using CompiPascal.AST_.funcionesPrimitivas;
 using CompiPascal.AST_.interfaces;
+using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
 using CompiPascal.entorno_.simbolos;
 using CompiPascal.GUI.Archivo;
@@ -64,11 +65,27 @@ namespace Pascal3D
 
         public static LinkedList<Error> Errores= null;
 
+        DataTable modeloErrores = null;
+
         public Pascal()
         {
             InitializeComponent();
             iniciar();
+            iniciarModeloErrores();
             Errores = new LinkedList<Error>();
+        }
+
+        public void iniciarModeloErrores()
+        {
+
+
+            modeloErrores = new DataTable();
+            modeloErrores.Columns.Add("Tipo");
+            modeloErrores.Columns.Add("Descripcion");
+            modeloErrores.Columns.Add("Linea");
+            modeloErrores.Columns.Add("Columna");
+
+            this.tablaErrores.DataSource=modeloErrores;
         }
 
         private void iniciar()
@@ -218,20 +235,25 @@ namespace Pascal3D
                     AST ARBOL =  armado.generarAST(arbolIrony);
 
                     Entorno GLOBAL = new Entorno(null, "GLOBAL");
-                    int tamanoPadre = 0;
                     string codigoDeclaraciones = "";
                     string codigoMain = "";
+                    string codigoFunciones = "";
                     if(ARBOL != null)
                     {
                         foreach (Instruccion item in ARBOL.obtenerInstrucciones())
                         {
-
-                            if(item is Declaracion)
+                            if (item is Funcion && !(item is BeginEndPrincipal))
                             {
-                                item.tamanoPadre = tamanoPadre;
-                                string codTemp = item.getC3(GLOBAL);
-                                tamanoPadre = item.tamanoPadre;
+                                //AGREGAMOS LA FUNCION AL ENTORNO GLOBAL
+                                Funcion funcionDeclarado = (Funcion)item;
+                                GLOBAL.agregarSimbolo(funcionDeclarado.Identificador, funcionDeclarado);
+                                codigoFunciones +=funcionDeclarado.getC3(GLOBAL);
 
+                            }
+                            else if (item is Declaracion)
+                            {
+
+                                string codTemp = item.getC3(GLOBAL);
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
 
@@ -270,6 +292,27 @@ namespace Pascal3D
                                         codigoMain += codTemp;
 
                                     }
+                                    else if(interna is Llamada)
+                                    {
+                                        string codTemp = ((Llamada)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
+                                    }
+                                    else if (interna is Asignacion)
+                                    {
+                                        string codTemp = ((Asignacion)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
+                                    }
+                                    else if (interna is For)
+                                    {
+                                        string codTemp = ((For)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
+                                    }
+
+
+
                                 }
 
 
@@ -282,6 +325,7 @@ namespace Pascal3D
                         SalidaTexto.Text += codigoDeclaraciones + codigoMain;
                         SalidaTexto.Text += "\treturn 0; \n";
                         SalidaTexto.Text += "}\n";
+                        SalidaTexto.Text += codigoFunciones;
 
 
                     }
@@ -300,6 +344,18 @@ namespace Pascal3D
 
             }//FIN DE TRADUCCIÓN
             
+
+            if(Errores != null && Errores.Count > 0)
+            {
+
+                DialogResult mostrarErrores = MessageBox.Show("Existen errores, Quiere verlos?","Errores",MessageBoxButtons.YesNo);
+                if(mostrarErrores == DialogResult.Yes)
+                {
+                    tabControl1.SelectedIndex = 0;
+                    generarTablaErrores();
+                }
+            }
+
         }
 
 
@@ -312,5 +368,15 @@ namespace Pascal3D
         {
             SalidaTexto.AppendText(salida);
         }
+
+        private void generarTablaErrores()
+        {
+            modeloErrores.Rows.Clear();
+            foreach (Error item in Errores)
+            {
+                modeloErrores.Rows.Add(item.TipoE, item.descripcion, item.fila, item.Columna);
+            }
+        }
+
     }
 }

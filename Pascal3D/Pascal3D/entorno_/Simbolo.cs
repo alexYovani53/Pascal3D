@@ -8,6 +8,9 @@ using System.Text;
 namespace CompiPascal.entorno_
 {
 
+
+
+
     /**
      *@comentario           La clase simbolo es un nodo de la tabla de simbolos
      *
@@ -99,6 +102,12 @@ namespace CompiPascal.entorno_
          */
         public string structGenerador { get; set; }
 
+        /*
+         * @param           ListaParametros
+         * @comentario      contendra la lista de parametros para una funcion
+         */
+        public LinkedList<Simbolo> ListaParametros { get; set; }
+
 
         /**   
          * @comentario  Constructor que se utiliza solo para guardar un ide en un simbolo
@@ -140,6 +149,9 @@ namespace CompiPascal.entorno_
 
         public Simbolo(TipoDatos tipoD, string nambeObjeto, LinkedList<Simbolo> parametros, int linea, int columna)
         {
+            this.Tipo = tipoD;
+            this.Identificador = nambeObjeto;
+            this.ListaParametros = parametros;
             this.linea = linea;
             this.columna = columna;
         }

@@ -50,6 +50,7 @@ namespace CompiPascal.AST_.definicion
         public int linea { get; set; }
         public int columna { get; set; }
 
+        public result3D valor { get; set; }
 
         /**
          *  @funcion        Constructor     
@@ -123,11 +124,16 @@ namespace CompiPascal.AST_.definicion
 
         }
 
-
+        public Declaracion(Simbolo variable,result3D valor)
+        {
+            this.variables = new LinkedList<Simbolo>();
+            this.variables.AddLast(variable);
+            this.valor = valor;
+        }
 
         public bool esInicializado()
         {
-            return this.valorInicializacion != null;
+            return this.valorInicializacion != null || this.valor != null;
         }
 
         private object valorDefecto(TipoDatos tipo)
@@ -188,20 +194,20 @@ namespace CompiPascal.AST_.definicion
                 }
 
                 string declaracionConstante = "";
-                int posicionRelativa = tamanoPadre;             //CUANDO SE DECLARA, LA POSICION RELATIVA ES JUSTAMENTE EL TAMAÑO DEL ENTORNO ACTUAL
+                int posicionRelativa = ent.tamano;             //CUANDO SE DECLARA, LA POSICION RELATIVA ES JUSTAMENTE EL TAMAÑO DEL ENTORNO ACTUAL
 
                 declaracionConstante += valAsignacion.Codigo;
 
                 string temporalConst = Generador.pedirTemporal();
 
                 declaracionConstante += $"/*Declaracion de la constante {ideUnico.Identificador}*/\n";
-                declaracionConstante += $"{temporalConst}= SP + {tamanoPadre}; \n";
+                declaracionConstante += $"{temporalConst}= SP + {ent.tamano}; \n";
                 declaracionConstante += $"Stack[(int){temporalConst}] = {valAsignacion.Temporal}; \n";
 
                 Simbolo constanteNueva = new Simbolo(tipo, ideUnico.Identificador, true, 1, posicionRelativa, ideUnico.linea, ideUnico.columna);
                 ent.agregarSimbolo(ideUnico.Identificador, constanteNueva);
 
-                tamanoPadre++;
+                ent.tamano++;
 
                 return declaracionConstante;
             }
@@ -210,7 +216,7 @@ namespace CompiPascal.AST_.definicion
 
             if(esInicializado() && variables.Count > 1)
             {
-                Program.getIntefaz().agregarError("Pascal solo permite la delcaracion inicializada de una variable a la vez", linea, columna);
+                Program.getIntefaz().agregarError("Pascal solo permite la declaracion inicializada de una variable a la vez", linea, columna);
                 return "";
             }
 
@@ -219,13 +225,13 @@ namespace CompiPascal.AST_.definicion
             {
                 object def = valorDefecto(tipo_variables);
 
-                int posicionRelativa = tamanoPadre;
+                int posicionRelativa = ent.tamano;
                 foreach (Simbolo item in variables)
                 {
                     string temp = Generador.pedirTemporal();
 
                     codigoSalida += $"/* declaracion de variable {item.Identificador}*/\n";
-                    codigoSalida += temp + " = SP +" + tamanoPadre + ";\n";
+                    codigoSalida += temp + " = SP +" + posicionRelativa + ";\n";
                     codigoSalida += $"Stack[(int){temp}] = {def} ; \n";
                     
                     Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador, false, 1,posicionRelativa,item.linea,item.columna);
@@ -233,7 +239,7 @@ namespace CompiPascal.AST_.definicion
 
 
                     posicionRelativa ++;
-                    tamanoPadre++;
+                    ent.tamano++;
                 }
 
                 return codigoSalida+"\n";
@@ -241,7 +247,9 @@ namespace CompiPascal.AST_.definicion
 
             else {
 
-                result3D valAsignacion = valorInicializacion.obtener3D(ent);
+                result3D valAsignacion;
+                if (valor == null) valAsignacion = valorInicializacion.obtener3D(ent);
+                else valAsignacion = valor;
 
                 if (tipo_variables == TipoDatos.Integer)
                 { 
@@ -273,11 +281,11 @@ namespace CompiPascal.AST_.definicion
 
                 codigoSalida += valAsignacion.Codigo;
 
-                int posicionRelativa = tamanoPadre;
+                int posicionRelativa = ent.tamano;
                 string temp = Generador.pedirTemporal();
 
                 codigoSalida += $"/* declaracion de variable {variableUniInicializada.Identificador}*/\n";
-                codigoSalida += $"{temp} = SP + {tamanoPadre}; \n";
+                codigoSalida += $"{temp} = SP + {ent.tamano}; \n";
                 codigoSalida += $"Stack[(int){temp}] = {valAsignacion.Temporal};\n";
                 
                
@@ -285,7 +293,7 @@ namespace CompiPascal.AST_.definicion
 
                 ent.agregarSimbolo(variableUniInicializada.Identificador, simboloNuevo);
 
-                tamanoPadre++;
+                ent.tamano++;
 
             }
 

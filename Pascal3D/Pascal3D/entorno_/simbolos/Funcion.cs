@@ -3,6 +3,7 @@ using CompiPascal.AST_.cambioFlujo;
 using CompiPascal.AST_.definicion;
 using CompiPascal.AST_.definicion.arrego;
 using CompiPascal.AST_.interfaces;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,6 +17,7 @@ namespace CompiPascal.entorno_.simbolos
         public int tamanoPadre { get; set; }
 
 
+        public int tamaFuncion { get; set; }
 
         /*@propiedad    string      nombreStruct
         *@comentario                guardara el nombre del struct que debe retornar*/
@@ -119,9 +121,78 @@ namespace CompiPascal.entorno_.simbolos
             }
 
         }
+
+
         public string getC3(Entorno ent)
         {
-            throw new NotImplementedException();
+
+            Entorno nuevo = new Entorno(ent,"Funcion_"+this.Identificador);
+            string codigoFuncion = "";
+
+            codigoFuncion += $"void {this.Identificador} () "+"{";
+            agregarParametros(nuevo);
+
+            foreach (Instruccion item in ENCABEZADOS)
+            {
+                if(item is Declaracion)
+                {
+                    string declaraVar = item.getC3(nuevo);
+                    codigoFuncion += Generador.tabular(declaraVar);
+                }
+            }
+
+            codigoFuncion += agregarRetorno(nuevo);
+
+            foreach (Instruccion item in instrucciones)
+            {
+
+                string codigo = item.getC3(nuevo);
+                codigoFuncion += Generador.tabular(codigo);
+
+            }
+
+            codigoFuncion += Generador.tabularLinea("return;", 1);
+            codigoFuncion += "}";
+
+            tamaFuncion = ent.tamano;
+
+            return codigoFuncion;
         }
-    }
+
+
+        public void agregarParametros(Entorno ent)
+        {
+
+            int posRelativa = 0;
+
+
+            if (ListaParametros != null)
+            {
+                foreach (Simbolo item in ListaParametros)
+                {
+                    Simbolo parametro = new Simbolo(item.Tipo, item.Identificador, false, 1, posRelativa, item.linea, item.columna);
+                    ent.agregarSimbolo(item.Identificador, parametro);
+                    ent.tamano++;
+                }
+            }
+
+        }
+
+        public string agregarRetorno(Entorno ent)
+        {
+
+            if (Tipo != TipoDatos.Void)
+            {
+                LinkedList<Simbolo> param = new LinkedList<Simbolo>();
+                param.AddLast(new Simbolo(Identificador, linea, columna));
+                Declaracion retornoPascal = new Declaracion(param, Tipo);
+                string codigo = retornoPascal.getC3(ent);
+                return codigo;
+            
+            }
+
+            return "";
+        }
+
+    } 
 }

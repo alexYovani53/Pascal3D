@@ -71,7 +71,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
         public result3D obtener3D(Entorno ent)
         {
-            //OBTENEMOS EL SIMBOLO DEL ENTORNO ACTUAL
+            /*//OBTENEMOS EL SIMBOLO DEL ENTORNO ACTUAL
             Simbolo encontrado = ent.obtenerSimbolo(this.ide);
 
             //SI EL SIMBOLO ES NULL ES PORQUE NO SE ENCONTRO 
@@ -100,7 +100,45 @@ namespace CompiPascal.AST_.valoreImplicito
             nuevo.Temporal = temp2;
             nuevo.TipoResultado = encontrado.Tipo;
 
-            return nuevo;
+            return nuevo;*/
+
+
+            result3D ide_buscando = buscandoId(ent,ide);
+
+            return ide_buscando;
+        }
+
+        private result3D buscandoId(Entorno ent,string identificador)
+        {
+
+            result3D regresos = new result3D();
+            string tempora1 = Generador.pedirTemporal();
+
+            regresos.Codigo += $"/*BUSCANDO UN IDENTIFICADOR*/\n";
+            regresos.Codigo += $"{tempora1} = SP;\n";
+
+            for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
+            {
+
+                foreach (Simbolo item in actual.TablaSimbolos())
+                {
+                    if (item.Identificador.Equals(identificador))
+                    {
+                        string tempora2 = Generador.pedirTemporal();
+                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
+                        regresos.Codigo += $"{tempora2} = Stack[(int){tempora1}];                    /*CAPTURAMOS EL VALOR ALMACENADO EN STACK*/\n";
+                        regresos.Codigo += "/*IDENTIFICADOR ENCONTRADO*/\n\n\n";
+
+                        regresos.Temporal = tempora2;
+                        regresos.TipoResultado = item.Tipo;
+                        return regresos;
+                    }
+                }
+
+                regresos.Codigo += $"{tempora1} = {tempora1} - {actual.tamano};             /*Retrocedemos entre los entornos*/\n";
+            }
+
+            return new result3D();
         }
     
     }

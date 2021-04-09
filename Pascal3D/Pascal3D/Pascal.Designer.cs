@@ -33,8 +33,14 @@ namespace Pascal3D
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.SalidaTexto = new ScintillaNET.Scintilla();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.traducir = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tablaErrores = new System.Windows.Forms.DataGridView();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
+            this.traducir = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -43,6 +49,11 @@ namespace Pascal3D
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // AreaTexto
@@ -95,31 +106,94 @@ namespace Pascal3D
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.traducir);
-            this.splitContainer2.Panel2.Controls.Add(this.button1);
+            this.splitContainer2.Panel2.Controls.Add(this.panel2);
+            this.splitContainer2.Panel2.Controls.Add(this.panel1);
             this.splitContainer2.Size = new System.Drawing.Size(1197, 627);
             this.splitContainer2.SplitterDistance = 425;
             this.splitContainer2.TabIndex = 2;
             // 
-            // traducir
+            // panel2
             // 
-            this.traducir.Location = new System.Drawing.Point(63, 121);
-            this.traducir.Name = "traducir";
-            this.traducir.Size = new System.Drawing.Size(75, 23);
-            this.traducir.TabIndex = 1;
-            this.traducir.Text = "Traducir";
-            this.traducir.UseVisualStyleBackColor = true;
-            this.traducir.Click += new System.EventHandler(this.traducir_Click);
+            this.panel2.Controls.Add(this.tabControl1);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel2.Location = new System.Drawing.Point(175, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(1022, 198);
+            this.panel2.TabIndex = 4;
+            // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(6, 3);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(1004, 183);
+            this.tabControl1.TabIndex = 3;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.tablaErrores);
+            this.tabPage1.Location = new System.Drawing.Point(4, 24);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(996, 155);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Errores";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tablaErrores
+            // 
+            this.tablaErrores.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.tablaErrores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tablaErrores.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tablaErrores.Location = new System.Drawing.Point(3, 3);
+            this.tablaErrores.Name = "tablaErrores";
+            this.tablaErrores.RowHeadersVisible = false;
+            this.tablaErrores.RowTemplate.Height = 25;
+            this.tablaErrores.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.tablaErrores.Size = new System.Drawing.Size(990, 149);
+            this.tablaErrores.TabIndex = 0;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 24);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(996, 155);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Simbolos";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.button1);
+            this.panel1.Controls.Add(this.traducir);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(175, 198);
+            this.panel1.TabIndex = 2;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(63, 40);
+            this.button1.Location = new System.Drawing.Point(31, 35);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(83, 26);
             this.button1.TabIndex = 0;
             this.button1.Text = "Abrir";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // traducir
+            // 
+            this.traducir.Location = new System.Drawing.Point(31, 122);
+            this.traducir.Name = "traducir";
+            this.traducir.Size = new System.Drawing.Size(83, 25);
+            this.traducir.TabIndex = 1;
+            this.traducir.Text = "Traducir";
+            this.traducir.UseVisualStyleBackColor = true;
+            this.traducir.Click += new System.EventHandler(this.traducir_Click);
             // 
             // Pascal
             // 
@@ -138,6 +212,11 @@ namespace Pascal3D
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).EndInit();
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -150,6 +229,12 @@ namespace Pascal3D
         private ScintillaNET.Scintilla SalidaTexto;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button traducir;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.DataGridView tablaErrores;
     }
 }
 

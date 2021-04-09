@@ -3,6 +3,8 @@ using CompiPascal.AST_.definicion;
 using CompiPascal.AST_.interfaces;
 using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -55,7 +57,40 @@ namespace CompiPascal.AST_.bucles
 
         public string getC3(Entorno ent)
         {
-            throw new NotImplementedException();
+
+            string nombreContador = ((Asignacion)valorInicial).variable.Identificador;
+            Simbolo asignador = ent.obtenerSimbolo(nombreContador);
+
+            if(asignador == null)
+            {
+                Program.getIntefaz().agregarError($"La variable {nombreContador} no existe en ningun entorno",linea,columna);
+                return "";
+            }
+
+            string codigoFor = "";
+            string contenidoFor = "";
+
+            codigoFor += "/*ASIGNACIÓN DEL CONTADOR*/ \n";
+            codigoFor += valorInicial.getC3(ent);
+
+
+            string etiquetaCiclo = Generador.pedirEtiqueta();
+            string etiquetaSalida = Generador.pedirEtiqueta();
+
+                
+            codigoFor += $"{etiquetaCiclo}:   /*INICIO DEL CICLO*/ \n\n";
+
+
+            foreach (Instruccion item in instrucciones)
+            {
+                contenidoFor += item.getC3(ent);
+            }
+
+
+            codigoFor += Generador.tabular(contenidoFor);
+
+            return codigoFor;
         }
+
     }
 }

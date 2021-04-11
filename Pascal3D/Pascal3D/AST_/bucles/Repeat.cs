@@ -36,11 +36,18 @@ namespace CompiPascal.AST_.bucles
             codigo += repeatInicio + ":\n";
             codigo += " /* codigo de instrucciones en repeat*/ \n";
 
+            /* LE ASIGNAMOS LAS ETIQUETAS, YA QUE LA CONDICION ES UNA EXPRESIÓN BOOLEANA
+             * Y EN EL CASO QUE SEA UNA EXPRESIÓN COMPUESTA, LAS ETIQUETAS 
+             * VERDADERAS Y FALSAS SE DEBEN HABER GENERADO ANTES DE COMENZAR CON LA TRADUCCIÓN DE ESTA EXPRESION
+             */
 
             ((Expresion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
             ((Expresion)exprCondicional).etiquetaVerdadera = repeatInicio;
+
+            /* GENERAMOS EL CODIGO DE LA EXPRESIÓN CONDICION DEL REPEAT*/
             result3D resultadoPrueba = exprCondicional.obtener3D(ent);
 
+            /* COPIAMOS EL CODIGO Y LA ETIQUETA DE SALIDA PARA LA EXPRESIÓN */
             codigo += resultadoPrueba.Codigo;
             codigo += resultadoPrueba.EtiquetaF + ": \n";
 

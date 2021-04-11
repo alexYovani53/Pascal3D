@@ -32,25 +32,26 @@ namespace CompiPascal.AST_.bucles
         public string getC3(Entorno ent)
         {
 
-
+            //Etiqueta de inicio para el ciclo 
             string etiquetaInicio = Generador.pedirEtiqueta();        //ETIQUETA DE INICIO
 
+            /* DEFINIMOS LAS ETIQUETAS FALSA Y VERDADERA DE LA CONDICIÓN, ESTO GUIARA PARA DONDE DEBER SALTAR 
+             * DEPENDIENDO DEL RESULTADO DEL CODIGO 3D*/ 
             ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
             ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
 
+            /* RECUPERAMOS EL CODIGO 3D DE LA EXPRESIÓN */
             result3D result = exprCondicional.obtener3D(ent);
 
+            /* CODIGO DEL WHILE */
             string whileCadena = etiquetaInicio + ": \n";
-
             whileCadena += result.Codigo;
             whileCadena += result.EtiquetaV +":\n";
 
+            /* SALTO Y ETIQUETA DE SALIDA*/
             whileCadena += "goto " + etiquetaInicio + ";\n";
-
             whileCadena += result.EtiquetaF+ ":\n";
 
-
-            Program.getIntefaz().agregarTexto(whileCadena);
 
             return whileCadena;
 

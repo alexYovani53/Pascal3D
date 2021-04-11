@@ -66,21 +66,23 @@ namespace CompiPascal.AST_.control
         public string getC3(Entorno ent)
         {
 
-
+            result3D result = new result3D();
             string etiquetaSalida = Generador.pedirEtiqueta();
 
 
             ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
             ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
-            result3D result = exprCondicional.obtener3D(ent);
+            result3D result2 = exprCondicional.obtener3D(ent);
 
-            result.Codigo += result.EtiquetaV+" :\n";
-            result.Codigo += " /*codigo instrucción if superior Verdadera */ \n";
+            result.Codigo += "/****************************  INSTRUCCION IF *************/";
+            result.Codigo += result2.Codigo;
+            result.Codigo += result2.EtiquetaV+" :               /*Continua el codigo de las instrucciones*/\n";
+            result.Codigo += generarCodigoInstrucciones(instrucciones, ent);
 
-            result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";
+            result.Codigo += $" goto {etiquetaSalida} ;             /*etiqueta salida*/ \n\n\n";
 
 
-            result.Codigo += result.EtiquetaF+ " :    /*Etiqueta falsa*/ \n";
+            result.Codigo += result2.EtiquetaF+ " :                  /*Etiqueta falsa*/ \n";
 
             foreach (Instruccion item in instruccionesElse_if)
             {
@@ -91,27 +93,41 @@ namespace CompiPascal.AST_.control
 
                 result.Codigo += ifElse_result.Codigo;
                 result.Codigo += ifElse_result.EtiquetaV + " :\n";
-                result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";
 
-                //INSTRUCCIONE DEL ELSE
+                result.Codigo += generarCodigoInstrucciones(pivote.instrucciones, ent);
 
-                result.Codigo += etiquetaSalida + ": \n\n\n";
+                result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";           
+
 
                 result.Codigo += ifElse_result.EtiquetaF + " : \t";
 
             }
 
+            /* SI HAY ALGUNA INSTRUCCIÓN PARA EL ELSE DEL IF, SE RECUPERAN  */
             if (instruccionesElse.Count > 0)
             {
-
                 result.Codigo += "//INSTRUCCIONES DEL ELSE \n";
-
+                result.Codigo += generarCodigoInstrucciones(instruccionesElse, ent);        
             }
 
 
             result.Codigo += etiquetaSalida + ": \n";
+            result.Codigo += "/****************************  FIN INSTRUCCION IF *************/";
 
             return result.Codigo;
+        }
+
+        public string generarCodigoInstrucciones(LinkedList<Instruccion> instrucciones,Entorno ent)
+        {
+
+            string codigo = "";
+
+            foreach (Instruccion item in instrucciones)
+            {
+                codigo += item.getC3(ent);
+            }
+
+            return Generador.tabular(codigo);
         }
     }
 }

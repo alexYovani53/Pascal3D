@@ -118,7 +118,6 @@ namespace CompiPascal.AST_.definicion
                 }
 
                 //CAPTURAMOS EL SIMBOLO
-
                 Simbolo simboloVar = ent.obtenerSimbolo(variable.Identificador);
 
                 if (simboloVar.Constante)
@@ -193,10 +192,24 @@ namespace CompiPascal.AST_.definicion
                 {
                     if (item.Identificador.Equals(identificador))
                     {
+                                            
                         regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n\n" ;
+
+                        /* CUANDO LA ASIGNACIÓN ES A UNA VARIABLE POR REFERENCIA EN UNA FUNCION, LA VARIABLE GUARDA LA REFERENCIA
+                         * HACIA EL STACK 
+                         */
+
+                        if (item.porReferencia)
+                        {
+                            string temporal2 = Generador.pedirTemporal();
+                            regresos.Codigo += $"{temporal2} = Stack[(int) {tempora1}]; /* Variable por referencia, puntero*/ \n";
+                            regresos.Temporal = temporal2;
+                        }
+                        else regresos.Temporal = tempora1;
+
                         regresos.Codigo += "/* Ya tenemos la posicion absoluta del id*/\n";
                         
-                        regresos.Temporal = tempora1;
+
                         regresos.TipoResultado = item.Tipo;
                         return regresos;
                     }

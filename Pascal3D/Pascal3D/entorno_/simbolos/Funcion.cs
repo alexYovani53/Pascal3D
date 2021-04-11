@@ -183,6 +183,11 @@ namespace CompiPascal.entorno_.simbolos
                 foreach (Simbolo item in ListaParametros)
                 {
                     Simbolo parametro = new Simbolo(item.Tipo, item.Identificador, false, 1, posRelativa, item.linea, item.columna);
+
+                    /* HACEMOS ESTA VALIDACIÓN PARA CUANDO VIENE UN PARAMETRO POR REFERENCIA, EN EL ENTORNO TAMBIEN APARESCA UNA BANDERA QUE LO INDIQUE
+                     * ESTA BANDERA SERA USADA EN LA ASIGNACIÓN O AL MOMENTO DE ACCEDER A LA VARIABLE */
+                    if (item.porReferencia) parametro.porReferencia = true;
+
                     ent.agregarSimbolo(item.Identificador, parametro);
                     ent.tamano++;
                     posRelativa++;

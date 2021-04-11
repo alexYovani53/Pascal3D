@@ -139,10 +139,7 @@ namespace CompiPascal.AST_.definicion
             this.declaraParametro = true;
         }
 
-        public bool esInicializado()
-        {
-            return this.valorInicializacion != null || this.valor != null;
-        }
+
 
         private object valorDefecto(TipoDatos tipo)
         {
@@ -187,6 +184,8 @@ namespace CompiPascal.AST_.definicion
             string puntero_SP_TEMPORAL = "SP";
             if (declaraParametro)
             {
+                /* CUANDO LA DECLARACIÓN ES UN PARAMETRO DE UNA FUNCIÓN, ESTA VARIABLE GUARDA LA ETIQUETA
+                 * QUE CONTIENE EL VALOR DEL NUEVO ENTORNO DONDE SE REQUIERE DECLARAR LOS PARAMETROS */
                 puntero_SP_TEMPORAL = TemporalCambioEntorno;
             }
 
@@ -201,6 +200,7 @@ namespace CompiPascal.AST_.definicion
 
                 string nombre = ideUnico.Identificador;
 
+                //ERROR PORQUE NO SE ENCONTRO EL SIMBOLO
                 if (ent.existeSimbolo(nombre))
                 {
                     Program.getIntefaz().agregarError("El simobolo a declarar ya existe en el entorno actual", linea, columna);
@@ -261,10 +261,16 @@ namespace CompiPascal.AST_.definicion
 
             else {
 
+                /* ESTA VALIDACIÓN SE HACE YA QUE HAY UN CONSTRUCTOR QUE RECIBE UN           result3D como valor inicial  
+                 * ESTE YA CONTIENE UNA ETIQUETA TEMPORAL QUE GUARDA EL VALOR (SI ES UN PRIMITIVO), DIRECCIÓN A HEAP(STRING O OBJETO) O DIRECCION
+                 * AL MISMO STACK (UNA REFERENCIA)
+                 */
+
                 result3D valAsignacion;
                 if (valor == null) valAsignacion = valorInicializacion.obtener3D(ent);
                 else valAsignacion = valor;
 
+                /* ESTAS VALIDACIONES SON PARA VER QUE LOS TIPOS COICIDAN, SON LAS POSIBILIDADES QUE PASCAL PERMITE */
                 if (tipo_variables == TipoDatos.Integer)
                 { 
                     if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
@@ -291,10 +297,12 @@ namespace CompiPascal.AST_.definicion
 
                 }
 
+                //COMO SOLO SE PUEDE INICIALIZAR UNA VARIABLE A LA VEZ (CUANDO SE DECLARA) SE CAPTURA EL UNICO ELEMENTO EN LA LISTA DE VARIABLES
                 Simbolo variableUniInicializada = variables.ElementAt(0);
 
                 codigoSalida += valAsignacion.Codigo;
 
+                // posicionRelativa lleva el conteo de variables dentro del entorno actual
                 int posicionRelativa = ent.tamano;
                 string temp = Generador.pedirTemporal();
 
@@ -315,7 +323,12 @@ namespace CompiPascal.AST_.definicion
             return codigoSalida+"\n";
         }
 
+        public bool esInicializado()
+        {
+            return this.valorInicializacion != null || this.valor != null;
+        }
 
-          
     }
+
+
 }

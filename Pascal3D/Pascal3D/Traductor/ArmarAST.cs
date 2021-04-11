@@ -1065,10 +1065,10 @@ namespace CompiPascal.Traductor
                 /*            _CASO.Rule = PRIMITIVO + doble_pt + SENTENCIA_CASOS;*/
 
                 // EN LA GRAMATICA, SE HIZO QUE EL DOBLE PUNTO NO APARECIERA 
-                Expresion primitivo = (Expresion)recorrerArbol(nodo.ChildNodes[0]);
+                Expresion valor_Caso = (Expresion)recorrerArbol(nodo.ChildNodes[0]);
                 LinkedList<Instruccion> sentencias = (LinkedList<Instruccion>)recorrerArbol(nodo.ChildNodes[1]);
+                return new Case(valor_Caso, sentencias, getLinea(nodo, 0), getColumna(nodo, 0));
 
-                return new Case(primitivo, sentencias, getLinea(nodo, 0), getColumna(nodo, 0));
             }
             else if (estoyEnEsteNodo(nodo, "SENTENCIA_CASOS"))
             {

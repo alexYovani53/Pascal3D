@@ -425,7 +425,7 @@ namespace CompiPascal.Traductor
 
             CASOS.Rule = MakePlusRule(CASOS, _CASO);
 
-            _CASO.Rule = PRIMITIVO + doble_pt + SENTENCIA_CASOS;
+            _CASO.Rule = EXPR + doble_pt + SENTENCIA_CASOS;
 
             SENTENCIA_CASOS.Rule = _SENTENCIA 
                                     | pr_begin + SENTENCIAS + pr_end + ptcoma;

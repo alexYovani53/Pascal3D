@@ -306,6 +306,20 @@ namespace CompiPascal.AST_.valoreImplicito
              ****************************************************************************/
             else if (expreIzq.TipoResultado == TipoDatos.String)
             {
+                resultado.Temporal = Generador.pedirTemporal();
+                resultado.TipoResultado = TipoDatos.String;
+
+                resultado.Codigo += expreIzq.Codigo;
+                resultado.Codigo += expreDer.Codigo;
+
+                resultado.Codigo += $"{resultado.Temporal} = HP; /*Guardamos el nuevo inicio de la cadena*/;";
+                
+                string codigo = SumarCadena(operando1, expreIzq);
+                string codigo2 = SumarCadena(operando2, expreDer);
+
+                resultado.Codigo += $"Heap[HP] = 0; \n";
+                resultado.Codigo += $"HP = HP + 1; \n";
+                resultado.Codigo += codigo + codigo2;
 
 
             }            
@@ -1076,6 +1090,47 @@ namespace CompiPascal.AST_.valoreImplicito
                     return "";
             }
 
+        }
+
+
+        private string SumarCadena(Expresion expr, result3D resultExpr)
+        {
+            string codigo = "";
+
+            if(expr is Identificador || expr is Primitivo)
+            {
+
+                if(resultExpr.TipoResultado == TipoDatos.String)
+                {
+                    //EL TEMPORAL DE "resulExpr" CONTIENE LA POSICION EN EL HEAP DONDE COMIENZA EL STRING
+
+                    string EtiquetaCiclo = Generador.pedirEtiqueta();
+                    string EtiquetaSalida = Generador.pedirEtiqueta();
+                    string CARACTER = Generador.pedirTemporal();
+
+
+                    codigo += $"{EtiquetaCiclo}: /*** Etiqueta para ciclado de lectura ***/ \n\n";
+                    codigo += $"    {CARACTER} = Heap[(int){resultExpr.Temporal}];   /*Capturamos el caracter a copiar*/\n\n";
+
+                    codigo += $"    if({CARACTER}==0) goto {EtiquetaSalida}; /*Comparamos si ya se a llegado al final de la cadena */\n\n";
+                    codigo += $"        Heap[HP] = {CARACTER}; /* Copiamos el caracter en la ultima posicion del HEAP, donde vamos*/\n";
+
+                    codigo += $"            {resultExpr.Temporal} = {resultExpr.Temporal}+1 ;  /*Aumentamos el contador para seguir leyendo los caracteres*/\n";
+                    codigo += $"            HP = HP + 1;\n";
+
+                    codigo += $"            goto {EtiquetaCiclo}; /*Regresamos al inicio del ciclo para seguir leyendo*/\n";
+                    codigo += $"{EtiquetaSalida}: \n\n";
+
+                }
+                else if( resultExpr.TipoResultado == TipoDatos.Integer)
+                {
+
+                }
+            
+            }
+
+
+            return codigo;
         }
 
 

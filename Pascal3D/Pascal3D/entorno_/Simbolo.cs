@@ -20,6 +20,8 @@ namespace CompiPascal.entorno_
 
     public class Simbolo
     {
+        private string generador;
+        private TipoDatos tipoParametros;
 
         /**
          * @enum            TipoDatos 
@@ -152,6 +154,26 @@ namespace CompiPascal.entorno_
             this.Tipo = tipoD;
             this.Identificador = nambeObjeto;
             this.ListaParametros = parametros;
+            this.linea = linea;
+            this.columna = columna;
+        }
+
+        /*Parametros en funciones del tipo STRUCTU y por referencia o no */
+        public Simbolo(string generador, string identificador, bool porReferencia, int linea, int columna)
+        {
+            this.generador = generador;
+            Identificador = identificador;
+            this.porReferencia = porReferencia;
+            this.linea = linea;
+            this.columna = columna;
+        }
+
+        /*Parametros de tipo primitivo y por referencia o no */
+        public Simbolo(TipoDatos tipoParametros, string identificador, bool porReferencia, int linea, int columna)
+        {
+            this.Tipo = tipoParametros;
+            Identificador = identificador;
+            this.porReferencia = porReferencia;
             this.linea = linea;
             this.columna = columna;
         }

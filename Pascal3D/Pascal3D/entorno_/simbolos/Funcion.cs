@@ -3,6 +3,7 @@ using CompiPascal.AST_.cambioFlujo;
 using CompiPascal.AST_.definicion;
 using CompiPascal.AST_.definicion.arrego;
 using CompiPascal.AST_.interfaces;
+using CompiPascal.AST_.valoreImplicito;
 using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
@@ -125,12 +126,14 @@ namespace CompiPascal.entorno_.simbolos
 
         public string getC3(Entorno ent)
         {
+            string etiquetaRetorno = Generador.pedirEtiqueta(); 
 
             Entorno nuevo = new Entorno(ent,"Funcion_"+this.Identificador);
             string codigoFuncion = "";
 
             codigoFuncion += $"void {this.Identificador} () "+"{";
             agregarParametros(nuevo);
+            agregarRetorno(nuevo);
 
             foreach (Instruccion item in ENCABEZADOS)
             {
@@ -141,7 +144,7 @@ namespace CompiPascal.entorno_.simbolos
                 }
             }
 
-            codigoFuncion += agregarRetorno(nuevo);
+
 
             foreach (Instruccion item in instrucciones)
             {
@@ -151,10 +154,14 @@ namespace CompiPascal.entorno_.simbolos
 
             }
 
-            codigoFuncion += Generador.tabularLinea("return;", 1);
+            codigoFuncion += RealizarCambioVariable(nuevo);
+
+            codigoFuncion += Generador.tabularLinea($"{etiquetaRetorno}: \n",1);
+            codigoFuncion += Generador.tabularLinea("return;\n", 1);
             codigoFuncion += "}";
 
             tamaFuncion = ent.tamano;
+
 
             return codigoFuncion;
         }
@@ -162,8 +169,13 @@ namespace CompiPascal.entorno_.simbolos
 
         public void agregarParametros(Entorno ent)
         {
-
-            int posRelativa = 0;
+            /*PARA EL MANEJO DE LAS FUNCIONES QUE TIENEN UN RETORNO
+              SE MANEJA QUE EL PRIMER ESPACIO EN EL ENTORNO DE LA FUNCION SEA EL QUE GUARDARA EL VALOR A RETORNAR
+              POR LO QUE LA PRIMERA DECLARACION EN LA FUNCION COMIENZA EN  
+              P = P + 1      Y NO EN         P = P + 0  
+             */
+            int posRelativa = 1;
+            ent.tamano++;
 
 
             if (ListaParametros != null)
@@ -173,6 +185,7 @@ namespace CompiPascal.entorno_.simbolos
                     Simbolo parametro = new Simbolo(item.Tipo, item.Identificador, false, 1, posRelativa, item.linea, item.columna);
                     ent.agregarSimbolo(item.Identificador, parametro);
                     ent.tamano++;
+                    posRelativa++;
                 }
             }
 
@@ -180,19 +193,46 @@ namespace CompiPascal.entorno_.simbolos
 
         public string agregarRetorno(Entorno ent)
         {
-
             if (Tipo != TipoDatos.Void)
             {
                 LinkedList<Simbolo> param = new LinkedList<Simbolo>();
                 param.AddLast(new Simbolo(Identificador, linea, columna));
                 Declaracion retornoPascal = new Declaracion(param, Tipo);
                 string codigo = retornoPascal.getC3(ent);
-                return codigo;
-            
+                return codigo;            
             }
-
             return "";
         }
 
-    } 
+
+        public string RealizarCambioVariable(Entorno ent)
+        {
+            string codigo = "/*************************************************** CONFIGURANDO RETORNO*/\n";
+            string temporal = Generador.pedirTemporal();
+            if (Tipo != TipoDatos.Void)
+            {
+
+                Identificador ide_var_funcion = new Identificador(Identificador, linea, columna);
+                result3D codigo_cambio_valor = ide_var_funcion.obtener3D(ent);
+
+                codigo += codigo_cambio_valor.Codigo;
+                codigo += $"{temporal} = SP + 0;  /* lo que hacemos es cambiar el valor en la variable que se llama igual que la funcion, a la primera posicion del entorno actual*/ \n";
+                codigo += $"Stack[(int){temporal}] = {codigo_cambio_valor.Temporal}; \n";
+
+            }
+            else
+            {
+                codigo += $"{temporal} = SP + 0; /*Retorno void, colocamos -1 en la variable de retorno en el entorno*/ \n\n";
+                codigo += $"Stack[(int){temporal}] = 0 - 1 ; \n";
+            }
+
+
+            codigo += "/*************************************************** CONFIGURANDO RETORNO*/\n";
+
+            return codigo = Generador.tabular(codigo);
+        }
+
+
+
+    }
 }

@@ -8,6 +8,7 @@ using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static CompiPascal.entorno_.Simbolo;
 
 namespace CompiPascal.AST_.bucles
 {
@@ -60,6 +61,7 @@ namespace CompiPascal.AST_.bucles
 
             string nombreContador = ((Asignacion)valorInicial).variable.Identificador;
             Simbolo asignador = ent.obtenerSimbolo(nombreContador);
+            Identificador contador = new Identificador(nombreContador, linea, columna);
 
             if(asignador == null)
             {
@@ -67,27 +69,73 @@ namespace CompiPascal.AST_.bucles
                 return "";
             }
 
-            string codigoFor = "";
-            string contenidoFor = "";
+            string codigoFor = "";                  /* GUARDARA EL CODIGO DE LA ESTRUCTURA DEL FOR*/
+            string contenidoFor = "";               /* GUARDARA EL CODIGO DE LAS INTRUCCIONES DENTRO DEL FOR*/
 
+            //ESTA ES LA SECCIÓN DONDE SE INICIA EL CONTADOR DEL FOR
             codigoFor += "/*ASIGNACIÓN DEL CONTADOR*/ \n";
-            codigoFor += valorInicial.getC3(ent);
+            codigoFor += valorInicial.getC3(ent);   
 
 
+            //CAPTURANDO VALOR FINAL  Y VALIDACIÓN DEL TIPO DEL PARAMETRO FINAL
+            result3D finalConteo = valfinal.obtener3D(ent);
+            if (finalConteo.TipoResultado != TipoDatos.Integer)
+            {
+                Program.getIntefaz().agregarError($"La expresion final no es un integer", linea, columna);
+                return "";
+            }
+
+
+            codigoFor += finalConteo.Codigo;
+
+            //DEFINIMOS LA ETIQUETA A LA QUE VUELTE CUANDO TERMINA UN CICLO
             string etiquetaCiclo = Generador.pedirEtiqueta();
             string etiquetaSalida = Generador.pedirEtiqueta();
 
-                
+
             codigoFor += $"{etiquetaCiclo}:   /*INICIO DEL CICLO*/ \n\n";
 
+            result3D buscarContador = contador.obtener3D(ent);
+            
+
+            //COMIENZO DE VALIDACIÓN DEL CONTADOR
+            codigoFor += buscarContador.Codigo;
+
+
+            if (aumentar)
+            {
+                codigoFor += $"if ({buscarContador.Temporal} > {finalConteo.Temporal}) goto {etiquetaSalida}; /*LA CONDICION DEL FOR SE A CUMPLIDO*/\n\n ";
+            }
+            else
+            {
+                codigoFor += $"if ({buscarContador.Temporal} < {finalConteo.Temporal}) goto {etiquetaSalida}; /*LA CONDICION DEL FOR SE A CUMPLIDO*/\n\n ";
+            }
+
+
+
+            //AQUI ESCRIBIMOS EL CODIGO DE TODAS LAS INSTRUCCIONES DENTRO DEL FOR
 
             foreach (Instruccion item in instrucciones)
             {
                 contenidoFor += item.getC3(ent);
             }
 
-
+            /*  ANTES DE COPIAR EL CODIGO FOR LO TABULAMOS */
             codigoFor += Generador.tabular(contenidoFor);
+
+
+            /* ANTES DE REGRESAR AL INICIO DEL CODIGO HAY QUE AUMENTAR O DECREMENTAR EL CONTADOR*/
+            Operacion.Operador aumentoDecremento;
+            if (aumentar) aumentoDecremento = Operacion.Operador.MAS;
+            else aumentoDecremento = Operacion.Operador.MENOS;
+
+            Expresion aumentando = new Operacion(new Identificador(nombreContador, valfinal.linea, valfinal.columna), new Primitivo(1, valfinal.linea, valfinal.columna), aumentoDecremento, linea, columna);
+            Asignacion asignacion = new Asignacion(new Simbolo(nombreContador, linea, columna), aumentando, false, linea, columna);
+            codigoFor += asignacion.getC3(ent);
+
+            // REGRESAR AL INICIO Y SALIR DEL FOR
+            codigoFor += $"goto {etiquetaCiclo}; /* CICLO CUMPLIDO, REGRESAMOS AL INICIO DE LA VALIDACIÓN*/\n\n";
+            codigoFor += $"{etiquetaSalida}: /*FIN DEL CICLO FOR*/ \n\n";
 
             return codigoFor;
         }

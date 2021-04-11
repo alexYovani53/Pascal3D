@@ -63,9 +63,12 @@ namespace CompiPascal.AST_.valoreImplicito
         public string getC3(Entorno ent)
         {
             Funcion existeFuncion = ent.obtenerFuncion(nombreLlamada);
+            Entorno entornoFuncion = new Entorno(ent, nombreLlamada);
+            entornoFuncion.tamano = 1; //HACEMOS ESTO PARA RECERBAR EL ESPACIO DEL RETORNO AL INICIO DE LAS VARIABLES 
 
             if (existeFuncion == null)
             {
+                Program.getIntefaz().agregarError("La funcion no se encontro", linea, columna);
                 return "";
             }
 
@@ -77,13 +80,17 @@ namespace CompiPascal.AST_.valoreImplicito
                 parametros.AddLast(item.obtener3D(ent));
             }
 
-            string codigoParams = verificarParametros(parametros, expresionesValor, existeFuncion.ListaParametros, ent);
+            //GENERAMOS UN TEMPORAL PARA QUE LAS DECLARACIONES SE HAGAN DESPUES DEL ENTORNO ACTUAL 
+            string temporalEntorno = Generador.pedirTemporal();
+            codigo += Generador.tabular($"{temporalEntorno} = SP + {ent.tamano}; \n\n");
+
+            string codigoParams = verificarParametros(parametros, expresionesValor, existeFuncion.ListaParametros, entornoFuncion,temporalEntorno);
             codigo += Generador.tabular(codigoParams);
 
 
-            codigo += $"SP = SP + {ent.tamano};";
+            codigo += $"SP = SP + {ent.tamano};  /*Estamos sumando el tamaño del entorno actual para pasar al siguiente*/\n";
             codigo += $"{existeFuncion.Identificador}();\n";
-            codigo += $"SP = SP -{ent.tamano};\n";
+            codigo += $"SP = SP -{ent.tamano};  /*Estamos restando el tamño sumando previamente para regresar al entorno actual*/\n";
 
             return codigo;
         }
@@ -95,6 +102,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
             if (funcionLlamada == null)
             {
+                Program.getIntefaz().agregarError("La funcion no se encontro", linea, columna);
                 return new result3D();
             }
 
@@ -111,6 +119,8 @@ namespace CompiPascal.AST_.valoreImplicito
             string temp2 = Generador.pedirTemporal();
             string temp3 = Generador.pedirTemporal();
 
+
+
             retorno.Codigo += $"{temp1} = SP + {ent.tamano};                    /*ENTRAMOS AL ENTORNO DE LA FUNCION*/\n";
             retorno.Codigo += $"{temp2} = {temp1} + {funcionLlamada.tamaFuncion};/*NOS TRASLADAMOS AL ULTIMO PARAMETRO DE LA FUNCION (AQUI ESTA EL RETURN)*/\n";
             retorno.Codigo += $"{temp3} = Stack[(int){temp2}];                  /*CAPTURAMOS EL VALOR DEL RETUR*/\n";
@@ -122,7 +132,7 @@ namespace CompiPascal.AST_.valoreImplicito
         }
 
 
-        private string  verificarParametros(LinkedList<result3D> valores, LinkedList<Expresion> refs, LinkedList<Simbolo> parametrosFuncProc, Entorno ent)
+        private string  verificarParametros(LinkedList<result3D> valores, LinkedList<Expresion> refs, LinkedList<Simbolo> parametrosFuncProc, Entorno ent,string temporalEntorno)
         {
             string codigoParams = "";
             int numeroParametros = parametrosFuncProc.Count;
@@ -158,7 +168,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 if(tipoParametro != tipoExpresion)
                 {
-                    Program.getIntefaz().agregarError($"Error de tipos {tipoParametro.ToString()} -> {tipoExpresion.ToString()} " + numeroRecibe, linea, columna);
+                    Program.getIntefaz().agregarError($"Error de tipos {tipoParametro} -> {tipoExpresion} " + numeroRecibe, linea, columna);
                     return "";
                 }
 
@@ -182,6 +192,7 @@ namespace CompiPascal.AST_.valoreImplicito
                     {
                         Simbolo simboloParam = new Simbolo(tipoParametro, nombreParam, false,0,0, parametroActual.linea, parametroActual.columna);
                         Declaracion parametro = new Declaracion(simboloParam,valorActual);
+                        parametro.TemporalCambioEntorno = temporalEntorno;
                         codigoParams+=parametro.getC3(ent);
 
                     }
@@ -194,6 +205,12 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
             return codigoParams;
+        }
+
+
+        public void reservandoRetorno(Entorno ent)
+        {
+            if (ent.tamano == 0) ent.tamano++;
         }
     }
 }

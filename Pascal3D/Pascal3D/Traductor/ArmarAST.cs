@@ -1213,7 +1213,7 @@ namespace CompiPascal.Traductor
                     LinkedList<Simbolo> temporal = (LinkedList<Simbolo>)recorrerArbol(nodo.ChildNodes[indiceLista]);
                     foreach (Simbolo item in temporal)
                     {
-                        //parametros.AddLast(new Simbolo(tipoParametros, item.Identificador,porReferencia,item.linea,item.columna));
+                        parametros.AddLast(new Simbolo(tipoParametros, item.Identificador,porReferencia,item.linea,item.columna));
                     }
                 }
                 else
@@ -1224,7 +1224,7 @@ namespace CompiPascal.Traductor
                     LinkedList<Simbolo> temporal = (LinkedList<Simbolo>)recorrerArbol(nodo.ChildNodes[indiceLista]);
                     foreach (Simbolo item in temporal)
                     {
-                        //parametros.AddLast(new Simbolo(generador, item.Identificador, porReferencia, item.linea, item.columna));
+                        parametros.AddLast(new Simbolo(generador, item.Identificador, porReferencia, item.linea, item.columna));
                     }
 
                 }
@@ -1378,12 +1378,12 @@ namespace CompiPascal.Traductor
 
         public int getLinea(ParseTreeNode nodo, int posicion)
         {
-            return nodo.ChildNodes[posicion].Span.Location.Line;
+            return nodo.ChildNodes[posicion].Span.Location.Line+1;
         }
 
         public int getLineaProduccion(ParseTreeNode nodo, int posicion)
         {
-            return nodo.ChildNodes[posicion].Span.Location.Line;
+            return nodo.ChildNodes[posicion].Span.Location.Line + 1;
         }
         public int getColumnaProduccion(ParseTreeNode nodo, int posicion)
         {

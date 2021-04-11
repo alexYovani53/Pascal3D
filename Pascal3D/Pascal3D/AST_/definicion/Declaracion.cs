@@ -24,6 +24,10 @@ namespace CompiPascal.AST_.definicion
     {
 
 
+        public bool declaraParametro { get; set; }
+
+        public string TemporalCambioEntorno { get; set; }
+
         public int tamanoPadre { get; set; }
         /**
          * @propiedad       valorInicializacion   
@@ -42,7 +46,6 @@ namespace CompiPascal.AST_.definicion
          * @comentario      Lista de las variables a declarar
          */
         private LinkedList<Simbolo> variables { get; set; }
-
 
         private Simbolo ideUnico { get; set; }
 
@@ -77,7 +80,7 @@ namespace CompiPascal.AST_.definicion
             this.tipo_variables = tipo;
             this.variables = variables;
             this.valorInicializacion = inicializador;
-
+            this.declaraParametro = false;
         }
 
         /**
@@ -103,6 +106,7 @@ namespace CompiPascal.AST_.definicion
             this.tipo_variables = tipo;
             this.variables = variables;
             this.valorInicializacion = null;
+            this.declaraParametro = false;
 
         }
 
@@ -121,14 +125,18 @@ namespace CompiPascal.AST_.definicion
 
             this.ideUnico = variable_;
             this.valorInicializacion = inicial;
+            this.declaraParametro = false;
 
         }
 
+        /*  ESTE METODO SE HIZO PARA LA DECLARACIÓN DE PARAMETROS EN FUNCIONES */
         public Declaracion(Simbolo variable,result3D valor)
         {
             this.variables = new LinkedList<Simbolo>();
             this.variables.AddLast(variable);
             this.valor = valor;
+            this.tipo_variables = variable.Tipo; 
+            this.declaraParametro = true;
         }
 
         public bool esInicializado()
@@ -176,6 +184,12 @@ namespace CompiPascal.AST_.definicion
 
         public string getC3(Entorno ent)
         {
+            string puntero_SP_TEMPORAL = "SP";
+            if (declaraParametro)
+            {
+                puntero_SP_TEMPORAL = TemporalCambioEntorno;
+            }
+
 
             //DECLARACION DE CONSTANTES
 
@@ -201,7 +215,7 @@ namespace CompiPascal.AST_.definicion
                 string temporalConst = Generador.pedirTemporal();
 
                 declaracionConstante += $"/*Declaracion de la constante {ideUnico.Identificador}*/\n";
-                declaracionConstante += $"{temporalConst}= SP + {ent.tamano}; \n";
+                declaracionConstante += $"{temporalConst}= {puntero_SP_TEMPORAL} + {ent.tamano}; \n";
                 declaracionConstante += $"Stack[(int){temporalConst}] = {valAsignacion.Temporal}; \n";
 
                 Simbolo constanteNueva = new Simbolo(tipo, ideUnico.Identificador, true, 1, posicionRelativa, ideUnico.linea, ideUnico.columna);
@@ -231,7 +245,7 @@ namespace CompiPascal.AST_.definicion
                     string temp = Generador.pedirTemporal();
 
                     codigoSalida += $"/* declaracion de variable {item.Identificador}*/\n";
-                    codigoSalida += temp + " = SP +" + posicionRelativa + ";\n";
+                    codigoSalida += $"{temp} = {puntero_SP_TEMPORAL} + {posicionRelativa};\n";
                     codigoSalida += $"Stack[(int){temp}] = {def} ; \n";
                     
                     Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador, false, 1,posicionRelativa,item.linea,item.columna);
@@ -285,9 +299,10 @@ namespace CompiPascal.AST_.definicion
                 string temp = Generador.pedirTemporal();
 
                 codigoSalida += $"/* declaracion de variable {variableUniInicializada.Identificador}*/\n";
-                codigoSalida += $"{temp} = SP + {ent.tamano}; \n";
+                codigoSalida += $"{temp} = {puntero_SP_TEMPORAL} + {ent.tamano}; \n";
                 codigoSalida += $"Stack[(int){temp}] = {valAsignacion.Temporal};\n";
                 
+
                
                 Simbolo simboloNuevo = new Simbolo(tipo_variables, variableUniInicializada.Identificador,false, 1, posicionRelativa, variableUniInicializada.linea, variableUniInicializada.columna);
 
@@ -299,6 +314,7 @@ namespace CompiPascal.AST_.definicion
 
             return codigoSalida+"\n";
         }
+
 
           
     }

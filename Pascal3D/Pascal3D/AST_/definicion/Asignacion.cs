@@ -97,7 +97,7 @@ namespace CompiPascal.AST_.definicion
 
         public string getC3(Entorno ent)
         {
-            string codigo = "";
+            string codigo = "/*         ASIGNACION     */\n\n";
             result3D final =   valor.obtener3D(ent);
 
 
@@ -133,7 +133,7 @@ namespace CompiPascal.AST_.definicion
                 {
                     if (final.TipoResultado != TipoDatos.Integer && final.TipoResultado != TipoDatos.Real)
                     {
-                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
                         return "";
                     }
                 }
@@ -141,7 +141,7 @@ namespace CompiPascal.AST_.definicion
                 {
                     if (final.TipoResultado != TipoDatos.Integer && final.TipoResultado != TipoDatos.Real)
                     {
-                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
                         return "";
                     }
                 }
@@ -149,7 +149,7 @@ namespace CompiPascal.AST_.definicion
                 {
                     if (simboloVar.Tipo != final.TipoResultado)
                     {
-                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
                         return "";
                     }
 
@@ -172,6 +172,8 @@ namespace CompiPascal.AST_.definicion
 
             }
 
+            codigo += "/*        FIN ASIGNACION     */\n\n";
+
             return codigo;
         }
 
@@ -181,7 +183,7 @@ namespace CompiPascal.AST_.definicion
             result3D regresos = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $" /*BUSCAMOS EL IDE QUE SERA ASIGNADA EN EL ENTORNO ACTUAL O EN LOS ANTERIORES*/\n";
+            regresos.Codigo += $" /*Buscamos el ide que sera asignado en el entorno actual o en los anteriores*/\n";
             regresos.Codigo += $"{tempora1} = SP; \n";
 
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
@@ -191,8 +193,8 @@ namespace CompiPascal.AST_.definicion
                 {
                     if (item.Identificador.Equals(identificador))
                     {
-                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n\n" ;
-                        regresos.Codigo += "/*ENCONTRAMOS LA POSICION ABSOLUTA EN EL STACK DEL IDE QUE SERA ASIGNADO*/\n";
+                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n\n" ;
+                        regresos.Codigo += "/* Ya tenemos la posicion absoluta del id*/\n";
                         
                         regresos.Temporal = tempora1;
                         regresos.TipoResultado = item.Tipo;

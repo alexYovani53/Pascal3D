@@ -10,6 +10,7 @@ using CompiPascal.entorno_.simbolos;
 using CompiPascal.GUI.Archivo;
 using CompiPascal.Traductor;
 using Irony.Parsing;
+using Pascal3D.GUI;
 using Pascal3D.Traductor;
 using ScintillaNET;
 using System;
@@ -70,9 +71,12 @@ namespace Pascal3D
         public Pascal()
         {
             InitializeComponent();
+            
             iniciar();
             iniciarModeloErrores();
             Errores = new LinkedList<Error>();
+
+            ConsolaSalida.iniciar(SalidaTexto);
         }
 
         public void iniciarModeloErrores()
@@ -321,11 +325,11 @@ namespace Pascal3D
                         }
 
                         SalidaTexto.Text = Generador.cabezera();
+                        SalidaTexto.Text += codigoFunciones;
                         SalidaTexto.Text += "void main() {\n\n";
                         SalidaTexto.Text += codigoDeclaraciones + codigoMain;
                         SalidaTexto.Text += "\treturn 0; \n";
                         SalidaTexto.Text += "}\n";
-                        SalidaTexto.Text += codigoFunciones;
 
 
                     }

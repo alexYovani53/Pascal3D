@@ -132,8 +132,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 //GUARDAMOS EL VALOR DEL PUNTERO (HP) en el temporal de la cadena resultado. 
                 cadena.Temporal = temporal;
 
-                cadena.Codigo  = "/************ Inicio de cadena ***********/ \n";
-                cadena.Codigo += $"{temporal} = HP;\n";
+                cadena.Codigo += $"{temporal} = HP; /************ Inicio de cadena ***********/ \n\n";
 
                 //RECORREMOS TODAS LAS POSICIONES DEL STRING PARA CAPTURAR SU VALOR ASCII 
                 string valString = (string)valor;

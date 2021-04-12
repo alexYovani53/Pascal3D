@@ -91,7 +91,7 @@ namespace CompiPascal.AST_.bucles
             //DEFINIMOS LA ETIQUETA A LA QUE VUELTE CUANDO TERMINA UN CICLO
             string etiquetaCiclo = Generador.pedirEtiqueta();
             string etiquetaSalida = Generador.pedirEtiqueta();
-
+            string etiquetaAumento = Generador.pedirEtiqueta();
 
             codigoFor += $"{etiquetaCiclo}:   /*INICIO DEL CICLO*/ \n\n";
 
@@ -123,6 +123,7 @@ namespace CompiPascal.AST_.bucles
             /*  ANTES DE COPIAR EL CODIGO FOR LO TABULAMOS */
             codigoFor += Generador.tabular(contenidoFor);
 
+            contenidoFor += $"{etiquetaAumento}: \n";
 
             /* ANTES DE REGRESAR AL INICIO DEL CODIGO HAY QUE AUMENTAR O DECREMENTAR EL CONTADOR*/
             Operacion.Operador aumentoDecremento;
@@ -136,6 +137,10 @@ namespace CompiPascal.AST_.bucles
             // REGRESAR AL INICIO Y SALIR DEL FOR
             codigoFor += $"goto {etiquetaCiclo}; /* CICLO CUMPLIDO, REGRESAMOS AL INICIO DE LA VALIDACIÓN*/\n\n";
             codigoFor += $"{etiquetaSalida}: /*FIN DEL CICLO FOR*/ \n\n";
+
+
+            codigoFor =  codigoFor.Replace("#BREAK#", $"goto {etiquetaSalida};"); 
+            codigoFor =  codigoFor.Replace("#CONTINUE#", $"goto {etiquetaAumento};");
 
             return codigoFor;
         }

@@ -211,8 +211,6 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
-            validarId_Ref(opIzq, expreIzq, ent);
-            validarId_Ref(opDer, expreDer, ent);
 
             result3D resultado = new result3D(); 
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede sumar con " + expreDer.TipoResultado;
@@ -360,8 +358,6 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
-            validarId_Ref(opIzq, expreIzq, ent);
-            validarId_Ref(opDer, expreDer, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede RESTAR con " + expreDer.TipoResultado;
@@ -470,8 +466,6 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
-            validarId_Ref(opIzq, expreIzq, ent);
-            validarId_Ref(opDer, expreDer, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede MULTIPLICAR con " + expreDer.TipoResultado;
@@ -580,8 +574,6 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
-            validarId_Ref(opIzq, expreIzq, ent);
-            validarId_Ref(opDer, expreDer, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede RESTAR con " + expreDer.TipoResultado;
@@ -696,8 +688,6 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
-            validarId_Ref(opIzq, expreIzq, ent);
-            validarId_Ref(opDer, expreDer, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede MODULAR con " + expreDer.TipoResultado;
@@ -813,8 +803,6 @@ namespace CompiPascal.AST_.valoreImplicito
             result3D resultado = new result3D();
             result3D resultadoIz = opIzq.obtener3D(ent);
             result3D resultadoDe = opDer.obtener3D(ent);
-            validarId_Ref(opIzq, resultadoIz, ent);
-            validarId_Ref(opDer, resultadoDe, ent);
 
 
             string er = "El tipo " + resultadoIz.TipoResultado + " no se puede OPERAR con " + resultadoDe.TipoResultado;
@@ -866,20 +854,19 @@ namespace CompiPascal.AST_.valoreImplicito
              *   
              */
 
+
             // OPERADOR IZQUIERDO, EN LA ETIQUETA VERDADERA SI SE GENERA UNA NUEVA ETIQUETA
             // EN LA FALSA NO
 
             opIzq.etiquetaFalsa = etiquetaFalsa;
             opIzq.etiquetaVerdadera = Generador.pedirEtiqueta();
             result3D resultIzq = opIzq.obtener3D(ent);
-            validarId_Ref(opIzq, resultIzq, ent);
 
             // OPERADOR FALSO, LA ETIQUETA FALSA Y VERDADERA DE ESTE OPERANDO SON LOS MISMOS DEL PADRES
             // POR ESO QUE SOLO SE COPIAN DE LA OPERACIÓN ACTUAL
             opDer.etiquetaFalsa = etiquetaFalsa;
             opDer.etiquetaVerdadera = etiquetaVerdadera;
             result3D resultDer = opDer.obtener3D(ent);
-            validarId_Ref(opDer, resultDer, ent);
 
             result3D resultado = new result3D();
             string er = "Eror tipo " + resultIzq.TipoResultado + " and " + resultDer.TipoResultado;
@@ -896,15 +883,15 @@ namespace CompiPascal.AST_.valoreImplicito
              *  CUANDO ES UN TRU O FALSE EL VALOR LO GUARDAMOS EN EL TEMPORAL DE ESA EXPRESION (result3D.temporal)
              */
 
-            if (resultIzq.Codigo == "")
+            if (resultIzq.EtiquetaF.Equals("") && resultIzq.EtiquetaV.Equals(""))
             {
                 string etiquetaV = Generador.pedirEtiqueta();
                 string etiquetaF;
                 if (etiquetaFalsa.Equals("")) etiquetaF = Generador.pedirEtiqueta();
                 else etiquetaF = etiquetaFalsa;
 
-
-                resultado.Codigo = "if (" + resultIzq.Temporal + " == 1)  goto " + etiquetaV+ "; \n";
+                resultado.Codigo = resultIzq.Codigo; 
+                resultado.Codigo += "if (" + resultIzq.Temporal + " == 1)  goto " + etiquetaV+ "; \n";
                 resultado.Codigo += "goto " + etiquetaF + "; \n";
 
                 resultIzq.EtiquetaV = etiquetaV;
@@ -919,10 +906,10 @@ namespace CompiPascal.AST_.valoreImplicito
             //PEGAMOS LA ETIQUETA VERDADERA PARA EVALUAR EL SIGUIENTE OPERANDO DEL AND
             resultado.Codigo += resultIzq.EtiquetaV+ ": ";
 
-            if(resultDer.Codigo == "")
+            if(resultDer.EtiquetaF.Equals("") && resultDer.EtiquetaV.Equals(""))
             {
                 string etiquetaV = Generador.pedirEtiqueta();
-
+                resultado.Codigo += resultDer.Codigo;
                 resultado.Codigo += "if (" + resultDer.Temporal + " == 1) goto " + etiquetaV +"; \n";
                 resultado.Codigo += "goto " + resultIzq.EtiquetaF + "; \n";
 
@@ -957,19 +944,18 @@ namespace CompiPascal.AST_.valoreImplicito
              */
 
 
+
             // OPERADOR IZQUIERDO, EN LA ETIQUETA FALSA SI SE GENERA UNA NUEVA ETIQUETA
             // EN LA VERDADERA NO
             opIzq.etiquetaVerdadera = etiquetaVerdadera;
             opIzq.etiquetaFalsa = Generador.pedirEtiqueta();
             result3D resultIzq = opIzq.obtener3D(ent);
-            validarId_Ref(opIzq, resultIzq, ent); 
 
             // OPERADOR FALSO, LA ETIQUETA FALSA Y VERDADERA DE ESTE OPERANDO SON LOS MISMOS DEL PADRES
             // POR ESO QUE SOLO SE COPIAN DE LA OPERACIÓN ACTUAL
             opDer.etiquetaVerdadera = etiquetaVerdadera;
             opDer.etiquetaFalsa = etiquetaFalsa;
             result3D resultDer = opDer.obtener3D(ent);
-            validarId_Ref(opDer, resultDer, ent);
 
             result3D resultado = new result3D();
             string er = "Eror tipo " + resultIzq.TipoResultado + " or " + resultDer.TipoResultado;
@@ -986,12 +972,13 @@ namespace CompiPascal.AST_.valoreImplicito
              *  CUANDO ES UN TRU O FALSE EL VALOR LO GUARDAMOS EN EL TEMPORAL DE ESA EXPRESION (result3D.temporal)
              */
 
-            if (resultIzq.Codigo == "")
+            if (resultIzq.EtiquetaF.Equals("") && resultIzq.EtiquetaV.Equals(""))
             {
                 string etiquetaV = opIzq.etiquetaVerdadera;
                 string etiquetaF = opIzq.etiquetaFalsa;
 
-                resultado.Codigo = "if (" + resultIzq.Temporal + " == 1 ) goto " + etiquetaV + "; \n";
+                resultado.Codigo += resultIzq.Codigo;
+                resultado.Codigo += "if (" + resultIzq.Temporal + " == 1 ) goto " + etiquetaV + "; \n";
                 resultado.Codigo += "goto " + etiquetaF + "; \n";
 
                 resultIzq.EtiquetaV = etiquetaV;
@@ -1006,11 +993,12 @@ namespace CompiPascal.AST_.valoreImplicito
             //PEGAMOS LA ETIQUETA VERDADERA PARA EVALUAR EL SIGUIENTE OPERANDO DEL AND
             resultado.Codigo += resultIzq.EtiquetaF + ": ";
 
-            if (resultDer.Codigo == "")
+            if (resultDer.EtiquetaF.Equals("") && resultDer.EtiquetaV.Equals(""))
             {
                 string etiquetaV = opDer.etiquetaVerdadera;
                 string etiquetaF = opDer.etiquetaFalsa;
 
+                resultado.Codigo += resultDer.Codigo;
                 resultado.Codigo += "if (" + resultDer.Temporal + " == 1) goto " + etiquetaV + "; \n";
                 resultado.Codigo += "goto " + resultIzq.EtiquetaF + "; \n";
 
@@ -1028,6 +1016,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
             return resultado;
         }
+
         public result3D LOGIC_NOT(Expresion opUnico, Entorno ent)
         {
 
@@ -1037,7 +1026,6 @@ namespace CompiPascal.AST_.valoreImplicito
             opUnico.etiquetaVerdadera = etiquetaFalsa; 
             opUnico.etiquetaFalsa = etiquetaVerdadera;
             result3D resultUnico = opUnico.obtener3D(ent);
-            validarId_Ref(opUnico, resultUnico, ent);
 
             result3D resultado = new result3D();
             string er = "Eror tipo  not " + resultUnico.TipoResultado;
@@ -1050,12 +1038,13 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
 
-            if (resultUnico.Codigo == "")
+            if (resultUnico.EtiquetaF.Equals("") && resultUnico.EtiquetaV.Equals(""))
             {
                 string etiquetaV = opUnico.etiquetaVerdadera;
                 string etiquetaF = opUnico.etiquetaFalsa;
 
-                resultado.Codigo = "if (" + resultUnico.Temporal + " == 1 ) goto " + etiquetaV + "; \n";
+                resultado.Codigo = resultUnico.Codigo; 
+                resultado.Codigo += "if (" + resultUnico.Temporal + " == 1 ) goto " + etiquetaV + "; \n";
                 resultado.Codigo += "goto " + etiquetaF + "; \n";
 
                 resultUnico.EtiquetaV = etiquetaV;
@@ -1157,34 +1146,15 @@ namespace CompiPascal.AST_.valoreImplicito
         }
 
 
-
-        /* CUANDO DENTRO DE UNA FUNCION, SE USA UN IDE QUE ES UNA REFERENCIA, AL OBTENER EL 3D DE ESTE IDE, SE RETORNA 
-         * LA POSICION DONDE ESTA GUARDADO EL VALOR AL QUE APUNTA, ES DECIR UNA POSICION DENTRO DEL STACK. POR LO QUE 
-         * AHORA RETORNAMOS ESE VALOR REAL QUE CONTIENE EL PUNTERO
-         */
-        public void validarId_Ref(Expresion ide, result3D valor, Entorno ent)
+        public Expresion comprobarTipo(Expresion op )
         {
 
-            ///*      VALIDAMOS QUE EL valol.Temporal NO SEA NULLO, ESTO INDICARIA QUE DURANTE SU OBTENCIÓN SE ENCONTRO UN ERROR
-            // *      Y EL RESULTADO NO SE RETORNO CORRECTAMENTE */
+            if (op is Identificador)
+            {
+                return new Operacion(op, new Primitivo(1, op.linea, op.columna), Operador.IGUAL, op.linea, op.columna);
+            }
 
-            //if(ide is Identificador && !valor.Temporal.Equals(""))
-            //{
-
-            //    foreach (Simbolo item in ent.TablaSimbolos())
-            //    {
-            //        if (item.Identificador.Equals(((Identificador)ide).nombre()))
-            //        {
-            //            string temporalNuevo = Generador.pedirTemporal();
-
-            //            valor.Codigo += $"{temporalNuevo} = Stack[(int){valor.Temporal}]; /*Ahora si tenemos la referencia al valor y no a un puntero*/\n";
-            //            valor.Temporal = temporalNuevo;
-            //        }
-                
-            //    }
-                
-            //}
-
+            return op;
         }
 
     }

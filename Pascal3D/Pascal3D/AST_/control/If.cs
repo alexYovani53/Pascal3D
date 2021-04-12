@@ -67,22 +67,32 @@ namespace CompiPascal.AST_.control
         {
 
             result3D result = new result3D();
+            result3D condicion = new result3D();
             string etiquetaSalida = Generador.pedirEtiqueta();
 
+            if(exprCondicional is Operacion)
+            {
+                ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
+                ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
+                condicion = exprCondicional.obtener3D(ent);
 
-            ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
-            ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
-            result3D result2 = exprCondicional.obtener3D(ent);
+            }
+            else if(exprCondicional is Llamada)
+            {
+                
+            }
+
+
 
             result.Codigo += "/****************************  INSTRUCCION IF *************/";
-            result.Codigo += result2.Codigo;
-            result.Codigo += result2.EtiquetaV+" :               /*Continua el codigo de las instrucciones*/\n";
+            result.Codigo += condicion.Codigo;
+            result.Codigo += condicion.EtiquetaV+" :               /*Continua el codigo de las instrucciones*/\n";
             result.Codigo += generarCodigoInstrucciones(instrucciones, ent);
 
             result.Codigo += $" goto {etiquetaSalida} ;             /*etiqueta salida*/ \n\n\n";
 
 
-            result.Codigo += result2.EtiquetaF+ " :                  /*Etiqueta falsa*/ \n";
+            result.Codigo += condicion.EtiquetaF+ " :                  /*Etiqueta falsa*/ \n";
 
             foreach (Instruccion item in instruccionesElse_if)
             {

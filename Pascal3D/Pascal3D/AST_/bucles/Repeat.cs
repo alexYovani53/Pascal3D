@@ -49,11 +49,21 @@ namespace CompiPascal.AST_.bucles
 
             /* COPIAMOS EL CODIGO Y LA ETIQUETA DE SALIDA PARA LA EXPRESIÓN */
             codigo += resultadoPrueba.Codigo;
+            codigo += $"{resultadoPrueba.EtiquetaV}: \n";
+
+            foreach (Instruccion item in instrucciones)
+            {
+                codigo += Generador.tabular(item.getC3(ent));
+            }
+            codigo += $"goto {repeatInicio};\n";
+
             codigo += resultadoPrueba.EtiquetaF + ": \n";
 
 
-            Program.getIntefaz().agregarTexto(codigo);
-            return "";
+            codigo = codigo.Replace("#BREAK#", $"goto {resultadoPrueba.EtiquetaF};");
+            codigo = codigo.Replace("#CONTINUE#", $"goto {repeatInicio};");
+
+            return codigo;
         }
     }
 }

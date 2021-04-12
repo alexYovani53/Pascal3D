@@ -94,7 +94,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 foreach (Simbolo item in actual.TablaSimbolos())
                 {
                     //COMPARAMOS CADA VARIABLE PARA COMPROBAR SI ESTA EN EL ENTORNO ACTUAL
-                    if (item.Identificador.Equals(identificador))
+                    if (item.Identificador.Equals(identificador.ToLower()))
                     {
                         string tempora2 = Generador.pedirTemporal();
                         regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
@@ -106,7 +106,7 @@ namespace CompiPascal.AST_.valoreImplicito
                         if (item.porReferencia)
                         {
                             string tempora3 = Generador.pedirTemporal();
-                            regresos.Codigo += $"{tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/";
+                            regresos.Codigo += $"{tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
                             regresos.Temporal = tempora3;
                         }
                         else regresos.Temporal = tempora2;
@@ -118,7 +118,10 @@ namespace CompiPascal.AST_.valoreImplicito
                     }
                 }
 
-                regresos.Codigo += $"{tempora1} = {tempora1} - {actual.tamano};             /*Retrocedemos entre los entornos*/\n";
+                if (actual.entAnterior() != null)
+                {
+                    regresos.Codigo += $"{tempora1} = {tempora1} - {actual.entAnterior().tamano};             /*Retrocedemos entre los entornos*/\n";
+                }
             }
 
             return new result3D();
@@ -144,7 +147,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 foreach (Simbolo item in actual.TablaSimbolos())
                 {
                     //COMPARAMOS CADA VARIABLE PARA COMPROBAR SI ESTA EN EL ENTORNO ACTUAL
-                    if (item.Identificador.Equals(identificador))
+                    if (item.Identificador.Equals(identificador.ToLower()))
                     {
                         string tempora2 = Generador.pedirTemporal();
 
@@ -158,7 +161,10 @@ namespace CompiPascal.AST_.valoreImplicito
                     }
                 }
 
-                regresos.Codigo += $"{tempora1} = {tempora1} - {actual.tamano};             /*Retrocedemos entre los entornos*/\n";
+                if (actual.entAnterior() != null)
+                {
+                    regresos.Codigo += $"{tempora1} = {tempora1} - {actual.entAnterior().tamano};             /*Retrocedemos entre los entornos*/\n";
+                }
             }
 
             return new result3D();

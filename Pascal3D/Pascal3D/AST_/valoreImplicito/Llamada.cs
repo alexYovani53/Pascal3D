@@ -74,7 +74,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
             retorno.Codigo += $"{temp1} = SP + {ent.tamano};                    /*ENTRAMOS AL ENTORNO DE LA FUNCION*/\n";
-            retorno.Codigo += $"{temp2} = {temp1} + {funcionLlamada.tamaFuncion};/*NOS TRASLADAMOS AL ULTIMO PARAMETRO DE LA FUNCION (AQUI ESTA EL RETURN)*/\n";
+            retorno.Codigo += $"{temp2} = {temp1} + 0;                          /*NOS TRASLADAMOS AL PRIMER PARAMETRO DE LA FUNCION (AQUI ESTA EL RETURN)*/\n";
             retorno.Codigo += $"{temp3} = Stack[(int){temp2}];                  /*CAPTURAMOS EL VALOR DEL RETUR*/\n";
 
             retorno.Temporal = temp3;

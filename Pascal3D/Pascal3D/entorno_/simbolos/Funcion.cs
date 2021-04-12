@@ -221,7 +221,7 @@ namespace CompiPascal.entorno_.simbolos
                 result3D codigo_cambio_valor = ide_var_funcion.obtener3D(ent);
 
                 codigo += codigo_cambio_valor.Codigo;
-                codigo += $"{temporal} = SP + 0;  /* lo que hacemos es cambiar el valor en la variable que se llama igual que la funcion, a la primera posicion del entorno actual*/ \n";
+                codigo += $"{temporal} = SP + 0;                    /* lo que hacemos es cambiar el valor en la variable que se llama igual que la funcion, a la primera posicion del entorno actual*/ \n";
                 codigo += $"Stack[(int){temporal}] = {codigo_cambio_valor.Temporal}; \n";
 
             }
@@ -234,7 +234,7 @@ namespace CompiPascal.entorno_.simbolos
 
             codigo += "/*************************************************** CONFIGURANDO RETORNO*/\n";
 
-            return codigo = Generador.tabular(codigo);
+            return Generador.tabular(codigo);
         }
 
 

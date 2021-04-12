@@ -1,6 +1,7 @@
 ﻿using CompiPascal.AST_.cambioFlujo;
 using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,7 +29,18 @@ namespace CompiPascal.AST_.control
 
         public string getC3(Entorno ent)
         {
-            throw new NotImplementedException();
+
+
+            string codigo = "";
+
+            foreach (Instruccion item in instrucciones)
+            {
+                codigo += item.getC3(ent);
+            }
+
+
+
+            return Generador.tabular(codigo);
         }
     }
 }

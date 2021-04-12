@@ -314,6 +314,12 @@ namespace Pascal3D
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }
+                                    else if (interna is SwitchCase)
+                                    {
+                                        string codTemp = ((SwitchCase)interna).getC3(GLOBAL);
+                                        codTemp = Generador.tabular(codTemp);
+                                        codigoMain += codTemp;
+                                    }
 
 
 

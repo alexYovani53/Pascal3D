@@ -97,11 +97,12 @@ namespace CompiPascal.AST_.definicion
 
         public string getC3(Entorno ent)
         {
-            string codigo = "/*         ASIGNACION     */\n\n";
+            string codigo = "/*************************************** FIN ASIGNACION *********/\n\n";
             result3D final =   valor.obtener3D(ent);
+            verificarTipo_Boolean(final);
 
 
-            if(esobjeto)
+            if (esobjeto)
             {
 
 
@@ -171,7 +172,7 @@ namespace CompiPascal.AST_.definicion
 
             }
 
-            codigo += "/*        FIN ASIGNACION     */\n\n";
+            codigo += "/*************************************** FIN ASIGNACION *********/\n\n";
 
             return codigo;
         }
@@ -182,7 +183,7 @@ namespace CompiPascal.AST_.definicion
             result3D regresos = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $" /*Buscamos el ide que sera asignado en el entorno actual o en los anteriores*/\n";
+            regresos.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR*/\n";
             regresos.Codigo += $"{tempora1} = SP; \n";
 
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
@@ -193,7 +194,7 @@ namespace CompiPascal.AST_.definicion
                     if (item.Identificador.Equals(identificador))
                     {
                                             
-                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n\n" ;
+                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n" ;
 
                         /* CUANDO LA ASIGNACIÓN ES A UNA VARIABLE POR REFERENCIA EN UNA FUNCION, LA VARIABLE GUARDA LA REFERENCIA
                          * HACIA EL STACK 
@@ -202,23 +203,42 @@ namespace CompiPascal.AST_.definicion
                         if (item.porReferencia)
                         {
                             string temporal2 = Generador.pedirTemporal();
-                            regresos.Codigo += $"{temporal2} = Stack[(int) {tempora1}]; /* Variable por referencia, puntero*/ \n";
+                            regresos.Codigo += $"{temporal2} = Stack[(int) {tempora1}];             /* Variable por referencia, puntero*/ \n";
                             regresos.Temporal = temporal2;
                         }
                         else regresos.Temporal = tempora1;
 
-                        regresos.Codigo += "/* Ya tenemos la posicion absoluta del id*/\n";
-                        
+
+                        regresos.Codigo += $"/*BUSCANDO DIRECCION DE UN IDENTIFICADOR -> ENCONTRADO*/\n\n";
+
 
                         regresos.TipoResultado = item.Tipo;
                         return regresos;
                     }
                 }
 
-                regresos.Codigo += $"{tempora1} = {tempora1} - {actual.tamano};             /*Retrocedemos entre los entornos*/";
+                if (actual.entAnterior() != null)
+                {
+                    regresos.Codigo += $"{tempora1} = {tempora1} - {actual.entAnterior().tamano};             /*Retrocedemos entre los entornos*/\n";
+                }
             }
 
             return regresos;
+        }
+
+        public void verificarTipo_Boolean(result3D reBooleano)
+        {
+
+            if (reBooleano.Temporal.Equals("") && reBooleano.TipoResultado == TipoDatos.Boolean)
+            {
+                reBooleano.Temporal = Generador.pedirTemporal();
+
+                reBooleano.Codigo += $"{reBooleano.EtiquetaV}: \n";
+                reBooleano.Codigo += Generador.tabularLinea($"{reBooleano.Temporal} = 1; \n", 1);
+                reBooleano.Codigo += $"{reBooleano.EtiquetaF}: \n";
+                reBooleano.Codigo += Generador.tabularLinea($"{reBooleano.Temporal} = 0; \n", 1);
+            }
+
         }
     }
 }

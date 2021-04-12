@@ -24,7 +24,13 @@ namespace CompiPascal.AST_.cambioFlujo
 
         public string getC3(Entorno ent)
         {
-            throw new NotImplementedException();
+            string codigo = "";
+            if (siPuedeRetornar)
+            {
+                codigo = Pascal3D.Traductor.Generador.tabularLinea("#CONTINUE# \n", 1);
+            }
+
+            return codigo;
         }
     }
 }

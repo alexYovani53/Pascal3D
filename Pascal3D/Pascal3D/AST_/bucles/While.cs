@@ -48,10 +48,20 @@ namespace CompiPascal.AST_.bucles
             whileCadena += result.Codigo;
             whileCadena += result.EtiquetaV +":\n";
 
+            foreach (Instruccion item in instrucciones)
+            {
+                whileCadena += Generador.tabular(item.getC3(ent));
+            }
+
             /* SALTO Y ETIQUETA DE SALIDA*/
             whileCadena += "goto " + etiquetaInicio + ";\n";
             whileCadena += result.EtiquetaF+ ":\n";
 
+
+            whileCadena.Replace("#RETORNAR#", $"goto {result.EtiquetaF};");
+
+            whileCadena = whileCadena.Replace("#BREAK#", $"goto {result.EtiquetaF};");
+            whileCadena = whileCadena.Replace("#CONTINUE#", $"goto {etiquetaInicio};");
 
             return whileCadena;
 

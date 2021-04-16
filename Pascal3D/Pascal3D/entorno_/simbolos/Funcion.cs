@@ -158,10 +158,11 @@ namespace CompiPascal.entorno_.simbolos
 
             codigoFuncion += Generador.tabularLinea($"{etiquetaRetorno}: \n",1);
             codigoFuncion += Generador.tabularLinea("return;\n", 1);
-            codigoFuncion += "}";
+            codigoFuncion += "}\n\n";
 
             tamaFuncion = ent.tamano;
 
+            codigoFuncion = codigoFuncion.Replace("#EXIT#", etiquetaRetorno);
 
             return codigoFuncion;
         }

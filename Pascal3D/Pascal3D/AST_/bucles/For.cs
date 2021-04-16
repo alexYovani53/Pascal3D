@@ -73,6 +73,7 @@ namespace CompiPascal.AST_.bucles
             string contenidoFor = "";               /* GUARDARA EL CODIGO DE LAS INTRUCCIONES DENTRO DEL FOR*/
 
             //ESTA ES LA SECCIÓN DONDE SE INICIA EL CONTADOR DEL FOR
+            codigoFor += "/************************************************************ INICIO CICLO FOR **************************/\n";
             codigoFor += "/*ASIGNACIÓN DEL CONTADOR*/ \n";
             codigoFor += valorInicial.getC3(ent);   
 
@@ -123,7 +124,7 @@ namespace CompiPascal.AST_.bucles
             /*  ANTES DE COPIAR EL CODIGO FOR LO TABULAMOS */
             codigoFor += Generador.tabular(contenidoFor);
 
-            contenidoFor += $"{etiquetaAumento}: \n";
+            codigoFor += $"{etiquetaAumento}: \n";
 
             /* ANTES DE REGRESAR AL INICIO DEL CODIGO HAY QUE AUMENTAR O DECREMENTAR EL CONTADOR*/
             Operacion.Operador aumentoDecremento;
@@ -136,7 +137,7 @@ namespace CompiPascal.AST_.bucles
 
             // REGRESAR AL INICIO Y SALIR DEL FOR
             codigoFor += $"goto {etiquetaCiclo}; /* CICLO CUMPLIDO, REGRESAMOS AL INICIO DE LA VALIDACIÓN*/\n\n";
-            codigoFor += $"{etiquetaSalida}: /*FIN DEL CICLO FOR*/ \n\n";
+            codigoFor += $"{etiquetaSalida}: \n /************************************************************ FIN CICLO FOR **************************/\n\n";
 
 
             codigoFor =  codigoFor.Replace("#BREAK#", $"goto {etiquetaSalida};"); 

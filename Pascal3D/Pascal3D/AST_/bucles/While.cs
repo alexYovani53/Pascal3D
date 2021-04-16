@@ -44,7 +44,8 @@ namespace CompiPascal.AST_.bucles
             result3D result = exprCondicional.obtener3D(ent);
 
             /* CODIGO DEL WHILE */
-            string whileCadena = etiquetaInicio + ": \n";
+            string whileCadena = "/************************************************************ INICIO CICLO WHILE **************************/\n\n";
+            whileCadena += etiquetaInicio + ": \n";
             whileCadena += result.Codigo;
             whileCadena += result.EtiquetaV +":\n";
 
@@ -56,7 +57,7 @@ namespace CompiPascal.AST_.bucles
             /* SALTO Y ETIQUETA DE SALIDA*/
             whileCadena += "goto " + etiquetaInicio + ";\n";
             whileCadena += result.EtiquetaF+ ":\n";
-
+            whileCadena += "/************************************************************ FIN CICLO WHILE **************************/\n\n";
 
             whileCadena.Replace("#RETORNAR#", $"goto {result.EtiquetaF};");
 

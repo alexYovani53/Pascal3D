@@ -58,10 +58,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
 
             string codigoWrite = "";
 
-            if (saltoLinea)
-            {
-                codigoWrite += "printf(\"%c\", (char)10); /*imprime salto de linea*/ \n";
-            }
+
 
             foreach (Expresion item in expr_imprimir)
             {
@@ -148,6 +145,11 @@ namespace CompiPascal.AST_.funcionesPrimitivas
                     }
                 }
 
+            }
+
+            if (saltoLinea)
+            {
+                codigoWrite += "printf(\"%c\", (char)10); /*imprime salto de linea*/ \n";
             }
 
             return codigoWrite;

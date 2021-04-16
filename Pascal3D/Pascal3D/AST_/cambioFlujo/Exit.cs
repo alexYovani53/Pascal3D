@@ -1,4 +1,5 @@
 ﻿using CompiPascal.AST_.interfaces;
+using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
 using Pascal3D.Traductor;
 using System;
@@ -67,7 +68,7 @@ namespace CompiPascal.AST_.cambioFlujo
             }
             else
             {
-                result3D resultExpresion = valorSalida.obtener3D(ent);
+                result3D resultExpresion = validarRetorno(ent);
                 codigo += resultExpresion.Codigo;
                 codigo += $"Stack[(int){temp1}] = {resultExpresion.Temporal}; /* Asiganción de valor de retorno */\n";
                 codigo += "#EXIT# \n";
@@ -86,6 +87,35 @@ namespace CompiPascal.AST_.cambioFlujo
             retorno.TipoResultado = tipoRet;
 
             return retorno;
+        }
+
+        /* MODIFICA EL RESULTADO CUANDO LA EXPRESIÓN A RETORNAR ES UNA OPERACIÓN QUE DEVUELVE UN IF (COMPARACIÓN --> TIPO BOOLEANO)  */
+        public result3D validarRetorno(Entorno ent)
+        {
+            result3D resultExpresion = valorSalida.obtener3D(ent);
+
+            // COMPROBAMOS QUE LA OPERACIÓN HAYA GENERADO CODIGO DE UN IF Y "NO DEVUELVE NADA EN EL TEMPORAL"
+            if(valorSalida is Operacion && resultExpresion.TipoResultado == TipoDatos.Boolean && resultExpresion.Temporal.Equals(""))
+            {
+                string temporal = Generador.pedirTemporal();
+                string salida = Generador.pedirEtiqueta();
+                result3D Nuevo = new result3D();
+                Nuevo.Codigo = resultExpresion.Codigo;
+
+
+                Nuevo.Codigo += $"{resultExpresion.EtiquetaV}: \n";
+                Nuevo.Codigo += Generador.tabularLinea($"{temporal} = 1;",2);
+                Nuevo.Codigo += Generador.tabularLinea($"goto {salida};",2);
+                Nuevo.Codigo += $"{resultExpresion.EtiquetaF}:\n"; 
+                Nuevo.Codigo += Generador.tabularLinea($"{temporal} = 0;",2);
+                Nuevo.Codigo += $"{salida}: \n";
+
+                Nuevo.Temporal = temporal;
+                Nuevo.TipoResultado = TipoDatos.Boolean;
+                return Nuevo;
+            }
+
+            return resultExpresion;
         }
     }
 }

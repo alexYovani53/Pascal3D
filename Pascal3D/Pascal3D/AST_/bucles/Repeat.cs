@@ -46,8 +46,8 @@ namespace CompiPascal.AST_.bucles
              * VERDADERAS Y FALSAS SE DEBEN HABER GENERADO ANTES DE COMENZAR CON LA TRADUCCIÓN DE ESTA EXPRESION
              */
 
-            ((Expresion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
-            ((Expresion)exprCondicional).etiquetaVerdadera = repeatInicio;
+            ((Expresion)exprCondicional).etiquetaFalsa = repeatInicio;
+            ((Expresion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta(); 
 
             /* GENERAMOS EL CODIGO DE LA EXPRESIÓN CONDICION DEL REPEAT*/
             result3D resultadoPrueba = exprCondicional.obtener3D(ent);
@@ -55,7 +55,7 @@ namespace CompiPascal.AST_.bucles
             /* COPIAMOS EL CODIGO Y LA ETIQUETA DE SALIDA PARA LA EXPRESIÓN */
             codigo += resultadoPrueba.Codigo;  
 
-            codigo += resultadoPrueba.EtiquetaF + ": \n";
+            codigo += resultadoPrueba.EtiquetaV + ": \n";
             codigo += "/************************************************************ FIN CICLO REPEAT - UNTIL **************************/ \n\n";
 
 

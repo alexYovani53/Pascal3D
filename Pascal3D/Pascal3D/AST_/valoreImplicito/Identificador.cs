@@ -120,7 +120,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 if (actual.entAnterior() != null)
                 {
-                    regresos.Codigo += $"{tempora1} = {tempora1} - {actual.entAnterior().tamano};             /*Retrocedemos entre los entornos*/\n";
+                    regresos.Codigo += $"{tempora1} = 0;             /*Retrocedemos al entorno global*/\n";
                 }
             }
 
@@ -163,7 +163,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 if (actual.entAnterior() != null)
                 {
-                    regresos.Codigo += $"{tempora1} = {tempora1} - {actual.entAnterior().tamano};             /*Retrocedemos entre los entornos*/\n";
+                    regresos.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
                 }
             }
 

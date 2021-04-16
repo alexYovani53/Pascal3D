@@ -162,7 +162,7 @@ namespace CompiPascal.entorno_.simbolos
 
             tamaFuncion = ent.tamano;
 
-            codigoFuncion = codigoFuncion.Replace("#EXIT#", etiquetaRetorno);
+            codigoFuncion = codigoFuncion.Replace("#EXIT#", $"goto {etiquetaRetorno};");
 
             return codigoFuncion;
         }

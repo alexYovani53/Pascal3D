@@ -165,7 +165,14 @@ namespace CompiPascal.AST_.valoreImplicito
                     resultado = SUMA(operando1, operando2, ent);
                     break;
                 case Operador.MENOS:
-                    resultado = RESTA(operando1, operando2, ent);
+                    if(operando1 != null && operando2 != null)
+                    {
+                        resultado = RESTA(operando1, operando2, ent);
+                    }
+                    else
+                    {
+                        resultado= RESTA_UNARIA(operandoU,ent);
+                    }
                     break;
                 case Operador.MULTIPLICACION:
                     resultado = MULTIPLICACION(operando1, operando2, ent);
@@ -353,6 +360,30 @@ namespace CompiPascal.AST_.valoreImplicito
 
             return resultado;
         }
+
+        public result3D RESTA_UNARIA(Expresion unario,Entorno ent)
+        {
+
+            result3D resultUnario = unario.obtener3D(ent);
+
+            if(resultUnario.TipoResultado != TipoDatos.Integer && resultUnario.TipoResultado != TipoDatos.Real)
+            {
+                Program.getIntefaz().agregarError("El operador unario \"-\" solo puede operarse con un valor numerico", unario.linea, unario.columna);
+                return new result3D();
+            }
+
+            result3D restaUnario = new result3D();
+            string temp1 = Generador.pedirTemporal();
+
+            restaUnario.Codigo += resultUnario.Codigo;
+            restaUnario.Codigo += $"{temp1} = 0 - {resultUnario.Temporal};\n";
+
+            resultUnario.Temporal = temp1;
+            resultUnario.TipoResultado = resultUnario.TipoResultado;
+
+            return resultUnario;
+        }
+
         public result3D RESTA(Expresion opIzq, Expresion opDer, Entorno ent)
         {
 

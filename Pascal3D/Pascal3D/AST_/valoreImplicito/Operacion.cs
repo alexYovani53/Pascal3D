@@ -830,6 +830,26 @@ namespace CompiPascal.AST_.valoreImplicito
                 resultado.TipoResultado = TipoDatos.Boolean;
             }
 
+            else if(resultadoIz.TipoResultado == TipoDatos.Boolean && resultadoDe.TipoResultado == TipoDatos.Boolean 
+                && (relacion.Equals("==") || relacion.Equals("!=")))
+            {
+                //OBTENEMOS LAS ETIQUETAS DE SALIDA Y CONTINUACION
+                string etiquetaV;
+                etiquetaV = (etiquetaVerdadera == null || etiquetaVerdadera.Equals("")) ? Generador.pedirEtiqueta() : etiquetaVerdadera;
+
+                string etiquetaF;
+                etiquetaF = (etiquetaFalsa == null || etiquetaFalsa.Equals("")) ? Generador.pedirEtiqueta() : etiquetaFalsa;
+
+
+                resultado.Codigo = resultadoIz.Codigo + resultadoDe.Codigo + "\n";
+                resultado.Codigo += "if (" + resultadoIz.Temporal + relacion + resultadoDe.Temporal + ") goto " + etiquetaV + "; \n";
+                resultado.Codigo += Generador.tabularLinea("goto " + etiquetaF + ";\n", 2);
+
+                resultado.EtiquetaV = etiquetaV;
+                resultado.EtiquetaF = etiquetaF;
+
+                resultado.TipoResultado = TipoDatos.Boolean;
+            }
             else
             {
                 Program.getIntefaz().agregarError(er, operando1.linea, operando1.columna);

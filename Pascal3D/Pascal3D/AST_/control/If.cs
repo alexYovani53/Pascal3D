@@ -70,21 +70,23 @@ namespace CompiPascal.AST_.control
             result3D condicion = new result3D();
             string etiquetaSalida = Generador.pedirEtiqueta();
 
-            if(exprCondicional is Operacion)
+            if (exprCondicional is Operacion)
             {
                 ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
                 ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
                 condicion = exprCondicional.obtener3D(ent);
 
             }
-            else if(exprCondicional is Llamada)
+            else if (exprCondicional is Llamada)
             {
-                
+                Operacion comparacion = new Operacion(exprCondicional, new Primitivo(true, linea, columna), Operacion.Operador.IGUAL, linea, columna);
+                comparacion.etiquetaFalsa = Generador.pedirEtiqueta();
+                comparacion.etiquetaVerdadera = Generador.pedirEtiqueta();
+                condicion = comparacion.obtener3D(ent);
             }
 
 
-
-            result.Codigo += "/****************************  INSTRUCCION IF *************/";
+            result.Codigo += "/****************************  INSTRUCCION IF *************/\n";
             result.Codigo += condicion.Codigo;
             result.Codigo += condicion.EtiquetaV+" :               /*Continua el codigo de las instrucciones*/\n";
             result.Codigo += generarCodigoInstrucciones(instrucciones, ent);

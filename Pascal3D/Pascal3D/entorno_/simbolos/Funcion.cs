@@ -131,7 +131,7 @@ namespace CompiPascal.entorno_.simbolos
             Entorno nuevo = new Entorno(ent,"Funcion_"+this.Identificador);
             string codigoFuncion = "";
 
-            codigoFuncion += $"void {this.Identificador} () "+"{";
+            codigoFuncion += $"void {this.Identificador} () "+"{\n\n";
             agregarParametros(nuevo);
             agregarRetorno(nuevo);
 

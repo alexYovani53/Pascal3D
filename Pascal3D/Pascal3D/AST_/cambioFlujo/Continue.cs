@@ -22,7 +22,7 @@ namespace CompiPascal.AST_.cambioFlujo
         }
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
             string codigo = "";
             if (siPuedeRetornar)

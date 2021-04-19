@@ -59,7 +59,7 @@ namespace CompiPascal.AST_.valoreImplicito
             }
 
             result3D retorno = new result3D();
-            retorno.Codigo = getC3(ent);
+            retorno.Codigo = getC3(ent,null);
 
             if (funcionLlamada.Tipo == TipoDatos.Void)
             {
@@ -85,7 +85,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
             Funcion existeFuncion = ent.obtenerFuncion(nombreLlamada);
             Entorno entornoFuncion = new Entorno(ent, nombreLlamada);
@@ -198,7 +198,7 @@ namespace CompiPascal.AST_.valoreImplicito
                         Simbolo simboloParam = new Simbolo(tipoParametro, nombreParam, false,0,0, parametroActual.linea, parametroActual.columna);
                         Declaracion parametro = new Declaracion(simboloParam,valorActual);
                         parametro.TemporalCambioEntorno = temporalEntorno;
-                        codigoParams+=parametro.getC3(ent);
+                        codigoParams+=parametro.getC3(ent,null);
 
                     }
 
@@ -270,7 +270,7 @@ namespace CompiPascal.AST_.valoreImplicito
                     Simbolo simboloParam = new Simbolo(tipoParametro, nombreParam, false, 0, 0, parametroActual.linea, parametroActual.columna);
                     Declaracion nuevaVarRef = new Declaracion(simboloParam, ValorRef);
                     nuevaVarRef.TemporalCambioEntorno = temporalCambio;
-                    codigo += nuevaVarRef.getC3(ent);
+                    codigo += nuevaVarRef.getC3(ent,null);
 
                 }
 

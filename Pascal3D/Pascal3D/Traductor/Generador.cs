@@ -74,8 +74,8 @@ namespace Pascal3D.Traductor
             codigo += "\t\t float Heap[100000]; //Estructura heap \n";
             codigo += "\t\t float Stack[100000]; //Estructura stack \n";
 
-            codigo += "int SP=0; //Puntero al stack  \n  ";
-            codigo += "int HP=0; //Puntero al heap  \n  ";
+            codigo += "int SP=0; //Puntero al stack  \n";
+            codigo += "int HP=0; //Puntero al heap  \n";
 
             if (temporales > 0)
             {

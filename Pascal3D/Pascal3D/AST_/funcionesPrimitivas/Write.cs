@@ -53,7 +53,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
         }
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
             string codigoWrite = "";

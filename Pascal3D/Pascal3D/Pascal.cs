@@ -251,16 +251,28 @@ namespace Pascal3D
                                 //AGREGAMOS LA FUNCION AL ENTORNO GLOBAL
                                 Funcion funcionDeclarado = (Funcion)item;
                                 GLOBAL.agregarSimbolo(funcionDeclarado.Identificador, funcionDeclarado);
-                                codigoFunciones +=funcionDeclarado.getC3(GLOBAL);
+                                codigoFunciones +=funcionDeclarado.getC3(GLOBAL, ARBOL);
 
                             }
                             else if (item is Declaracion)
                             {
 
-                                string codTemp = item.getC3(GLOBAL);
+                                string codTemp = item.getC3(GLOBAL, ARBOL);
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
 
+                            }
+                            else if(item is DeclararStruct)
+                            {
+                                string codTemp = item.getC3(GLOBAL, ARBOL);
+                                codTemp = Generador.tabular(codTemp);
+                                codigoDeclaraciones += codTemp;
+                            }
+                            else if(item is GuardarStruct)
+                            {
+                                string codTemp = item.getC3(GLOBAL, ARBOL);
+                                codTemp = Generador.tabular(codTemp);
+                                codigoDeclaraciones += codTemp;
                             }
 
                             else if(item is BeginEndPrincipal)
@@ -271,52 +283,52 @@ namespace Pascal3D
                                 {
                                     if (interna is If)
                                     {
-                                        string codTemp = ((If)interna).getC3(GLOBAL);
+                                        string codTemp = ((If)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }
 
                                     else if (interna is While)
                                     {
-                                        string codTemp = ((While)interna).getC3(GLOBAL);
+                                        string codTemp = ((While)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }
                                     else if (interna is Repeat)
                                     {
-                                        string codTemp = ((Repeat)interna).getC3(GLOBAL);
+                                        string codTemp = ((Repeat)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
 
                                     }
                                     else if (interna is Write)
                                     {
-                                        string codTemp = ((Write)interna).getC3(GLOBAL);
+                                        string codTemp = ((Write)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
 
                                     }
                                     else if(interna is Llamada)
                                     {
-                                        string codTemp = ((Llamada)interna).getC3(GLOBAL);
+                                        string codTemp = ((Llamada)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }
                                     else if (interna is Asignacion)
                                     {
-                                        string codTemp = ((Asignacion)interna).getC3(GLOBAL);
+                                        string codTemp = ((Asignacion)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }
                                     else if (interna is For)
                                     {
-                                        string codTemp = ((For)interna).getC3(GLOBAL);
+                                        string codTemp = ((For)interna).getC3(GLOBAL, ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }
                                     else if (interna is SwitchCase)
                                     {
-                                        string codTemp = ((SwitchCase)interna).getC3(GLOBAL);
+                                        string codTemp = ((SwitchCase)interna).getC3(GLOBAL,ARBOL);
                                         codTemp = Generador.tabular(codTemp);
                                         codigoMain += codTemp;
                                     }

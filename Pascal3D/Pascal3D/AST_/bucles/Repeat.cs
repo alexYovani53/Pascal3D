@@ -24,7 +24,7 @@ namespace CompiPascal.AST_.bucles
             this.columna = columna;
         }
 
-        public string getC3(Entorno ent) 
+        public string getC3(Entorno ent, AST arbol) 
         {
             
             string repeatInicio = Generador.pedirEtiqueta();
@@ -38,7 +38,7 @@ namespace CompiPascal.AST_.bucles
 
             foreach (Instruccion item in instrucciones)
             {
-                codigo += Generador.tabular(item.getC3(ent));
+                codigo += Generador.tabular(item.getC3(ent,arbol));
             }
 
             /* LE ASIGNAMOS LAS ETIQUETAS, YA QUE LA CONDICION ES UNA EXPRESIÓN BOOLEANA

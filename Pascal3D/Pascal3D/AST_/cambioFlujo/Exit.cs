@@ -53,7 +53,7 @@ namespace CompiPascal.AST_.cambioFlujo
             this.columna = columna;
         }
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
             string codigo = "/*CODIGO PARA INSTRUCCIÓN RETURN*/\n";
@@ -82,7 +82,7 @@ namespace CompiPascal.AST_.cambioFlujo
         public result3D obtener3D(Entorno ent)
         {
             result3D retorno = new result3D();
-            retorno.Codigo = getC3(ent);
+            retorno.Codigo = getC3(ent,null);
             retorno.Temporal = Generador.pedirTemporal();
             retorno.TipoResultado = tipoRet;
 

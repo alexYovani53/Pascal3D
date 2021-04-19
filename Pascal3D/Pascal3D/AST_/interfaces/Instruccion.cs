@@ -28,6 +28,6 @@ namespace CompiPascal.AST_.interfaces
         */
 
 
-        public string getC3(Entorno ent);
+        public string getC3(Entorno ent,AST arbol);
     }
 }

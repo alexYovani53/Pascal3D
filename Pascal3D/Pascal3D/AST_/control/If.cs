@@ -63,7 +63,7 @@ namespace CompiPascal.AST_.control
             this.columna = columna;
         }
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
             result3D result = new result3D();
@@ -89,7 +89,7 @@ namespace CompiPascal.AST_.control
             result.Codigo += "/****************************  INSTRUCCION IF *************/\n";
             result.Codigo += condicion.Codigo;
             result.Codigo += condicion.EtiquetaV+" :               /*Continua el codigo de las instrucciones*/\n";
-            result.Codigo += generarCodigoInstrucciones(instrucciones, ent);
+            result.Codigo += generarCodigoInstrucciones(instrucciones, ent,arbol);
 
             result.Codigo += $" goto {etiquetaSalida} ;             /*etiqueta salida*/ \n\n\n";
 
@@ -106,7 +106,7 @@ namespace CompiPascal.AST_.control
                 result.Codigo += ifElse_result.Codigo;
                 result.Codigo += ifElse_result.EtiquetaV + " :\n";
 
-                result.Codigo += generarCodigoInstrucciones(pivote.instrucciones, ent);
+                result.Codigo += generarCodigoInstrucciones(pivote.instrucciones, ent,arbol);
 
                 result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";           
 
@@ -119,7 +119,7 @@ namespace CompiPascal.AST_.control
             if (instruccionesElse.Count > 0)
             {
                 result.Codigo += "//INSTRUCCIONES DEL ELSE \n";
-                result.Codigo += generarCodigoInstrucciones(instruccionesElse, ent);        
+                result.Codigo += generarCodigoInstrucciones(instruccionesElse, ent,arbol);        
             }
 
 
@@ -129,14 +129,14 @@ namespace CompiPascal.AST_.control
             return result.Codigo;
         }
 
-        public string generarCodigoInstrucciones(LinkedList<Instruccion> instrucciones,Entorno ent)
+        public string generarCodigoInstrucciones(LinkedList<Instruccion> instrucciones,Entorno ent, AST arbol)
         {
 
             string codigo = "";
 
             foreach (Instruccion item in instrucciones)
             {
-                codigo += item.getC3(ent);
+                codigo += item.getC3(ent,arbol);
             }
 
             return Generador.tabular(codigo);

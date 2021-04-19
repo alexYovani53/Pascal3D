@@ -56,7 +56,7 @@ namespace CompiPascal.AST_.bucles
 
         }
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
             string nombreContador = ((Asignacion)valorInicial).variable.Identificador;
@@ -75,7 +75,7 @@ namespace CompiPascal.AST_.bucles
             //ESTA ES LA SECCIÓN DONDE SE INICIA EL CONTADOR DEL FOR
             codigoFor += "/************************************************************ INICIO CICLO FOR **************************/\n";
             codigoFor += "/*ASIGNACIÓN DEL CONTADOR*/ \n";
-            codigoFor += valorInicial.getC3(ent);   
+            codigoFor += valorInicial.getC3(ent,arbol);   
 
 
             //CAPTURANDO VALOR FINAL  Y VALIDACIÓN DEL TIPO DEL PARAMETRO FINAL
@@ -118,7 +118,7 @@ namespace CompiPascal.AST_.bucles
 
             foreach (Instruccion item in instrucciones)
             {
-                contenidoFor += item.getC3(ent);
+                contenidoFor += item.getC3(ent,arbol);
             }
 
             /*  ANTES DE COPIAR EL CODIGO FOR LO TABULAMOS */
@@ -133,7 +133,7 @@ namespace CompiPascal.AST_.bucles
 
             Expresion aumentando = new Operacion(new Identificador(nombreContador, valfinal.linea, valfinal.columna), new Primitivo(1, valfinal.linea, valfinal.columna), aumentoDecremento, linea, columna);
             Asignacion asignacion = new Asignacion(new Simbolo(nombreContador, linea, columna), aumentando, false, linea, columna);
-            codigoFor += asignacion.getC3(ent);
+            codigoFor += asignacion.getC3(ent,arbol);
 
             // REGRESAR AL INICIO Y SALIR DEL FOR
             codigoFor += $"goto {etiquetaCiclo}; /* CICLO CUMPLIDO, REGRESAMOS AL INICIO DE LA VALIDACIÓN*/\n\n";

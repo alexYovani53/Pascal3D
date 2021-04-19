@@ -110,6 +110,13 @@ namespace CompiPascal.entorno_
          */
         public LinkedList<Simbolo> ListaParametros { get; set; }
 
+        /*
+         * @param           EstructuraNuev
+         * @comentario      Guarda la definición para un struct 
+         */
+
+        public Struct EstructuraNuev { get; }
+
 
         /**   
          * @comentario  Constructor que se utiliza solo para guardar un ide en un simbolo
@@ -142,9 +149,14 @@ namespace CompiPascal.entorno_
         }
 
 
+        /*      Declaracion de un OBJETO tipo STRUCT
+         */
 
-        public Simbolo(TipoDatos tipoD, string nameObjeto, int linea, int columna)
+        public Simbolo(TipoDatos tipoD, string nameObjeto, int direccion,int linea, int columna)
         {
+            this.Tipo = tipoD;
+            this.Identificador = nameObjeto;
+            this.direccion = direccion;
             this.linea = linea;
             this.columna = columna;
         }
@@ -172,8 +184,17 @@ namespace CompiPascal.entorno_
         public Simbolo(TipoDatos tipoParametros, string identificador, bool porReferencia, int linea, int columna)
         {
             this.Tipo = tipoParametros;
-            Identificador = identificador;
+            this.Identificador = identificador;
             this.porReferencia = porReferencia;
+            this.linea = linea;
+            this.columna = columna;
+        }
+
+        public Simbolo(string identificador, TipoDatos tipo, Struct estructuraNuev, int linea, int columna)
+        {
+            this.Identificador = identificador;
+            this.Tipo = tipo;
+            this.EstructuraNuev = estructuraNuev;
             this.linea = linea;
             this.columna = columna;
         }

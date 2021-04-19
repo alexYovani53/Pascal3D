@@ -46,7 +46,7 @@ namespace CompiPascal.AST_.control
 
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
             string codigo = "/********************* SWITCH CASE ***************************************/\n\n";
@@ -72,7 +72,7 @@ namespace CompiPascal.AST_.control
                 codigo += expresion.Codigo;
                 codigo += $"{expresion.EtiquetaV}: \n";
 
-                codigo += item.getC3(ent);
+                codigo += item.getC3(ent,arbol);
 
                 codigo += Generador.tabularLinea($"goto {etiquetaSalida}; \n", 1);
 
@@ -84,7 +84,7 @@ namespace CompiPascal.AST_.control
             if(casoDefault != null)
             {
                 codigo += "\n";
-                codigo += casoDefault.getC3(ent);
+                codigo += casoDefault.getC3(ent,arbol);
             }
 
 

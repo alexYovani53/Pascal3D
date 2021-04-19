@@ -29,7 +29,7 @@ namespace CompiPascal.AST_.bucles
         }
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
             //Etiqueta de inicio para el ciclo 
@@ -51,7 +51,7 @@ namespace CompiPascal.AST_.bucles
 
             foreach (Instruccion item in instrucciones)
             {
-                whileCadena += Generador.tabular(item.getC3(ent));
+                whileCadena += Generador.tabular(item.getC3(ent,arbol));
             }
 
             /* SALTO Y ETIQUETA DE SALIDA*/

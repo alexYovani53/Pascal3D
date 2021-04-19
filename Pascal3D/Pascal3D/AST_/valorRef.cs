@@ -56,7 +56,7 @@ namespace CompiPascal.AST_
 
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
             throw new NotImplementedException();
         }

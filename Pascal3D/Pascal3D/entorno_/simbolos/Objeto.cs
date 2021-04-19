@@ -19,7 +19,7 @@ namespace CompiPascal.entorno_.simbolos
          */
         string nombreStructura { get; set; }
 
-        public Objeto(string nombreObjeto,string nombreStructura, Entorno entornoPropio,int linea, int columna):base(TipoDatos.Object,nombreObjeto,linea,columna)
+        public Objeto(string nombreObjeto,string nombreStructura, Entorno entornoPropio,int posicionRelativa,int linea, int columna):base(TipoDatos.Object,nombreObjeto,posicionRelativa,linea,columna)
         {
             this.nombreStructura = nombreStructura;
             this.entornoPropio = entornoPropio;

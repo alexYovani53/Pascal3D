@@ -24,35 +24,36 @@ namespace CompiPascal.AST_
 
 
         private LinkedList<Instruccion> instrucciones;
-        public LinkedList<Funcion> funciones;
+        public LinkedList<Struct> Estructuras;
 
         public AST(LinkedList<Instruccion> instruccion,Instruccion main)
         {
-            this.funciones = new LinkedList<Funcion>();
+            this.Estructuras = new LinkedList<Struct>();
             this.instrucciones = instruccion;
             this.instrucciones.AddLast(main);
         }
 
-        public void agregarObjeto()
+        public void agregarEstructura(Struct Estructura)
         {
-
+            Estructuras.AddLast(Estructura);
         }
 
-        public void existeObjeto()
+        public bool existeEstructura(string identificador)
         {
-
-        }
-
-        public Funcion getFuncion(string id)
-        {
-            id = id.ToLower();
-            foreach (Funcion item in funciones)
+            identificador = identificador.ToLower();
+            foreach (Struct item in Estructuras)
             {
-                if (item.Identificador.Equals(id))
-                {
-                    return item;
-                }
+                if (item.identificador.Equals(identificador)) return true;
+            }
+            return false;
+        }
 
+        public Struct retornarEstructura(string identificador)
+        {
+            identificador = identificador.ToLower();
+            foreach (Struct item in Estructuras)
+            {
+                if (item.identificador.Equals(identificador)) return item;
             }
             return null;
         }

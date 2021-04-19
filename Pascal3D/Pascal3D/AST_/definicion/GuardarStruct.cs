@@ -1,5 +1,6 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
+using Pascal3D;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,9 +27,21 @@ namespace CompiPascal.AST_.definicion
             this.columna = columna;
         }
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
-            throw new NotImplementedException();
+
+            bool existe = ent.existeSimbolo(identificador);
+
+            if (existe)
+            {
+                Program.getIntefaz().agregarError("El identificador" + identificador + " ya tiene una definicion en el entorno actual", linea, columna);
+                return null;
+            }
+
+            Struct estructuraNuev = new Struct(identificador, instruccionesDef);
+            arbol.agregarEstructura(estructuraNuev);
+
+            return "";
         }
     }
 }

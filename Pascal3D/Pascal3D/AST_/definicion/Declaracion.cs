@@ -23,8 +23,9 @@ namespace CompiPascal.AST_.definicion
     public class Declaracion : Instruccion
     {
 
+        public bool declara_EN_Objeto { get; set; }
 
-        public bool declaraParametro { get; set; }
+        public bool cambiar_Ambito { get; set; }
 
         public string TemporalCambioEntorno { get; set; }
 
@@ -80,7 +81,8 @@ namespace CompiPascal.AST_.definicion
             this.tipo_variables = tipo;
             this.variables = variables;
             this.valorInicializacion = inicializador;
-            this.declaraParametro = false;
+            this.cambiar_Ambito = false;
+            this.declara_EN_Objeto = false;
         }
 
         /**
@@ -106,7 +108,8 @@ namespace CompiPascal.AST_.definicion
             this.tipo_variables = tipo;
             this.variables = variables;
             this.valorInicializacion = null;
-            this.declaraParametro = false;
+            this.cambiar_Ambito = false;
+            this.declara_EN_Objeto = false;
 
         }
 
@@ -125,7 +128,8 @@ namespace CompiPascal.AST_.definicion
 
             this.ideUnico = variable_;
             this.valorInicializacion = inicial;
-            this.declaraParametro = false;
+            this.cambiar_Ambito = false;
+            this.declara_EN_Objeto = false;
 
         }
 
@@ -136,40 +140,54 @@ namespace CompiPascal.AST_.definicion
             this.variables.AddLast(variable);
             this.valor = valor;
             this.tipo_variables = variable.Tipo; 
-            this.declaraParametro = true;
+            this.cambiar_Ambito = true;
+            this.declara_EN_Objeto = false;
         }
 
 
 
-        private object valorDefecto(TipoDatos tipo)
+        private result3D valorDefecto(TipoDatos tipo)
         {
+            result3D codigoDef = new result3D();
 
             if (tipo == TipoDatos.String)
             {
-                return "";
+                string temp1 = Generador.pedirTemporal();
+
+                codigoDef.Codigo += $"{temp1}= HP; \n";
+                codigoDef.Codigo += $"Heap[(int){temp1}] = 0; \n";
+                codigoDef.Codigo += $"HP = HP + 1; \n";
+
+                codigoDef.Temporal = temp1;
+                codigoDef.TipoResultado = TipoDatos.String;
+                return codigoDef;
             }
             else if (tipo == TipoDatos.Char)
             {
-                return 0;
+                codigoDef.Temporal = ""+0;
+                return codigoDef;
             }
             else if (tipo == TipoDatos.Integer)
             {
-                return 0;
+                codigoDef.Temporal = "" + 0;
+                return codigoDef;
             }
             else if (tipo == TipoDatos.Real)
             {
-                return 0.0;
+                codigoDef.Temporal = "" + 0.0;
+                return codigoDef;
             }
             else if (tipo == TipoDatos.Boolean)
             {
-                return 0;
+                codigoDef.Temporal = "" + 0;
+                return codigoDef;
             }
             else if (tipo == TipoDatos.Void)
             {
-                return "";
+                return codigoDef;
             }
 
-            return "";
+            return codigoDef;
 
         }
 
@@ -179,14 +197,35 @@ namespace CompiPascal.AST_.definicion
             return variables;
         }
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
-            string puntero_SP_TEMPORAL = "SP";
-            if (declaraParametro)
+            string puntero_Ambito = "SP";
+            string stack_heap = "Stack";
+
+            if (cambiar_Ambito)
             {
-                /* CUANDO LA DECLARACIÓN ES UN PARAMETRO DE UNA FUNCIÓN, ESTA VARIABLE GUARDA LA ETIQUETA
-                 * QUE CONTIENE EL VALOR DEL NUEVO ENTORNO DONDE SE REQUIERE DECLARAR LOS PARAMETROS */
-                puntero_SP_TEMPORAL = TemporalCambioEntorno;
+                /* *****Cuando la Declaración es un PARAMETRO de una FUNCION, --> TemporalCambioEntorno <-- guarda
+                 *      el temporal 
+                 *      que contiene el valor del nuevo entorno donde se requiere declarar los parametros
+                 *
+                 * *****Al igual que cuando se declaran parametros de un STRUCT, estos se guardan en un nuevo entorno 
+                 *      El cual se encuentra en EL HEAP y no en EL STACK, por lo que el apuntador al HEAP se pasa 
+                 *      en la declaración en la propiedad  ->TemporalCambioEntorno <--- que ya lleva la referencia al 
+                 *      HEAP y solo hace falta usarla. 
+                 */
+                puntero_Ambito = TemporalCambioEntorno;
+            }
+            if (declara_EN_Objeto)
+            {
+                /*      declara_EN_Objeto se modifica en la clase  @DeclaraStruct.cs
+                 */
+
+                /*      Esto se hace por la razón de que cuando se hace una instancia de un STRUCT, este contiene
+                 *      propiedades que se almacenan en el HEAP y no en el Stack
+                 *
+                 */
+                stack_heap = "Heap";
+
             }
 
 
@@ -215,8 +254,8 @@ namespace CompiPascal.AST_.definicion
                 string temporalConst = Generador.pedirTemporal();
 
                 declaracionConstante += $"/*Declaracion de la constante {ideUnico.Identificador}*/\n";
-                declaracionConstante += $"{temporalConst}= {puntero_SP_TEMPORAL} + {ent.tamano}; \n";
-                declaracionConstante += $"Stack[(int){temporalConst}] = {valAsignacion.Temporal}; \n";
+                declaracionConstante += $"{temporalConst}= {puntero_Ambito} + {ent.tamano}; \n";
+                declaracionConstante += $"{stack_heap}[(int){temporalConst}] = {valAsignacion.Temporal}; \n";
 
                 Simbolo constanteNueva = new Simbolo(tipo, ideUnico.Identificador, true, 1, posicionRelativa, ideUnico.linea, ideUnico.columna);
                 ent.agregarSimbolo(ideUnico.Identificador, constanteNueva);
@@ -237,7 +276,7 @@ namespace CompiPascal.AST_.definicion
             string codigoSalida = "";
             if (!esInicializado())
             {
-                object def = valorDefecto(tipo_variables);
+                result3D def = valorDefecto(tipo_variables);
 
                 int posicionRelativa = ent.tamano;
                 foreach (Simbolo item in variables)
@@ -245,8 +284,9 @@ namespace CompiPascal.AST_.definicion
                     string temp = Generador.pedirTemporal();
 
                     codigoSalida += $"/* declaracion de variable {item.Identificador}*/\n";
-                    codigoSalida += $"{temp} = {puntero_SP_TEMPORAL} + {posicionRelativa};\n";
-                    codigoSalida += $"Stack[(int){temp}] = {def} ; \n";
+                    codigoSalida += def.Codigo;
+                    codigoSalida += $"{temp} = {puntero_Ambito} + {posicionRelativa};\n";
+                    codigoSalida += $"{stack_heap}[(int){temp}] = {def.Temporal} ; \n";
                     
                     Simbolo simboloNuevo = new Simbolo(tipo_variables,item.Identificador, false, 1,posicionRelativa,item.linea,item.columna);
                     ent.agregarSimbolo(item.Identificador, simboloNuevo);
@@ -307,8 +347,8 @@ namespace CompiPascal.AST_.definicion
                 string temp = Generador.pedirTemporal();
 
                 codigoSalida += $"/* declaracion de variable {variableUniInicializada.Identificador}*/\n";
-                codigoSalida += $"{temp} = {puntero_SP_TEMPORAL} + {ent.tamano}; \n";
-                codigoSalida += $"Stack[(int){temp}] = {valAsignacion.Temporal};\n";
+                codigoSalida += $"{temp} = {puntero_Ambito} + {ent.tamano}; \n";
+                codigoSalida += $"{stack_heap}[(int){temp}] = {valAsignacion.Temporal};\n";
                 
 
                

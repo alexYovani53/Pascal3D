@@ -124,7 +124,7 @@ namespace CompiPascal.entorno_.simbolos
         }
 
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
             string etiquetaRetorno = Generador.pedirEtiqueta(); 
 
@@ -132,14 +132,14 @@ namespace CompiPascal.entorno_.simbolos
             string codigoFuncion = "";
 
             codigoFuncion += $"void {this.Identificador} () "+"{\n\n";
-            agregarParametros(nuevo);
-            agregarRetorno(nuevo);
+            agregarParametros(nuevo,arbol);
+            agregarRetorno(nuevo,arbol);
 
             foreach (Instruccion item in ENCABEZADOS)
             {
                 if(item is Declaracion)
                 {
-                    string declaraVar = item.getC3(nuevo);
+                    string declaraVar = item.getC3(nuevo,arbol);
                     codigoFuncion += Generador.tabular(declaraVar);
                 }
             }
@@ -149,7 +149,7 @@ namespace CompiPascal.entorno_.simbolos
             foreach (Instruccion item in instrucciones)
             {
 
-                string codigo = item.getC3(nuevo);
+                string codigo = item.getC3(nuevo,arbol);
                 codigoFuncion += Generador.tabular(codigo);
 
             }
@@ -168,7 +168,7 @@ namespace CompiPascal.entorno_.simbolos
         }
 
 
-        public void agregarParametros(Entorno ent)
+        public void agregarParametros(Entorno ent,AST arbol)
         {
             /*PARA EL MANEJO DE LAS FUNCIONES QUE TIENEN UN RETORNO
               SE MANEJA QUE EL PRIMER ESPACIO EN EL ENTORNO DE LA FUNCION SEA EL QUE GUARDARA EL VALOR A RETORNAR
@@ -197,14 +197,14 @@ namespace CompiPascal.entorno_.simbolos
 
         }
 
-        public string agregarRetorno(Entorno ent)
+        public string agregarRetorno(Entorno ent,AST ARBOL)
         {
             if (Tipo != TipoDatos.Void)
             {
                 LinkedList<Simbolo> param = new LinkedList<Simbolo>();
                 param.AddLast(new Simbolo(Identificador, linea, columna));
                 Declaracion retornoPascal = new Declaracion(param, Tipo);
-                string codigo = retornoPascal.getC3(ent);
+                string codigo = retornoPascal.getC3(ent, ARBOL);
                 return codigo;            
             }
             return "";

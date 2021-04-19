@@ -36,6 +36,7 @@ namespace CompiPascal.entorno_
         private Entorno ent_Anterior { get; set; }
 
 
+        
         /**
          * @constructor  public Entorno(Entorno anterior)
          *

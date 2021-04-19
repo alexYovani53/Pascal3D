@@ -27,7 +27,7 @@ namespace CompiPascal.AST_.control
             this.columna = columna;
         }
 
-        public string getC3(Entorno ent)
+        public string getC3(Entorno ent, AST arbol)
         {
 
 
@@ -35,7 +35,7 @@ namespace CompiPascal.AST_.control
 
             foreach (Instruccion item in instrucciones)
             {
-                codigo += item.getC3(ent);
+                codigo += item.getC3(ent,arbol);
             }
 
 

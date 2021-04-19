@@ -1,4 +1,6 @@
-﻿using CompiPascal.entorno_;
+﻿using CompiPascal.AST_.definicion;
+using CompiPascal.AST_.definicion.arrego;
+using CompiPascal.entorno_;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -32,7 +34,7 @@ namespace CompiPascal.AST_.interfaces
          * @comentario   esta propiedad guardara el identificador con el que se denominara el struct
          */
 
-        private string identificador { get; set; }
+        public string identificador { get; set; }
 
 
         /* @propiedad    String      identificador
@@ -57,9 +59,24 @@ namespace CompiPascal.AST_.interfaces
             return declaraciones;
         }
 
+        public int tamano()
+        {
+            int declaracionesNumero = 0;
+            foreach (Instruccion item in declaraciones)
+            {
+                if(item is Declaracion || item is DeclararStruct || item is DeclaraArray  || item is DeclaraArray2)
+                {
+                    declaracionesNumero++;
+                }
+
+            }
+
+            return declaracionesNumero;
+        }
+
         public string getC3()
         {
-            throw new NotImplementedException();
+            return "";
         }
     }
 }

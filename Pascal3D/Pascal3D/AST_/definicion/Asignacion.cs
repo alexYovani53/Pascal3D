@@ -15,8 +15,9 @@ namespace CompiPascal.AST_.definicion
     public class Asignacion : Instruccion
     {
 
+        public int linea { get; set; }
+        public int columna { get; set; }
 
-        public int tamanoPadre { get; set; }
         /**
          * @propiedad       bool        esObjeto
          * @comentario      esta bandera dira si la asignación es hacia una variable o a la propiedad 
@@ -52,10 +53,6 @@ namespace CompiPascal.AST_.definicion
         private Expresion valor { get; set; }
 
 
-
-        public int linea { get; set; }
-        public int columna { get; set; }
-
         public Asignacion(Simbolo variable, Expresion valor, bool objeto, int linea, int columna)
         {
             this.variable = variable;
@@ -80,32 +77,41 @@ namespace CompiPascal.AST_.definicion
    
 
 
-        public Simbolo variable
+
+
+        public string getC3(Entorno ent, AST arbol)
         {
-            get
-            {
-                return variable_;
-            }
-            set
-            {
-                variable_ = value;
-            }
-        }
-
-
-
-
-        public string getC3(Entorno ent)
-        {
-            string codigo = "/*************************************** FIN ASIGNACION *********/\n\n";
-            result3D final =   valor.obtener3D(ent);
+            string codigo = "/*************************************** INICIO ASIGNACION *********/\n\n";
+            result3D final = valor.obtener3D(ent);
             verificarTipo_Boolean(final);
 
 
             if (esobjeto)
             {
 
+                Simbolo objetoEncontrado = ent.obtenerSimbolo(idObjeto);
 
+                if(objetoEncontrado == null)
+                {
+                    Program.getIntefaz().agregarError($"La variable {idObjeto} no se encontro instanciada", variable.linea, variable.columna);
+                    return "";
+                }
+                
+                if(!(objetoEncontrado is Objeto))
+                {
+                    Program.getIntefaz().agregarError($"La variable {idObjeto} no es un objeto ", variable.linea, variable.columna);
+                    return "";
+                }
+
+                string temp1 = Generador.pedirTemporal();
+                string temp2 = Generador.pedirTemporal();
+
+                codigo += $"{temp1} = SP + {((Objeto)objetoEncontrado).direccion}; /*Capturamos la direccion de la instancia de objeto*/  \n";
+                codigo += $"{temp2} = Stack[(int){temp1}]; \n";
+
+                codigo += cambiarValorRecursivo((Objeto)objetoEncontrado, propiedades, 0, final, temp2 );
+
+                return codigo;
 
             }
             else
@@ -129,34 +135,10 @@ namespace CompiPascal.AST_.definicion
 
 
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
-                if (simboloVar.Tipo == TipoDatos.Integer)
-                {
-                    if (final.TipoResultado != TipoDatos.Integer && final.TipoResultado != TipoDatos.Real)
-                    {
-                        Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
-                        return "";
-                    }
-                }
-                else if (simboloVar.Tipo == TipoDatos.Real)
-                {
-                    if (final.TipoResultado != TipoDatos.Integer && final.TipoResultado != TipoDatos.Real)
-                    {
-                        Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
-                        return "";
-                    }
-                }
-                else
-                {
-                    if (simboloVar.Tipo != final.TipoResultado)
-                    {
-                        Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
-                        return "";
-                    }
-
-                }
+                if (!verificarTipos(simboloVar.Tipo, final.TipoResultado)) return "";
 
                 //ASIGNACIÓN DEL TIPO IDE := IDE ; 
-                if(simboloVar.Tipo == TipoDatos.Object)
+                if (simboloVar.Tipo == TipoDatos.Object)
                 {
 
                 }
@@ -239,6 +221,115 @@ namespace CompiPascal.AST_.definicion
                 reBooleano.Codigo += Generador.tabularLinea($"{reBooleano.Temporal} = 0; \n", 1);
             }
 
+        }
+
+        string cambiarValorRecursivo(Objeto instancia, LinkedList<string> propiedad, int indice, result3D val,string etiquetaDireccion)
+        {
+            string codigo = "";
+
+            string propiedadBuscada = propiedad.ElementAt(indice);          //nombre de la propiedad buscada en este nivel
+            Entorno entornoNoModificado = instancia.getPropiedades();
+            bool existeParametro = entornoNoModificado.existeEnEntornoActual(propiedadBuscada);
+
+            if (!existeParametro) return "";                                                      //SI EN ALGUN NIVEL NO SE ENCUENTRA EL PARAMETRO SE RETORNA NULL
+
+            //TIPO DE DATOS DEL PARAMETRO BUSCADO
+            TipoDatos tipoParametro = entornoNoModificado.obtenerSimbolo(propiedadBuscada).Tipo;    
+       
+            //CAPTURAMOS EL SIMBOLO QUE BUSCAMOS
+            Simbolo encontrado = entornoNoModificado.obtenerSimbolo(propiedadBuscada);
+            codigo += $"{etiquetaDireccion} = {etiquetaDireccion} + {encontrado.direccion}; \n";
+
+            if (indice == propiedad.Count - 1)
+            {
+                // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
+                if (!verificarTipos(tipoParametro, val.TipoResultado)) return "";
+
+                //YA QUE EL BUSCADO NO FUE AGREGADO, AHORA CREAMOS UN NUEVO SIMBOLO QUE SUSTITUIRA AL NO AGREGADO
+                if (tipoParametro == TipoDatos.Object)
+                {
+
+                    if (val.TipoResultado == TipoDatos.Array)
+                    {
+                        //nuevoModificado.agregarSimbolo(propiedadBuscada, (ObjetoArray)val);
+                    }
+                    else if (val.TipoResultado == TipoDatos.Object)
+                    {
+                        //nuevoModificado.agregarSimbolo(propiedadBuscada, (Objeto)val);
+                    }
+
+                }
+                else
+                {
+
+                    codigo += val.Codigo;
+                    codigo += $"Heap[(int){etiquetaDireccion}] = {val.Temporal};";
+                }
+
+                return codigo;
+
+            }
+            else
+            {
+                if (tipoParametro != TipoDatos.Object)
+                {
+
+                    Program.getIntefaz().agregarError(" La propiedad " + propiedadBuscada + " no es un objeto", encontrado.linea, encontrado.columna);
+                    return null;
+
+                }
+                string nuevaDireccion = Generador.pedirTemporal();
+                codigo += $"{nuevaDireccion} = Heap[(int){etiquetaDireccion}];";
+                codigo += cambiarValorRecursivo((Objeto)encontrado, propiedad, indice + 1, val, nuevaDireccion);
+
+                return codigo ; //MODIFICAR RECURSIVO
+            }
+
+
+        }
+
+
+        public Simbolo variable
+        {
+            get
+            {
+                return variable_;
+            }
+            set
+            {
+                variable_ = value;
+            }
+        }
+
+        public bool verificarTipos(TipoDatos tipoParametro, TipoDatos TipoResultado)
+        {
+            // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
+            if (tipoParametro == TipoDatos.Integer)
+            {
+                if (TipoResultado != TipoDatos.Integer && TipoResultado != TipoDatos.Real)
+                {
+                    Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
+                    return false;
+                }
+            }
+            else if (tipoParametro == TipoDatos.Real)
+            {
+                if (TipoResultado != TipoDatos.Integer && TipoResultado != TipoDatos.Real)
+                {
+                    Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
+                    return false;
+                }
+            }
+            else
+            {
+                if (tipoParametro !=  TipoResultado)
+                {
+                    Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
+                    return false;
+                }
+
+            }
+            return true;
         }
     }
 }

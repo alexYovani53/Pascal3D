@@ -30,5 +30,10 @@ namespace CompiPascal.AST_.funcionesPrimitivas
         {
             throw new NotImplementedException();
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

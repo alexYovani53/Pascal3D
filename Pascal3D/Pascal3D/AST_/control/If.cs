@@ -141,6 +141,21 @@ namespace CompiPascal.AST_.control
 
             return Generador.tabular(codigo);
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            exprCondicional.obtenerListasAnidadas(variablesUsadas);
+            foreach (Instruccion item in instruccionesElse_if)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
+
+            foreach (Instruccion item in instruccionesElse)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
+        
+        }
     }
 }
 

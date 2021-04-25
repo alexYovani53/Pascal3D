@@ -77,58 +77,13 @@ namespace CompiPascal.entorno_.simbolos
             this.nombreStruct = structTipo;
         }
 
-
-        private bool verificarTipo(TipoDatos tipo, object result)
-        {
-            if (tipo == TipoDatos.Integer && result is int)
-            {
-                return true;
-            }
-            if (tipo == TipoDatos.String && result is string)
-            {
-                return true;
-            }
-            else if (tipo == TipoDatos.Char && result is char)
-            {
-                return true;
-            }
-            else if (tipo == TipoDatos.Real && result is double)
-            {
-                return true;
-            }
-            else if (tipo == TipoDatos.Boolean && result is bool)
-            {
-                return true;
-            }
-            else if (tipo == TipoDatos.Object && result is Objeto)
-            {
-                return true;
-            }
-            else if (tipo == TipoDatos.Object && result is ObjetoArray)
-            {
-                return true;
-            }
-            else if (tipo==TipoDatos.Void && result is Exit)
-            {
-                return true;
-            }
-            else if (tipo == TipoDatos.Void && (TipoDatos)result == TipoDatos.Void)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-
-
         public string getC3(Entorno ent, AST arbol)
         {
             string etiquetaRetorno = Generador.pedirEtiqueta(); 
 
             Entorno nuevo = new Entorno(ent,"Funcion_"+this.Identificador);
+
+            string codigoAnidadas = "";
             string codigoFuncion = "";
 
             codigoFuncion += $"void {this.Identificador} () "+"{\n\n";
@@ -142,7 +97,14 @@ namespace CompiPascal.entorno_.simbolos
                     string declaraVar = item.getC3(nuevo,arbol);
                     codigoFuncion += Generador.tabular(declaraVar);
                 }
+                else if(item is Funcion)
+                {
+                    anidada((Funcion)item,ent);
+                    ent.agregarSimbolo(((Funcion)item).Identificador,(Funcion)item);
+                    codigoAnidadas += ((Funcion)item).getC3(ent, arbol) + codigoAnidadas;
+                }
             }
+
 
 
 
@@ -164,9 +126,8 @@ namespace CompiPascal.entorno_.simbolos
 
             codigoFuncion = codigoFuncion.Replace("#EXIT#", $"goto {etiquetaRetorno};");
 
-            return codigoFuncion;
+            return codigoAnidadas + codigoFuncion;
         }
-
 
         public void agregarParametros(Entorno ent,AST arbol)
         {
@@ -210,7 +171,6 @@ namespace CompiPascal.entorno_.simbolos
             return "";
         }
 
-
         public string RealizarCambioVariable(Entorno ent)
         {
             string codigo = "/*************************************************** CONFIGURANDO RETORNO*/\n";
@@ -238,7 +198,148 @@ namespace CompiPascal.entorno_.simbolos
             return Generador.tabular(codigo);
         }
 
+        public void anidada(Funcion funcion, Entorno ent)
+        {
+            LinkedList<string> vars = new LinkedList<string>();
+            buscarAnidadas(vars);
 
+            LinkedList<TipoDatos> tipos = new LinkedList<TipoDatos>();
+            foreach (string item in vars)
+            {
+                tipos.AddLast(obtenerTipoAnidada(item, ent));
+            }
+
+            LinkedList<bool> referencias = new LinkedList<bool>();
+            foreach (string item in vars)
+            {
+                referencias.AddLast(porReferenciaAnidada(item, ent));
+            }
+
+
+            IList<string> vars2 = new List<string>(vars);
+            IList<TipoDatos> tipo2 = new List<TipoDatos>(tipos);
+            IList<bool> referencias2 = new List<bool>(referencias);
+
+            if (vars2.Count != tipo2.Count || vars2.Count != referencias2.Count || tipo2.Count != referencias2.Count) return;
+
+            for (int i = 0; i < vars.Count; i++)
+            {
+                funcion.ListaParametros.AddLast(new Simbolo(tipo2[i], vars2[i], referencias2[i], 0, 0));         
+            }
+
+            foreach (string item in vars2)
+            {
+                cambiarLLamada(funcion.Identificador, item);
+            }
+
+        }
+
+        public void buscarAnidadas(LinkedList<string> vars)
+        {
+
+            foreach (Instruccion item in ENCABEZADOS)
+            {
+                if(item is Funcion)
+                {
+                    ((Funcion)item).buscarAnidadas(vars);
+                    ((Funcion)item).obtenerListasAnidadas(vars);
+                }
+            }
+                        
+        }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            /**
+             * En este lenguaje no se validan los encabezados porque pascal da error, que 
+             * fue comprobado para sustentar esto 
+             */
+
+            foreach (Instruccion item in instrucciones)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
+
+            foreach (Instruccion item in ENCABEZADOS)
+            {
+                if(item is Declaracion)
+                {
+                    LinkedList<string> declaras = new LinkedList<string>();
+                    ((Declaracion)item).obtenerIdes(declaras);
+
+                    foreach (string pivote in declaras)
+                    {
+                        if (variablesUsadas.Contains(pivote))
+                        {
+                            variablesUsadas.Remove(pivote.ToLower());
+                        }
+                    }
+                }
+            }
+
+            foreach (Simbolo item in ListaParametros)
+            {
+                if (variablesUsadas.Contains(item.Identificador.ToLower()))
+                {
+                    variablesUsadas.Remove(item.Identificador.ToLower());
+                }
+            }
+
+        }
+    
+        public TipoDatos obtenerTipoAnidada(string ide, Entorno ent)
+        {
+            foreach (Simbolo item in this.ListaParametros)
+            {
+                if (item.Identificador.Equals(ide)){
+                    return item.Tipo;
+                }
+            }
+
+            foreach (Instruccion item in ENCABEZADOS)
+            {
+                if(item is Declaracion)
+                {
+                    LinkedList<string> vars = new LinkedList<string>();
+                    if (vars.Contains(ide.ToLower())) return ((Declaracion)item).tipoVars();
+                }
+            }
+
+            Simbolo buscando = ent.obtenerSimbolo(ide);
+            if(buscando!=null)return buscando.Tipo;
+
+            return TipoDatos.NULL;
+
+        }
+        
+        public bool porReferenciaAnidada(string ide, Entorno ent)
+        {
+            foreach (Simbolo item in this.ListaParametros)
+            {
+                if (item.Identificador.Equals(ide))
+                {
+                    return item.porReferencia;
+                }
+            }
+
+            return false;
+        }
+
+        public void cambiarLLamada(string llamada,string parametro)
+        {
+
+            foreach (Instruccion item in instrucciones)
+            {
+                if(item is Llamada)
+                {
+                    if (((Llamada)item).nombreLlamada.Equals(llamada))
+                    {
+                        ((Llamada)item).expresionesValor.AddLast(new Identificador(parametro,0,0));
+                    }
+                }
+            }
+
+        }
 
     }
 }

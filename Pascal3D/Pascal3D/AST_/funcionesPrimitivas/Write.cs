@@ -199,6 +199,12 @@ namespace CompiPascal.AST_.funcionesPrimitivas
             return cadenaImpresion;
         }
 
-
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            foreach (Expresion item in this.expr_imprimir)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
+        }
     }
 }

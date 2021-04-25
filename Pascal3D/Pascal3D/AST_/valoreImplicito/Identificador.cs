@@ -52,8 +52,6 @@ namespace CompiPascal.AST_.valoreImplicito
             this.columna = columna;
         }
 
-
-
         public string nombre()
         {
             return ide;
@@ -64,6 +62,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D ide_buscando; 
 
+            // UN PUNTERO SE REFIERE A UNA VARIABLE POR REFERENCIA 
             if (buscar_puntero)
             {
                 ide_buscando = buscando_Direccion(ent, ide);
@@ -82,7 +81,7 @@ namespace CompiPascal.AST_.valoreImplicito
             result3D regresos = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"/*BUSCANDO UN IDENTIFICADOR*/\n";
+            regresos.Codigo += $"/*BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
             regresos.Codigo += $"{tempora1} = SP;\n";
 
             /* RECORREMOS TODOS LOS ENTORNOS POR EL CASO DE QUE LA VARIABLE SEA EXTERNA
@@ -135,7 +134,7 @@ namespace CompiPascal.AST_.valoreImplicito
             result3D regresos = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR*/\n";
+            regresos.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
             regresos.Codigo += $"{tempora1} = SP;\n";
 
             /* RECORREMOS TODOS LOS ENTORNOS POR EL CASO DE QUE LA VARIABLE SEA EXTERNA
@@ -170,6 +169,15 @@ namespace CompiPascal.AST_.valoreImplicito
             return new result3D();
         }
 
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            if (!variablesUsadas.Contains(ide))
+            {
+                variablesUsadas.AddLast(ide);
+            }
+
+        }
 
 
     }

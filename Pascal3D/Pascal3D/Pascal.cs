@@ -346,7 +346,7 @@ namespace Pascal3D
                         SalidaTexto.Text += codigoFunciones;
                         SalidaTexto.Text += "void main() {\n\n";
                         SalidaTexto.Text += codigoDeclaraciones + codigoMain;
-                        SalidaTexto.Text += "\treturn 0; \n";
+                        SalidaTexto.Text += "\treturn; \n";
                         SalidaTexto.Text += "}\n";
 
 

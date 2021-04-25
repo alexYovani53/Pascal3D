@@ -14,7 +14,6 @@ namespace CompiPascal.AST_.bucles
     public class Repeat : Condicional, Instruccion
     {
 
-        public int tamanoPadre { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
         public Repeat(Expresion condicional, LinkedList<Instruccion> instrucciones, int linea, int columna):
@@ -63,6 +62,15 @@ namespace CompiPascal.AST_.bucles
             codigo = codigo.Replace("#CONTINUE#", $"goto {repeatInicio};");
 
             return codigo;
+        }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            exprCondicional.obtenerListasAnidadas(variablesUsadas);
+            foreach (Instruccion item in instrucciones)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
         }
     }
 }

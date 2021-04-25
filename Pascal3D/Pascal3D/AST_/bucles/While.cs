@@ -67,5 +67,14 @@ namespace CompiPascal.AST_.bucles
             return whileCadena;
 
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            exprCondicional.obtenerListasAnidadas(variablesUsadas);
+            foreach (Instruccion item in instrucciones)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
+        }
     }
 }

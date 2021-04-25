@@ -146,5 +146,13 @@ namespace CompiPascal.AST_.valoreImplicito
             final.Temporal = codigoSiguiente.Temporal;
             return final;
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            if (!variablesUsadas.Contains(idObjeto))
+            {
+                variablesUsadas.AddLast(this.idObjeto);
+            }
+        }
     }
 }

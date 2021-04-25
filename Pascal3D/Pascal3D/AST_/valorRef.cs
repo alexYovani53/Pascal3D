@@ -11,7 +11,7 @@ using static CompiPascal.entorno_.Simbolo;
 
 namespace CompiPascal.AST_
 {
-    public class valorRef:Instruccion
+    public class valorRef : Instruccion
     {
 
 
@@ -57,6 +57,11 @@ namespace CompiPascal.AST_
 
 
         public string getC3(Entorno ent, AST arbol)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
         {
             throw new NotImplementedException();
         }

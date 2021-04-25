@@ -132,5 +132,9 @@ namespace CompiPascal.AST_.definicion
             return codigo;
         }
 
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+           
+        }
     }
 }

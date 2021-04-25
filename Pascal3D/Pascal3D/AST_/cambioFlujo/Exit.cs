@@ -117,5 +117,10 @@ namespace CompiPascal.AST_.cambioFlujo
 
             return resultExpresion;
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            valorSalida.obtenerListasAnidadas(variablesUsadas);
+        }
     }
 }

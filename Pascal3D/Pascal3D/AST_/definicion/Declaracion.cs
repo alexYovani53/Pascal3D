@@ -368,6 +368,50 @@ namespace CompiPascal.AST_.definicion
             return this.valorInicializacion != null || this.valor != null;
         }
 
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            if (valorInicializacion != null)
+            {
+                valorInicializacion.obtenerListasAnidadas(variablesUsadas);
+            }
+        }
+
+        public void obtenerIdes(LinkedList<string> declaraciones)
+        {
+
+            if (ideUnico != null)
+            {
+                declaraciones.AddLast(this.ideUnico.Identificador.ToLower());
+            }
+
+            if (variables != null)
+            {
+                foreach (Simbolo item in this.variables)
+                {
+                    declaraciones.AddLast(item.Identificador.ToLower());
+                }
+            }
+        
+        }
+
+        public TipoDatos tipoVars()
+        {
+            if (ideUnico != null)
+            {
+                return ideUnico.Tipo;
+            }
+
+            if(variables != null)
+            {
+                foreach (Simbolo item in variables)
+                {
+                    return item.Tipo;
+                }
+            }
+
+            return TipoDatos.NULL;
+        }
+        
     }
 
 

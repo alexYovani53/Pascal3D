@@ -26,6 +26,6 @@ namespace CompiPascal.AST_.interfaces
 
         public result3D obtener3D(Entorno ent);
 
-       
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas);
     }
 }

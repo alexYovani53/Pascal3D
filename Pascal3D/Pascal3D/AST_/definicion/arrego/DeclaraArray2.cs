@@ -38,5 +38,10 @@ namespace CompiPascal.AST_.definicion.arrego
         {
             throw new NotImplementedException();
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

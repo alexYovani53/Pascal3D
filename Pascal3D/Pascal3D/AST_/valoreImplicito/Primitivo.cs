@@ -155,5 +155,9 @@ namespace CompiPascal.AST_.valoreImplicito
             return nuevo;
         }
 
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+
+        }
     }
 }

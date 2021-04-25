@@ -33,5 +33,9 @@ namespace CompiPascal.AST_.cambioFlujo
 
             return Generador.tabular(codigo);
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+        }
     }
 }

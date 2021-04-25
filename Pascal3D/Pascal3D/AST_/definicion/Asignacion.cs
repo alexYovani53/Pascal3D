@@ -53,6 +53,11 @@ namespace CompiPascal.AST_.definicion
         private Expresion valor { get; set; }
 
 
+        /*
+         *  Asignación a variables de cualquier tipo pero que no cuente con acceso 
+         *  es decir    variable.param1.param2...   esto va en el otro constructor
+         */
+
         public Asignacion(Simbolo variable, Expresion valor, bool objeto, int linea, int columna)
         {
             this.variable = variable;
@@ -62,6 +67,13 @@ namespace CompiPascal.AST_.definicion
             this.columna = columna;
 
         }
+
+        /*
+         * Este constructor es para crear asignaciones hacia parametros de un objeto
+         * es decir
+         * objeto.param1.param2 := X (valor);   donde idObjeto =  objeto,   idPropiedad =  lista (param1,param2) 
+         * 
+         */
 
         public Asignacion(string idObjeto, LinkedList<string> idPropiedad , Expresion valor, int linea, int columna)
         {
@@ -288,7 +300,6 @@ namespace CompiPascal.AST_.definicion
 
         }
 
-
         public Simbolo variable
         {
             get
@@ -331,5 +342,25 @@ namespace CompiPascal.AST_.definicion
             }
             return true;
         }
+
+
+
+        public void obtenerListasAnidadas(LinkedList<string> nombres)
+        {
+
+
+            if(variable != null)
+            {
+                if(!nombres.Contains(variable.Identificador.ToLower())) nombres.AddLast(variable.Identificador);
+            }
+            else
+            {
+                if(!nombres.Contains(idObjeto.ToLower())) nombres.AddLast(idObjeto);
+            }
+
+            valor.obtenerListasAnidadas(nombres);
+
+        }
+    
     }
 }

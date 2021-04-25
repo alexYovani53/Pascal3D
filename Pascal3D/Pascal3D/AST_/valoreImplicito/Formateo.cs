@@ -98,5 +98,9 @@ namespace CompiPascal.AST_.valoreImplicito
         {
             throw new NotImplementedException();
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+        }
     }
 }

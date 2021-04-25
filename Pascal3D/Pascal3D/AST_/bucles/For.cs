@@ -146,5 +146,14 @@ namespace CompiPascal.AST_.bucles
             return codigoFor;
         }
 
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            valorInicial.obtenerListasAnidadas(variablesUsadas);
+            valfinal.obtenerListasAnidadas(variablesUsadas);
+            foreach (Instruccion item in instrucciones)
+            {
+                item.obtenerListasAnidadas(variablesUsadas);
+            }
+        }
     }
 }

@@ -43,5 +43,10 @@ namespace CompiPascal.AST_.definicion
 
             return "";
         }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+
+        }
     }
 }

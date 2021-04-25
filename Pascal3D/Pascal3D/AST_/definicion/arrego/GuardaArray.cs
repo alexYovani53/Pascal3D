@@ -7,7 +7,7 @@ using static CompiPascal.entorno_.Simbolo;
 
 namespace CompiPascal.AST_.definicion.arrego
 {
-    public class GuardaArray:Instruccion
+    public class GuardaArray : Instruccion
     {
         public int tamanoPadre { get; set; }
         public int linea { get; set; }
@@ -33,6 +33,11 @@ namespace CompiPascal.AST_.definicion.arrego
 
 
         public string getC3(Entorno ent, AST arbol)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
         {
             throw new NotImplementedException();
         }

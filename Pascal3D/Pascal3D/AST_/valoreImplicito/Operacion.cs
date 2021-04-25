@@ -1208,5 +1208,18 @@ namespace CompiPascal.AST_.valoreImplicito
             return op;
         }
 
+        public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
+        {
+            if (operandoU != null)
+            {
+                operandoU.obtenerListasAnidadas(variablesUsadas);
+            }
+            else
+            {
+
+                operando1.obtenerListasAnidadas(variablesUsadas);
+                operando2.obtenerListasAnidadas(variablesUsadas);
+            }
+        }
     }
 }

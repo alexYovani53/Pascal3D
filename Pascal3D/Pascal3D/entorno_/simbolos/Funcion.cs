@@ -81,14 +81,25 @@ namespace CompiPascal.entorno_.simbolos
         {
             string etiquetaRetorno = Generador.pedirEtiqueta(); 
 
+            /*  
+             *      En la @class Llamada no se agregaban las variables a un entorno, en esta sección si. 
+             *      por ello declaramos un nuevo entorno
+             * 
+             */
             Entorno nuevo = new Entorno(ent,"Funcion_"+this.Identificador);
 
             string codigoAnidadas = "";
             string codigoFuncion = "";
 
             codigoFuncion += $"void {this.Identificador} () "+"{\n\n";
+
+            /*  
+             *      Agregamos los parametros, dejando EL PRIMER ESPACIO DE ESTE ENTORNO, libre para el 
+             *      ****RETORNO****************
+             *        
+             */
             agregarParametros(nuevo,arbol);
-            agregarRetorno(nuevo,arbol);
+            agregarRetorno(nuevo,arbol);  // PASCAL usa una variable con el mismo nombre de la función como una forma de retorno
 
             foreach (Instruccion item in ENCABEZADOS)
             {
@@ -99,14 +110,15 @@ namespace CompiPascal.entorno_.simbolos
                 }
                 else if(item is Funcion)
                 {
-                    anidada((Funcion)item,ent);
+                    // En pascal, las funciones se declaran en el encabezado de una función, (buscar estructura funcion, procedimiento)
+                    // por lo que unicamente acá se puede declarar funciones anidadas
+                    
+                    anidada((Funcion)item,ent);         //ESTA FUNCION DES-ANIDA LAS FUNCIONES
+
                     ent.agregarSimbolo(((Funcion)item).Identificador,(Funcion)item);
                     codigoAnidadas += ((Funcion)item).getC3(ent, arbol) + codigoAnidadas;
                 }
             }
-
-
-
 
             foreach (Instruccion item in instrucciones)
             {
@@ -201,25 +213,30 @@ namespace CompiPascal.entorno_.simbolos
         public void anidada(Funcion funcion, Entorno ent)
         {
             LinkedList<string> vars = new LinkedList<string>();
-            buscarAnidadas(vars);
+            buscarAnidadas(vars);   //Buscamos recursivamente, todas las variables que en este entorno, se
+                                    // referencian en las funciones anidadas. 
 
+            // obtener los tipos de esas variables que se referencian hacía adentro de las anidadas. 
             LinkedList<TipoDatos> tipos = new LinkedList<TipoDatos>();
             foreach (string item in vars)
             {
                 tipos.AddLast(obtenerTipoAnidada(item, ent));
             }
-
+            
+            // obtener un valor booleano que indica si la variable que se va a pasar ya es una referencia, 
+            // para manipularlos correctamente
             LinkedList<bool> referencias = new LinkedList<bool>();
             foreach (string item in vars)
             {
                 referencias.AddLast(porReferenciaAnidada(item, ent));
             }
 
-
+            // Esto es extra, solo para comodidad de acceso a las listas previas
             IList<string> vars2 = new List<string>(vars);
             IList<TipoDatos> tipo2 = new List<TipoDatos>(tipos);
             IList<bool> referencias2 = new List<bool>(referencias);
 
+            // comprobar que las listas sean del mismo tamñano, o habría un desbordamiento
             if (vars2.Count != tipo2.Count || vars2.Count != referencias2.Count || tipo2.Count != referencias2.Count) return;
 
             for (int i = 0; i < vars.Count; i++)
@@ -227,6 +244,8 @@ namespace CompiPascal.entorno_.simbolos
                 funcion.ListaParametros.AddLast(new Simbolo(tipo2[i], vars2[i], referencias2[i], 0, 0));         
             }
 
+            // CAMBIO DE FUNCIONES ANIDADAS PARA DES-ANIDARLAS Y PASAR LOS PARAMETROS QUE NO TENÍA 
+            // Y QUE SON DEL PADRE, PARA QUE AL DESHANIDARLAS FUNCIONE CORRECTAMENTE
             foreach (string item in vars2)
             {
                 cambiarLLamada(funcion.Identificador, item);

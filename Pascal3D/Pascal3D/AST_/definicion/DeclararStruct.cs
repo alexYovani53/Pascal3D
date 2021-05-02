@@ -33,6 +33,7 @@ namespace CompiPascal.AST_.definicion
         public string structuraNombre { get; set; }
 
 
+
         public DeclararStruct(LinkedList<Simbolo> variables, string structuraNombre, int linea, int columna)
         {
             this.variables = variables;

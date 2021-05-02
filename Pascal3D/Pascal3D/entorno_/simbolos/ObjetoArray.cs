@@ -8,7 +8,7 @@ namespace CompiPascal.entorno_.simbolos
     public class ObjetoArray : Simbolo,ICloneable
     {
 
-
+        public Objeto valorDEArreglo { get; set; }
 
         /* @propiedad    string      nombre
          * @comentario   esta propiedad guardara el nombre de la estructura tipo arreglo que la genero

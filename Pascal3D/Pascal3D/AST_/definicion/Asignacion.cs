@@ -161,7 +161,7 @@ namespace CompiPascal.AST_.definicion
                     result3D varAsignar = obtenerPosicionVar(ent, simboloVar.Identificador);
 
                     codigo += varAsignar.Codigo;
-                    codigo += $"Stack[{varAsignar.Temporal}] = {final.Temporal}; \n";
+                    codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
                 }
 
             }
@@ -177,7 +177,7 @@ namespace CompiPascal.AST_.definicion
             result3D regresos = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR*/\n";
+            regresos.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR   >>>>------ {identificador} <<<<----*/\n";
             regresos.Codigo += $"{tempora1} = SP; \n";
 
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())

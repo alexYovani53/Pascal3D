@@ -125,7 +125,7 @@ namespace CompiPascal.AST_.valoreImplicito
             string temporalEntorno = Generador.pedirTemporal();
             codigo += Generador.tabular($"{temporalEntorno} = SP + {ent.tamano}; \n\n");
 
-            string codigoParams = verificarParametros(parametros,  funcionLLamada.ListaParametros, entornoFuncion,temporalEntorno);
+            string codigoParams = verificarParametros(parametros,  funcionLLamada.ListaParametros, entornoFuncion,temporalEntorno,arbol);
             codigo += Generador.tabular(codigoParams);
 
 
@@ -138,7 +138,9 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
 
-        private string  verificarParametros(LinkedList<result3D> valores, LinkedList<Simbolo> parametrosFuncProc, Entorno ent,string temporalEntorno)
+
+
+        private string  verificarParametros(LinkedList<result3D> valores, LinkedList<Simbolo> parametrosFuncProc, Entorno ent,string temporalEntorno,AST arbol)
         {
             string codigoParams = "";
             int numeroParametros = parametrosFuncProc.Count;
@@ -174,7 +176,15 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 //COMPARAMOS LOS TIPOS
 
-                if(tipoParametro != tipoExpresion) {
+                if (parametroActual.structGenerador !=null && !parametroActual.structGenerador.Equals(""))
+                {
+                    Struct aux1 = arbol.retornarEstructura(parametroActual.structGenerador);
+                    Arreglo aux2 = arbol.retornarArreglo(parametroActual.structGenerador);
+
+                    tipoParametro = aux1 != null ? TipoDatos.Object : TipoDatos.Array;
+                }
+
+                if(tipoParametro != tipoExpresion ) {
                     Program.getIntefaz().agregarError($"Error de tipos {tipoParametro} -> {tipoExpresion} " + numeroRecibe, linea, columna);
                     return "";
                 }
@@ -183,7 +193,8 @@ namespace CompiPascal.AST_.valoreImplicito
                 //COMPROBAMOS SI EL VALOR ES POR REFERENCIA O POR VALOR
                 if (parametroActual.porReferencia)
                 {
-                    codigoParams += valoresReferencia(parametroActual, parametroActual.Tipo, nombreParam, valorActual, ent, temporalEntorno,i);
+                    codigoParams += valorActual.Codigo;
+                    codigoParams += valoresReferencia(parametroActual, tipoParametro, nombreParam, valorActual, ent, temporalEntorno,i,arbol);
                 }
                 else
                 {
@@ -205,7 +216,6 @@ namespace CompiPascal.AST_.valoreImplicito
 
             }
 
-
             return codigoParams;
         }
 
@@ -214,54 +224,74 @@ namespace CompiPascal.AST_.valoreImplicito
         /* Esta funcion se encarga unicamente de las validaciones correspondientes para poder trabajar con variables por referencia
          * se separa el codigo para no tener un metodo demasiado extenso*/
 
-        private string valoresReferencia(Simbolo parametroActual, TipoDatos tipoParametro, string nombreParam, result3D ValorRef, Entorno ent,string temporalCambio,int posicionExpresionValor)
+        private string valoresReferencia(Simbolo parametroActual, TipoDatos tipoParametro, string nombreParam, result3D ValorRef, Entorno ent,string temporalCambio,int posicionExpresionValor,AST arbol)
         {                    // SI EL PARAMETRO ESPERADO ES POR REFERENCIA, SE DEVE VALIDAR QUE ESTE SEA UN IDENTIFICADOR Y NO UN VALOR PRIMITIVO
 
             string codigo = "";
 
             if (tipoParametro == TipoDatos.Object)
             {
-                /*Simbolo structura = ent.obtenerSimbolo(parametroActual.structGenerador);
-                if (structura == null && structura.Tipo != TipoDatos.Struct && structura.Tipo != TipoDatos.Array)
-                {
-                    Program.getIntefaz().agregarError("El identificador " + parametroActual.structGenerador + " no tiene una definicion struct asociada", linea, columna);
-                    return false;
-                }
 
-                if (structura.Tipo == TipoDatos.Array)
+                /*  Esta VALIDACIÓN  se hace ya que cuando se pasa un valor por referencia, en el caso de pascal, que existen
+                     *  funciones anidadas, es decir, definición de funciones dentro de una funcion. 
+                     *  
+                     *  sería algo como    public void funcionpadre(){
+                     *                          void funcionHija(){
+                     *                          }
+                     *                     }
+                     *            
+                     *  se puede que el parametro del padre sea una referencía, y al pasarsela al hijo se pasa la referencía también, entonces
+                     *  se debe validar que se pase correctamente. 
+                     * 
+                     */
+                if (expresionesValor.ElementAt(posicionExpresionValor) is Identificador)
                 {
-                    if (!(valorExpresion is ObjetoArray))
+
+                    string nombreRef_ref = ((Identificador)expresionesValor.ElementAt(posicionExpresionValor)).nombre();
+                    Simbolo referencia = ent.obtenerSimbolo(nombreRef_ref);
+
+                    // validar que la variable referenciada ya sea una referencia.
+                    if (referencia != null && referencia.porReferencia)
                     {
-                        Program.getIntefaz().agregarError("El identificador " + ((Identificador)valorActual).nombre() + " no tiene representa un arreglo", linea, columna);
-                        return false;
+                        // Previamente se tenía que cuando se pasa una variable por referencia se pasa solo su dirección
+                        // pero en este caso, cuando se vuelve a pasar la misma referencía necesitamos acceder al Stack en la posicion que se 
+                        // devuelve al obtener el codigo 3D 
+                        string temporal = Generador.pedirTemporal();
+                        ValorRef.Codigo += $"{temporal} = Stack[(int){ValorRef.Temporal}];\n";
+                        ValorRef.Temporal = temporal;
                     }
-
-                    ObjetoArray valorCopia = (ObjetoArray)valorExpresion;
-
-                    List<int[]> nivels = new List<int[]>(valorCopia.getNiveles());
-                    object[] valores = valorCopia.valores;
-                    ObjetoArray nuevo = new ObjetoArray(nombreParam, parametroActual.structGenerador, valorCopia.Tipo, valores, nivels, parametroActual.linea, parametroActual.columna)
-                    {
-                        porReferencia = true,
-                        punteroRef = new valorRef(valorCopia, ent.entAnterior(), tipoParametro, parametroActual.linea, parametroActual.columna)
-                    };
-                    ent.agregarSimbolo(nombreParam, nuevo);
                 }
-                else
-                {
-                    Objeto valorACopiar = (Objeto)valorExpresion;
-                    Objeto nuevo = new Objeto(nombreParam, parametroActual.structGenerador, valorACopiar.getPropiedades().copiarEntorno(), parametroActual.linea, parametroActual.columna)
-                    {
-                        porReferencia = true,
-                        punteroRef = new valorRef(valorActual, ent.entAnterior(), tipoParametro)
-                    };
 
-                    ent.agregarSimbolo(nombreParam, nuevo);
-                }*/
+                string temp1 = Generador.pedirTemporal();
+                string temp2 = Generador.pedirTemporal();
 
+                codigo += $"/*Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
+                //codigo += $"{temp1} = Stack[(int){ValorRef.Temporal}];\n\n";
+
+                codigo += $"    {temp2} = {temporalCambio} + {ent.tamano};\n";
+                codigo += $"    Stack[(int){temp2}] = {ValorRef.Temporal};\n";
+                codigo += $"/* FIN Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
+                ent.tamano++;
 
             }
-            else{
+            else if(tipoParametro == TipoDatos.Array)
+            {
+
+                string temp1 = Generador.pedirTemporal();
+                string temp2 = Generador.pedirTemporal();
+
+                codigo += $"/*Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
+                //codigo += $"{temp1} = Stack[(int){ValorRef.Temporal}];\n\n";
+
+
+                codigo += $"    {temp2} = {temporalCambio} + {ent.tamano};\n";
+                codigo += $"    Stack[(int){temp2}] = {ValorRef.Temporal};\n";
+
+                codigo += $"/* FIN Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
+                ent.tamano++;
+            }
+            else
+            {
 
                 /*  Esta VALIDACIÓN  se hace ya que cuando se pasa un valor por referencia, en el caso de pascal, que existen
                  *  funciones anidadas, es decir, definición de funciones dentro de una funcion. 
@@ -309,6 +339,8 @@ namespace CompiPascal.AST_.valoreImplicito
 
         }
 
+
+
         public void buscarReferencia(Funcion llamada)
         {
             //  comprobar cuantos parametros tiene la llamada
@@ -337,7 +369,6 @@ namespace CompiPascal.AST_.valoreImplicito
                 item.obtenerListasAnidadas(variablesUsadas);
             }
         }
-
 
     }
 

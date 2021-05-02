@@ -12,7 +12,10 @@ namespace CompiPascal.AST_.definicion.arrego
 {
     public class DeclaraArray : Instruccion
     {
-        public int tamanoPadre { get; set; }
+
+
+        Objeto defaultTipo { get; set; }
+
         public int linea { get; set; }
         public int columna { get; set; }
 
@@ -30,6 +33,7 @@ namespace CompiPascal.AST_.definicion.arrego
         
         public string temporalCambioEntorno;
 
+
         public DeclaraArray(string ide, string nombreStructArreglo, string tipoObjeto, TipoDatos tipo, List<string[]> niveles, int linea, int columna)
         {
             arrayPropDimension = new List<string[]>(niveles);      //SI NO SE HACE ESTO LA REFERENCIA SEGUIRA Y DARA PROBLEMAS
@@ -39,6 +43,7 @@ namespace CompiPascal.AST_.definicion.arrego
             this.linea = linea;
             this.columna = columna;
             this.tipo = tipo;
+            this.defaultTipo = null;
         }
 
 
@@ -46,12 +51,12 @@ namespace CompiPascal.AST_.definicion.arrego
 
         public string getC3(Entorno ent, AST arbol)
         {
-            string codigo = "";
+            string codigo = $"/*           ----------------------  Declaración de arreglo {ide} <<<<<<<<<<<<<<<<<<<<<<< */\n";
 
             List<string[]> copiaDimensiones = new List<string[]>(arrayPropDimension);
 
             //VEMOS SI EXISTE EL IDE DE ESTE ARREGLO
-            bool existeId = ent.existeSimbolo(this.ide);
+            bool existeId = ent.existeEnEntornoActual(this.ide);
             if (existeId)
             {
                 Program.getIntefaz().agregarError("El ide " + this.ide + " ya esta definido con otro valor", linea, columna);
@@ -86,9 +91,14 @@ namespace CompiPascal.AST_.definicion.arrego
 
             int posicionRelativa = ent.tamano;
 
-            ent.agregarSimbolo(ide, new ObjetoArray(ide, nombreStructArreglo, tipo, posicionRelativa, arrayPropDimension, linea, columna));
+            ObjetoArray instancia = new ObjetoArray(ide, nombreStructArreglo, tipo, posicionRelativa, arrayPropDimension, linea, columna);
+
+            if (defaultTipo != null) instancia.valorDEArreglo = defaultTipo;
+
+            ent.agregarSimbolo(ide,instancia);
             ent.tamano++;
 
+            codigo += $"/*           ---------------------- FIN Declaración de arreglo {ide} <<<<<<<<<<<<<<<<<<<<<<< */\n";
             return codigo;
         }
 
@@ -105,45 +115,50 @@ namespace CompiPascal.AST_.definicion.arrego
             string inicio = nivel[0]; 
             string ancho = nivel[1];
 
-            
 
             if (copiaLista.Count > 0)
             {
-                //RECURSIVAMENTE AGREGAMOS LAS DIMENSIONES EN CADA POSICION
-                // CREANDO UN FOR 
-                string etiquetaInicio = Generador.pedirEtiqueta();
-                string etiquetaFinal = Generador.pedirEtiqueta();
 
-                string posiciones = Generador.pedirTemporal();
-                string contador = Generador.pedirTemporal();
-                string siguientePosicion = Generador.pedirTemporal();
-                string ancho_mas_1 = Generador.pedirTemporal();
+                    string siguientePosicion = Generador.pedirTemporal();
+                    string posiciones = Generador.pedirTemporal();
+                    string contador = Generador.pedirTemporal();
+                    string ancho_mas_1 = Generador.pedirTemporal();
+
+                    //RECURSIVAMENTE AGREGAMOS LAS DIMENSIONES EN CADA POSICION
+                    // CREANDO UN FOR 
+                    string etiquetaInicio = Generador.pedirEtiqueta();
+                    string etiquetaFinal = Generador.pedirEtiqueta();
 
 
-                codigo += $"{ancho_mas_1} = {ancho} + 1;  /*Ancho del arreglo mas una posicion para almacenar el tamano*/\n";
-                codigo += $"{posiciones} = {direccionHeap}; /*Capturamos el inico del arreglo*/\n";
-                codigo += $"Heap[(int){posiciones}] = {ancho};  /*El la primera posicion colocamos el tamaño del arreglo*/ \n";
-                codigo += $"HP = HP + {ancho_mas_1}; /*Reservamos el espacio para la dimension*/\n";
 
-                codigo += $"{posiciones} = {posiciones} + 1;  /*Pasamos a la primera posicion donde iran los valores*/\n";
-                codigo += $"{contador} = 1 ; \n";
-                codigo += $"{etiquetaInicio}: \n";
+                    codigo += $"{ancho_mas_1} = {ancho} + 1;  /*Ancho del arreglo mas una posicion para almacenar el tamano*/\n";
+                    codigo += $"{posiciones} = {direccionHeap}; /*Capturamos el inico del arreglo*/\n";
+                    codigo += $"Heap[(int){posiciones}] = {ancho};  /*El la primera posicion colocamos el tamaño del arreglo*/ \n";
+                    codigo += $"HP = HP + {ancho_mas_1}; /*Reservamos el espacio para la dimension*/\n";
 
-                codigo += $"{siguientePosicion} = HP;\n";
-                codigo += $"Heap[(int){posiciones}] = {siguientePosicion};\n";
-                codigo += Generador.tabular(arregloValores(tipoDatos, tipoObjeto, copiaLista, siguientePosicion,ent,arbol));
-                 
+                    codigo += $"{posiciones} = {posiciones} + 1;  /*Pasamos a la primera posicion donde iran los valores*/\n";
+                    codigo += $"{contador} = 1 ; \n";
+                    codigo += $"{etiquetaInicio}: \n";
 
-                codigo += $"if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
-                codigo += $"    {posiciones} = {posiciones} + 1; \n";
-                codigo += $"    {contador} = {contador} + 1; \n";
+                    codigo += $"{siguientePosicion} = HP;\n";
+                    codigo += $"Heap[(int){posiciones}] = {siguientePosicion};\n";
+                    codigo += Generador.tabular(arregloValores(tipoDatos, tipoObjeto, copiaLista, siguientePosicion, ent, arbol));
 
-                codigo += $"        goto {etiquetaInicio};\n";
-                codigo += $"{etiquetaFinal}:\n\n";
+
+                    codigo += $"if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
+                    codigo += $"    {posiciones} = {posiciones} + 1; \n";
+                    codigo += $"    {contador} = {contador} + 1; \n";
+
+                    codigo += $"        goto {etiquetaInicio};\n";
+                    codigo += $"{etiquetaFinal}:\n\n";
+
+
 
             }
             else
             {
+
+   
                 // CREANDO UN FOR 
                 string etiquetaInicio = Generador.pedirEtiqueta();
                 string etiquetaFinal = Generador.pedirEtiqueta();
@@ -258,12 +273,12 @@ namespace CompiPascal.AST_.definicion.arrego
                     arrayPropDimension.Add(item);
                 }
 
-              
                 string direccionHeap = Generador.pedirTemporal();
                 final.Codigo += $"{direccionHeap} = HP; \n";
-                final.Codigo += arregloValores(arreglo.tipoArreglo, arreglo.nombreObjeto_arrTipoObject, arreglo.niveles,direccionHeap,ent,arbol);
+                final.Codigo += arregloValores(arreglo.tipoArreglo, arreglo.nombreObjeto_arrTipoObject, arreglo.niveles, direccionHeap, ent, arbol);
                 final.Temporal = direccionHeap;
                 final.TipoResultado = arreglo.tipoArreglo;   // esto esta de mas, pero se hace para llevar el tipo 
+
 
             }
             else if(estructura != null)
@@ -274,18 +289,24 @@ namespace CompiPascal.AST_.definicion.arrego
                 string tempDireccionHeap = Generador.pedirTemporal();
                 LinkedList<Simbolo> LISTA = new LinkedList<Simbolo>();
 
+
                 // UBICACION DEL OBJETO TIPO STRUCT
                 final.Codigo += $"{tempDireccionHeap} = HP; \n";
                 LISTA.AddLast(new Simbolo("--", 0, 0));
 
                 // DECLARAMOS EL OBJETO 
-                DeclararStruct structEnArray = new DeclararStruct(LISTA, estructura.identificador, linea, columna);
-                structEnArray.objetoInterno = true;
-               
+                DeclararStruct structEnArray = new DeclararStruct(LISTA, estructura.identificador, linea, columna)
+                {
+                    objetoInterno = true
+                };
+
                 // GENERAMOS EL OBJETO
                 final.Codigo += structEnArray.getC3(entornoStruct, arbol);
                 final.Temporal = tempDireccionHeap;
                 final.TipoResultado = TipoDatos.Object;
+
+                defaultTipo = (Objeto)entornoStruct.obtenerSimbolo("--");
+
 
             }
 

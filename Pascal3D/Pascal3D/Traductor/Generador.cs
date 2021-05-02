@@ -16,9 +16,12 @@ namespace Pascal3D.Traductor
         public static int ptrHeap = 0;
         public static int ptrStack = 0;
 
+        public static bool generar = true;
 
         public static string pedirTemporal()
         {
+            if (!generar) return "  ";
+
             string temp = "";
             temp += "t" + temporales.ToString();
             temporales++;
@@ -27,6 +30,8 @@ namespace Pascal3D.Traductor
 
         public static string pedirEtiqueta()
         {
+            if (!generar) return "  "; 
+
             string etiqueta = "";
             etiqueta += "L" + etiquetas.ToString();
             etiquetas++;

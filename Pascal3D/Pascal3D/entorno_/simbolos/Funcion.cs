@@ -39,7 +39,7 @@ namespace CompiPascal.entorno_.simbolos
 
 
 
-
+        public Entorno propio { get; set; }
 
         /**
          * @comentario   Constructor de funcion de tipo PRIMITIVO.
@@ -100,17 +100,13 @@ namespace CompiPascal.entorno_.simbolos
              *      ****RETORNO****************
              *        
              */
-            agregarParametros(nuevo,arbol);
+            agregarParametros2(nuevo,arbol);
             agregarRetorno(nuevo,arbol);  // PASCAL usa una variable con el mismo nombre de la función como una forma de retorno
 
             foreach (Instruccion item in ENCABEZADOS)
             {
-                if(item is Declaracion)
-                {
-                    string declaraVar = item.getC3(nuevo,arbol);
-                    codigoFuncion += Generador.tabular(declaraVar);
-                }
-                else if(item is Funcion)
+
+                if(item is Funcion)
                 {
                     // En pascal, las funciones se declaran en el encabezado de una función, (buscar estructura funcion, procedimiento)
                     // por lo que unicamente acá se puede declarar funciones anidadas
@@ -119,6 +115,12 @@ namespace CompiPascal.entorno_.simbolos
 
                     ent.agregarSimbolo(((Funcion)item).Identificador,(Funcion)item);
                     codigoAnidadas += ((Funcion)item).getC3(ent, arbol) + codigoAnidadas;
+                }
+                else
+                {
+                    string declaraVar = item.getC3(nuevo, arbol);
+                    codigoFuncion += Generador.tabular(declaraVar);
+
                 }
             }
 
@@ -182,6 +184,54 @@ namespace CompiPascal.entorno_.simbolos
 
         }
 
+
+        public void agregarParametros2(Entorno ent, AST arbol)
+        {
+            /*PARA EL MANEJO DE LAS FUNCIONES QUE TIENEN UN RETORNO
+              SE MANEJA QUE EL PRIMER ESPACIO EN EL ENTORNO DE LA FUNCION SEA EL QUE GUARDARA EL VALOR A RETORNAR
+              POR LO QUE LA PRIMERA DECLARACION EN LA FUNCION COMIENZA EN  
+              P = P + 1      Y NO EN         P = P + 0  
+             */
+            ent.tamano++;
+
+
+            if (ListaParametros != null)
+            {
+                Generador.generar = false;
+                foreach (Simbolo item in ListaParametros)
+                {
+                    LinkedList<Simbolo> vars = new LinkedList<Simbolo>();
+                    vars.AddLast(new Simbolo(item.Identificador, item.linea, item.columna));
+
+                    if (item.structGenerador != null)
+                    {
+
+                        DeclararStruct nuevaEstructura = new DeclararStruct(vars, item.structGenerador, linea, columna);
+                        nuevaEstructura.getC3(ent, arbol);
+                    }
+                    else
+                    {
+                        Declaracion nuevaDeclaracion = new Declaracion(vars, item.Tipo);
+                        nuevaDeclaracion.getC3(ent, arbol);
+
+                    }
+
+                    /* HACEMOS ESTA VALIDACIÓN PARA CUANDO VIENE UN PARAMETRO POR REFERENCIA, EN EL ENTORNO TAMBIEN APARESCA UNA BANDERA QUE LO INDIQUE
+                     * ESTA BANDERA SERA USADA EN LA ASIGNACIÓN O AL MOMENTO DE ACCEDER A LA VARIABLE */
+                    if (item.porReferencia)
+                    {
+                        Simbolo cambiarRef =  ent.obtenerSimbolo(item.Identificador);
+                        if (cambiarRef != null) cambiarRef.porReferencia = true;
+                    }
+
+ 
+                }
+                Generador.generar = true;
+            }
+
+        }
+
+
         public string agregarRetorno(Entorno ent,AST ARBOL)
         {
             if (Tipo != TipoDatos.Void)
@@ -221,58 +271,6 @@ namespace CompiPascal.entorno_.simbolos
 
             return Generador.tabular(codigo);
         }
-
-
-
-        public string IniciarParametros(Entorno ent, AST arbol)
-        {
-
-            string codigo = "";
-
-            /*PARA EL MANEJO DE LAS FUNCIONES QUE TIENEN UN RETORNO
-              SE MANEJA QUE EL PRIMER ESPACIO EN EL ENTORNO DE LA FUNCION SEA EL QUE GUARDARA EL VALOR A RETORNAR
-              POR LO QUE LA PRIMERA DECLARACION EN LA FUNCION COMIENZA EN  
-              P = P + 1      Y NO EN         P = P + 0  
-             */
-
-            ent.tamano++;
-
-
-            if (ListaParametros != null)
-            {
-                foreach (Simbolo item in ListaParametros)
-                {
-                    Entorno nuevo = new Entorno(null, "null");
-                    LinkedList<Simbolo> vars = new LinkedList<Simbolo>();
-                    vars.AddLast(new Simbolo(item.Identificador, item.linea, item.columna));
-
-                    if (item.structGenerador != null)
-                    {
-                        DeclararStruct declararEstruct = new DeclararStruct(vars,item.structGenerador,linea,columna);
-                        codigo += declararEstruct.getC3(ent, arbol);
-                    }
-                    else
-                    {
-                        Declaracion simple = new Declaracion(vars, item.Tipo);
-                        codigo += simple.getC3(ent, arbol);
-                    }
-
-                    foreach (Simbolo cambiando in ent.TablaSimbolos())
-                    {
-                        if (item.Identificador.Equals(cambiando.Identificador))
-                        {
-                            cambiando.porReferencia = item.porReferencia;
-                        }
-                    }
-
-                }
-            }
-
-            return codigo;
-
-        }
-
-
 
         public void anidada(Funcion funcion, Entorno ent)
         {
@@ -423,6 +421,8 @@ namespace CompiPascal.entorno_.simbolos
             }
 
         }
+
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CompiPascal.AST_.interfaces;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,27 +17,27 @@ namespace CompiPascal.AST_.definicion.arrego
         public  TipoDatos tipoArreglo;
 
 
-        public List<int[]> niveles { get; set; }
+        public List<string[]> niveles { get; set; }
 
         /* @propiedad    String      identificador
          * @comentario   esta propiedad guardara el identificador con el que se denominara el arreglo
          */
 
-        public  string nombreArreglo { get; set; }
-        public string nombreObjeto { get; set; }
+        public  string idePlantillaArreglo { get; set; }
+        public string nombreObjeto_arrTipoObject { get; set; }
 
-        public Arreglo(string nombreStuct, TipoDatos tipoArray, List<int[]> niveles)
+        public Arreglo(string nombreStuct, TipoDatos tipoArray, List<string[]> niveles)
         {
-            this.nombreArreglo = nombreStuct;
+            this.idePlantillaArreglo = nombreStuct;
             this.tipoArreglo = tipoArray;
             this.niveles = niveles;
         }
 
-        public Arreglo(string nombreStuct, string objeto, TipoDatos tipoArray, List<int[]> niveles)
+        public Arreglo(string nombreStuct, string objeto, TipoDatos tipoArray, List<string[]> niveles)
         {
-            this.nombreArreglo = nombreStuct;
+            this.idePlantillaArreglo = nombreStuct;
             this.tipoArreglo = tipoArray;
-            this.nombreObjeto = objeto;
+            this.nombreObjeto_arrTipoObject = objeto;
             this.niveles = niveles;
         }
 

@@ -96,7 +96,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
         public result3D obtener3D(Entorno ent)
         {
-            throw new NotImplementedException();
+            return new result3D();
         }
 
         public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)

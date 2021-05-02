@@ -324,7 +324,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 */
                 if(llamada.ListaParametros.ElementAt(i).porReferencia && expresionesValor.ElementAt(i) is Identificador)
                 {
-                    ((Identificador)expresionesValor.ElementAt(i)).buscar_puntero = true;
+                    ((Identificador)expresionesValor.ElementAt(i)).buscarSoloDireccion = true;
                 }
             }
         }

@@ -1,6 +1,8 @@
 ﻿using CompiPascal.AST_.interfaces;
 using CompiPascal.entorno_;
 using CompiPascal.entorno_.simbolos;
+using Pascal3D;
+using Pascal3D.Traductor;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,11 +24,15 @@ namespace CompiPascal.AST_.definicion.arrego
 
         private TipoDatos tipo;
 
-        List<int[]> arrayPropDimension;
+        List<string[]> arrayPropDimension;
 
-        public DeclaraArray(string ide, string nombreStructArreglo, string tipoObjeto, TipoDatos tipo, List<int[]> niveles, int linea, int columna)
+        public bool objetoInterno;
+        
+        public string temporalCambioEntorno;
+
+        public DeclaraArray(string ide, string nombreStructArreglo, string tipoObjeto, TipoDatos tipo, List<string[]> niveles, int linea, int columna)
         {
-            arrayPropDimension = new List<int[]>(niveles);      //SI NO SE HACE ESTO LA REFERENCIA SEGUIRA Y DARA PROBLEMAS
+            arrayPropDimension = new List<string[]>(niveles);      //SI NO SE HACE ESTO LA REFERENCIA SEGUIRA Y DARA PROBLEMAS
             this.ide = ide;
             this.nombreStructArreglo = nombreStructArreglo;
             this.nombreStruct = tipoObjeto;
@@ -37,94 +43,260 @@ namespace CompiPascal.AST_.definicion.arrego
 
 
 
-        private object valorDefecto(TipoDatos tipo, string nombreObjeto,Entorno ent, AST arbol)
-        {
 
-            if (tipo == TipoDatos.String)
+        public string getC3(Entorno ent, AST arbol)
+        {
+            string codigo = "";
+
+            List<string[]> copiaDimensiones = new List<string[]>(arrayPropDimension);
+
+            //VEMOS SI EXISTE EL IDE DE ESTE ARREGLO
+            bool existeId = ent.existeSimbolo(this.ide);
+            if (existeId)
             {
+                Program.getIntefaz().agregarError("El ide " + this.ide + " ya esta definido con otro valor", linea, columna);
                 return "";
             }
-            else if (tipo == TipoDatos.Char)
+
+            //OBTENEMOS EL ARREGLO DE VALORES
+
+            string direccionArray = Generador.pedirTemporal();
+            string direccionHeap = Generador.pedirTemporal();
+
+            // Declaración de la forma    estructura.arreglo[][]    aqui estamos declarando arreglo[][] dentro del entorno en heap de estructura
+            if (objetoInterno)
             {
-                return '\0';
-            }
-            else if (tipo == TipoDatos.Boolean)
-            {
-                return false;
-            }
-            else if (tipo == TipoDatos.Integer)
-            {
-                return 0;
-            }
-            else if (tipo == TipoDatos.Real)
-            {
-                return 0.0;
-            }
-            else if (tipo == TipoDatos.Struct)
-            {
-                return null;
-            }
-            else if (tipo == TipoDatos.Object)
-            {
-                return null;
-            }
 
-            return null;
-        }
-
-
-
-
-        private object[] arregloValores(List<int[]> lista, object valorDefecto)
-        {
-            List<int[]> copiaLista = new List<int[]>(lista);
-            int[] nivel = copiaLista[0];
-            copiaLista.RemoveAt(0);                             //Removemos la dimension actual leida
-
-            int inicio = nivel[0];
-            int ancho = nivel[1];
-
-
-            object[] dimen = new object[ancho];
-
-            if (copiaLista.Count > 0)
-            {
-                //RECURSIVAMENTE AGREGAMOS LAS DIMENSIONES EN CADA POSICION
-                for (int i = 0; i < (int)ancho; i++)
-                {
-                    dimen[i] = arregloValores(copiaLista, valorDefecto);
-                }
+                codigo += $"{direccionArray} = {temporalCambioEntorno};\n";
+                codigo += $"{direccionArray} = {direccionArray} + {ent.tamano};\n";
+                codigo += $"{direccionHeap} = HP;\n";
+                codigo += $"    Heap[(int){direccionArray}] = {direccionHeap};\n\n";
 
             }
             else
             {
-                //EN CADA POSICION A LO ANCHO DEL ARREGLO
-                for (int i = 0; i < (int)ancho; i++)
-                {
-                    if (valorDefecto is Objeto)
-                    {
-                        dimen[i] = ((Objeto)valorDefecto).Clone();
-                    }
-                    else
-                    {
-                        dimen[i] = valorDefecto;
-                    }
-                }
+                codigo += $"{direccionArray} = SP;\n";
+                codigo += $"{direccionArray} = {direccionArray} + {ent.tamano};\n";
+                codigo += $"{direccionHeap} = HP;\n";
+                codigo += $"    Stack[(int){direccionArray}] = {direccionHeap};\n\n";
+
             }
 
-            return dimen;
+            codigo += Generador.tabular(arregloValores(tipo, nombreStruct, copiaDimensiones, direccionHeap, ent, arbol));
 
+            int posicionRelativa = ent.tamano;
+
+            ent.agregarSimbolo(ide, new ObjetoArray(ide, nombreStructArreglo, tipo, posicionRelativa, arrayPropDimension, linea, columna));
+            ent.tamano++;
+
+            return codigo;
         }
 
 
-        public string getC3(Entorno ent, AST arbol)
+
+        private string arregloValores(TipoDatos tipoDatos, string tipoObjeto, List<string[]> lista,string direccionHeap,Entorno ent, AST arbol)
         {
-            throw new NotImplementedException();
+            string codigo = "";
+
+            List<string[]> copiaLista = new List<string[]>(lista);
+            string[] nivel = copiaLista[0];
+            copiaLista.RemoveAt(0);                             //Removemos la dimension actual leida
+
+            string inicio = nivel[0]; 
+            string ancho = nivel[1];
+
+            
+
+            if (copiaLista.Count > 0)
+            {
+                //RECURSIVAMENTE AGREGAMOS LAS DIMENSIONES EN CADA POSICION
+                // CREANDO UN FOR 
+                string etiquetaInicio = Generador.pedirEtiqueta();
+                string etiquetaFinal = Generador.pedirEtiqueta();
+
+                string posiciones = Generador.pedirTemporal();
+                string contador = Generador.pedirTemporal();
+                string siguientePosicion = Generador.pedirTemporal();
+                string ancho_mas_1 = Generador.pedirTemporal();
+
+
+                codigo += $"{ancho_mas_1} = {ancho} + 1;  /*Ancho del arreglo mas una posicion para almacenar el tamano*/\n";
+                codigo += $"{posiciones} = {direccionHeap}; /*Capturamos el inico del arreglo*/\n";
+                codigo += $"Heap[(int){posiciones}] = {ancho};  /*El la primera posicion colocamos el tamaño del arreglo*/ \n";
+                codigo += $"HP = HP + {ancho_mas_1}; /*Reservamos el espacio para la dimension*/\n";
+
+                codigo += $"{posiciones} = {posiciones} + 1;  /*Pasamos a la primera posicion donde iran los valores*/\n";
+                codigo += $"{contador} = 1 ; \n";
+                codigo += $"{etiquetaInicio}: \n";
+
+                codigo += $"{siguientePosicion} = HP;\n";
+                codigo += $"Heap[(int){posiciones}] = {siguientePosicion};\n";
+                codigo += Generador.tabular(arregloValores(tipoDatos, tipoObjeto, copiaLista, siguientePosicion,ent,arbol));
+                 
+
+                codigo += $"if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
+                codigo += $"    {posiciones} = {posiciones} + 1; \n";
+                codigo += $"    {contador} = {contador} + 1; \n";
+
+                codigo += $"        goto {etiquetaInicio};\n";
+                codigo += $"{etiquetaFinal}:\n\n";
+
+            }
+            else
+            {
+                // CREANDO UN FOR 
+                string etiquetaInicio = Generador.pedirEtiqueta();
+                string etiquetaFinal = Generador.pedirEtiqueta();
+
+                string contador = Generador.pedirTemporal();
+                string posiciones = Generador.pedirTemporal();
+                string ancho_mas_1 = Generador.pedirTemporal();
+
+
+                codigo += $"{ancho_mas_1} = {ancho} + 1;\n";
+                codigo += $"{posiciones} = {direccionHeap}; /*Capturamos el inico del arreglo*/\n";
+                codigo += $"Heap[(int){posiciones}] = {ancho};  /*El la primera posicion colocamos el tamaño del arreglo*/\n";
+                codigo += $"HP = HP + {ancho_mas_1}; /*Reservamos el espacio para la dimension*/\n";
+
+                codigo += $"{posiciones} = {posiciones} + 1;  /*Pasamos a la primera posicion donde iran los valores*/\n";
+                codigo += $"{contador} = 1; \n\n";
+                codigo += $"{etiquetaInicio}: \n";
+
+                result3D valpor_defecto = valorDefecto(tipoDatos, tipoObjeto, ent, arbol);
+
+                codigo += Generador.tabular(valpor_defecto.Codigo);
+
+                codigo += $"\n\nHeap[(int){posiciones}] = {valpor_defecto.Temporal};\n";
+
+                codigo += $"if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
+                codigo += $"    {posiciones} = {posiciones} + 1; \n";
+                codigo += $"    {contador} = {contador} + 1; \n";
+
+                codigo += $"        goto {etiquetaInicio};\n";
+                codigo += $"{etiquetaFinal}:\n";
+
+            }
+
+            return codigo;
+
         }
+
+
+        private result3D valorDefecto(TipoDatos tipo, string nombreObjeto, Entorno ent, AST arbol)
+        {
+            result3D codigoDef = new result3D();
+
+            if (tipo == TipoDatos.String)
+            {
+                string temp1 = Generador.pedirTemporal();
+
+                codigoDef.Codigo += $"{temp1}= HP; \n";
+                codigoDef.Codigo += $"Heap[(int){temp1}] = 0; \n";
+                codigoDef.Codigo += $"HP = HP + 1; \n";
+
+                codigoDef.Temporal = temp1;
+                codigoDef.TipoResultado = TipoDatos.String;
+                return codigoDef;
+            }
+            else if (tipo == TipoDatos.Char)
+            {
+                codigoDef.Temporal = "" + 0;
+                return codigoDef;
+            }
+            else if (tipo == TipoDatos.Integer)
+            {
+                codigoDef.Temporal = "" + 0;
+                return codigoDef;
+            }
+            else if (tipo == TipoDatos.Real)
+            {
+                codigoDef.Temporal = "" + 0.0;
+                return codigoDef;
+            }
+            else if (tipo == TipoDatos.Boolean)
+            {
+                codigoDef.Temporal = "" + 0;
+                return codigoDef;
+            }
+            else if (tipo == TipoDatos.Void)
+            {
+                return codigoDef;
+            }
+            else if (tipo == TipoDatos.Object)
+            {
+                return valorObjeto(nombreObjeto, ent, arbol);
+            }
+
+            return codigoDef;
+
+        }
+
+        public result3D valorObjeto(string nombreOjbeto, Entorno ent, AST arbol)
+        {
+
+            result3D final = new result3D();
+
+            //SE VALIDA SI EL NOMBRE DE LA ESTRUCTURA QUE GUARDARA EL ARREGLO EXISTE O NO 
+            if (nombreOjbeto == null)
+            {
+                Program.getIntefaz().agregarError("NO SE A DEFINIDO UN TIPO PARA LA ESTRUCTURA A ALMACENAR", linea, columna);
+                return null;
+            }
+
+
+            Struct estructura = arbol.retornarEstructura(nombreOjbeto);
+            Arreglo arreglo = arbol.retornarArreglo(nombreOjbeto);
+
+            if(arreglo!= null)
+            {
+                //CAPTURAMOS EL TIPO DEL ARREGLO Y SE LO PASAMOS COMO TIPO GENERAL DEL ARREGLO
+                tipo = arreglo.tipoArreglo;
+
+                //AGREGAMOS LOS NIVELES A LOS NIVELES SUPERIORES 
+                foreach (string[] item in arreglo.niveles)
+                {
+                    arrayPropDimension.Add(item);
+                }
+
+              
+                string direccionHeap = Generador.pedirTemporal();
+                final.Codigo += $"{direccionHeap} = HP; \n";
+                final.Codigo += arregloValores(arreglo.tipoArreglo, arreglo.nombreObjeto_arrTipoObject, arreglo.niveles,direccionHeap,ent,arbol);
+                final.Temporal = direccionHeap;
+                final.TipoResultado = arreglo.tipoArreglo;   // esto esta de mas, pero se hace para llevar el tipo 
+
+            }
+            else if(estructura != null)
+            {
+                tipo = TipoDatos.Object;
+
+                Entorno entornoStruct = new Entorno(ent, "Objeto");
+                string tempDireccionHeap = Generador.pedirTemporal();
+                LinkedList<Simbolo> LISTA = new LinkedList<Simbolo>();
+
+                // UBICACION DEL OBJETO TIPO STRUCT
+                final.Codigo += $"{tempDireccionHeap} = HP; \n";
+                LISTA.AddLast(new Simbolo("--", 0, 0));
+
+                // DECLARAMOS EL OBJETO 
+                DeclararStruct structEnArray = new DeclararStruct(LISTA, estructura.identificador, linea, columna);
+                structEnArray.objetoInterno = true;
+               
+                // GENERAMOS EL OBJETO
+                final.Codigo += structEnArray.getC3(entornoStruct, arbol);
+                final.Temporal = tempDireccionHeap;
+                final.TipoResultado = TipoDatos.Object;
+
+            }
+
+            return final;
+        }
+
+
 
         public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
         {
-            throw new NotImplementedException();
+
         }
     }
 }

@@ -19,6 +19,8 @@ namespace CompiPascal.AST_.definicion
         
         public bool objetoInterno { get; set; }
 
+        public string TemporalCambioEntorno { get;  set; }
+
         /**
          * @propiedad       variables   
          * @comentario      Lista de las variables a declarar
@@ -53,17 +55,36 @@ namespace CompiPascal.AST_.definicion
             string codigoDeclaraStruct = "" ;
 
             Struct encontrarStructPlantilla = arbol.retornarEstructura(this.structuraNombre);
-            if(encontrarStructPlantilla == null)
+            Arreglo encontrarArreglo = arbol.retornarArreglo(this.structuraNombre);
+
+            if(encontrarStructPlantilla == null && encontrarArreglo == null)
             {
                 Program.getIntefaz().agregarError($"No se encontro la estructura {structuraNombre}.",linea,columna);
                 return "";
             }
 
-            codigoDeclaraStruct += declararStructOBJETO(encontrarStructPlantilla, ent, arbol);
+            if (encontrarStructPlantilla != null) codigoDeclaraStruct += declararStructOBJETO(encontrarStructPlantilla, ent, arbol);
+            else if (encontrarArreglo != null) codigoDeclaraStruct += declararArregloOBJETO(encontrarArreglo,ent,arbol);
 
             return codigoDeclaraStruct;
         }
 
+        public string declararArregloOBJETO(Arreglo plantilla, Entorno ent, AST arbol)
+        {
+            string codigo = "";
+
+            foreach (Simbolo item in variables)
+            {
+                DeclaraArray declaracionArreglo = new DeclaraArray(item.Identificador, structuraNombre, plantilla.nombreObjeto_arrTipoObject, plantilla.tipoArreglo, plantilla.niveles, item.linea, item.columna)
+                {
+                    objetoInterno = this.objetoInterno,
+                    temporalCambioEntorno = TemporalCambioEntorno
+                };
+                codigo += declaracionArreglo.getC3(ent, arbol);
+            }
+
+            return codigo;
+        }
 
         public string declararStructOBJETO(Struct estructura, Entorno ent, AST arbol)
         {
@@ -89,11 +110,12 @@ namespace CompiPascal.AST_.definicion
                     //CAPTURAMOS LA DIRECCIÓN DONDE ESTARA EL OBJETO EN EL HEAP
                     codigo += $"{tempDireccionHeap} =  HP; /*Capturamos la direccion del heap*/\n";
 
+                    //SUMAMOS EL TAMAÑO DE LA ESTRUCTURA AL PUNTERO "HP" PARA APARTAR EL TAMAÑO DEL OBJETO
+                    codigo += $"HP = HP + {objetoStruct.tamano()};\n";
+
+
                     if (!objetoInterno)
                     {
-                        //SUMAMOS EL TAMAÑO DE LA ESTRUCTURA AL PUNTERO "HP" PARA APARTAR EL TAMAÑO DEL OBJETO
-                        codigo += $"HP = HP + {objetoStruct.tamano()};\n";
-
                         //OBTENEMOS LA DIRECCIÓN DONDE EL OBJETO ESTARA EN EL STACK
                         codigo += $"{tempDireccionStack} = SP + {ent.tamano};\n";
 
@@ -115,8 +137,9 @@ namespace CompiPascal.AST_.definicion
                         else if(declaracionesInternas is DeclararStruct)
                         {
                             ((DeclararStruct)declaracionesInternas).objetoInterno = true;
+                            ((DeclararStruct)declaracionesInternas).TemporalCambioEntorno = tempDireccionHeap;
                         }
-                        codigo += declaracionesInternas.getC3(nuevoObjeto,arbol);
+                        codigo += Generador.tabular(declaracionesInternas.getC3(nuevoObjeto,arbol));
                     }
 
                     int posicionRelativa = ent.tamano;
@@ -135,6 +158,21 @@ namespace CompiPascal.AST_.definicion
         public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
         {
            
+        }
+
+        public int obtenerTamano()
+        {
+            int numero = 0;
+
+            if (variables != null)
+            {
+                foreach (Simbolo item in this.variables)
+                {
+                    numero++;
+                }
+            }
+            return numero;
+
         }
     }
 }

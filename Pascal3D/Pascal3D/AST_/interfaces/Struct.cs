@@ -64,11 +64,18 @@ namespace CompiPascal.AST_.interfaces
             int declaracionesNumero = 0;
             foreach (Instruccion item in declaraciones)
             {
-                if(item is Declaracion || item is DeclararStruct || item is DeclaraArray  || item is DeclaraArray2)
+                if(item is Declaracion )
                 {
-                    declaracionesNumero++;
+                    declaracionesNumero += ((Declaracion)item).obtenerTamano();   
                 }
-
+                else if(item is DeclararStruct)
+                {
+                    declaracionesNumero += ((DeclararStruct)item).obtenerTamano();
+                }
+                else if( item is DeclaraArray)
+                {
+                    declaracionesNumero++;   // esto porque declara array esta hecho solo para declarar una variable a la vez. 
+                }
             }
 
             return declaracionesNumero;

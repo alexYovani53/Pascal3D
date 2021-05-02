@@ -2,6 +2,7 @@
 using CompiPascal.AST_.bucles;
 using CompiPascal.AST_.control;
 using CompiPascal.AST_.definicion;
+using CompiPascal.AST_.definicion.arrego;
 using CompiPascal.AST_.funcionesPrimitivas;
 using CompiPascal.AST_.interfaces;
 using CompiPascal.AST_.valoreImplicito;
@@ -274,6 +275,12 @@ namespace Pascal3D
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
                             }
+                            else if(item is GuardaArray)
+                            {
+                                string codTemp = item.getC3(GLOBAL, ARBOL);
+                                codTemp = Generador.tabular(codTemp);
+                                codigoDeclaraciones += codTemp;
+                            }
 
                             else if(item is BeginEndPrincipal)
                             {
@@ -281,60 +288,10 @@ namespace Pascal3D
 
                                 foreach (Instruccion interna in ((BeginEndPrincipal)item).instrucciones)
                                 {
-                                    if (interna is If)
-                                    {
-                                        string codTemp = ((If)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-                                    }
 
-                                    else if (interna is While)
-                                    {
-                                        string codTemp = ((While)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-                                    }
-                                    else if (interna is Repeat)
-                                    {
-                                        string codTemp = ((Repeat)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-
-                                    }
-                                    else if (interna is Write)
-                                    {
-                                        string codTemp = ((Write)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-
-                                    }
-                                    else if(interna is Llamada)
-                                    {
-                                        string codTemp = ((Llamada)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-                                    }
-                                    else if (interna is Asignacion)
-                                    {
-                                        string codTemp = ((Asignacion)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-                                    }
-                                    else if (interna is For)
-                                    {
-                                        string codTemp = ((For)interna).getC3(GLOBAL, ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-                                    }
-                                    else if (interna is SwitchCase)
-                                    {
-                                        string codTemp = ((SwitchCase)interna).getC3(GLOBAL,ARBOL);
-                                        codTemp = Generador.tabular(codTemp);
-                                        codigoMain += codTemp;
-                                    }
-
-
-
+                                    string codTemp = interna.getC3(GLOBAL, ARBOL);
+                                    codTemp = Generador.tabular(codTemp);
+                                    codigoMain += codTemp;
                                 }
 
 

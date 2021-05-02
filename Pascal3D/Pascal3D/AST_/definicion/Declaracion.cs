@@ -394,6 +394,25 @@ namespace CompiPascal.AST_.definicion
         
         }
 
+        public int obtenerTamano()
+        {
+            int numero = 0;
+            if (ideUnico != null)
+            {
+                return 1;
+            }
+
+            if (variables != null)
+            {
+                foreach (Simbolo item in this.variables)
+                {
+                    numero++;
+                }
+            }
+            return numero;
+
+        }
+
         public TipoDatos tipoVars()
         {
             if (ideUnico != null)

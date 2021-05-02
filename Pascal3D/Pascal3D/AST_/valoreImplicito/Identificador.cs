@@ -43,7 +43,9 @@ namespace CompiPascal.AST_.valoreImplicito
         public int columna { get; set; }
         public int tamanoPadre { get ; set; }
 
-        public bool buscar_puntero { get; set; }
+        public bool buscarSoloDireccion { get; set; }
+
+        public string etiquetaEntornoHeap { get; set; }
 
         public Identificador(string letra, int linea, int columna)
         {
@@ -63,11 +65,15 @@ namespace CompiPascal.AST_.valoreImplicito
             result3D ide_buscando; 
 
             // UN PUNTERO SE REFIERE A UNA VARIABLE POR REFERENCIA 
-            if (buscar_puntero)
+            if (buscarSoloDireccion)
             {
                 ide_buscando = buscando_Direccion(ent, ide);
             }
-            else
+            else if (etiquetaEntornoHeap !=null)
+            {
+                ide_buscando = buscando_Direccion_Heap(ent, ide);
+            }
+            else 
             {
                 ide_buscando = buscandoId(ent, ide);
             }
@@ -132,6 +138,7 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D regresos = new result3D();
+
             string tempora1 = Generador.pedirTemporal();
 
             regresos.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
@@ -166,6 +173,37 @@ namespace CompiPascal.AST_.valoreImplicito
                 }
             }
 
+            return new result3D();
+        }
+
+        private result3D buscando_Direccion_Heap(Entorno ent, string identificador)
+        {
+
+            result3D regresos = new result3D();
+
+            if (etiquetaEntornoHeap == null) return regresos;
+            string tempora1 = Generador.pedirTemporal();
+
+            regresos.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
+            regresos.Codigo += $"{tempora1} = {etiquetaEntornoHeap};\n";
+
+
+            foreach (Simbolo item in ent.TablaSimbolos())
+            {
+                //COMPARAMOS CADA VARIABLE PARA COMPROBAR SI ESTA EN EL ENTORNO ACTUAL
+                if (item.Identificador.Equals(identificador.ToLower()))
+                {
+                    string tempora2 = Generador.pedirTemporal();
+                    regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
+                    regresos.Temporal = tempora1;
+
+                    regresos.Codigo += "/***********************IDENTIFICADOR ENCONTRADO*/\n\n\n";
+
+                    regresos.TipoResultado = item.Tipo;
+                    return regresos;
+                }
+            }
+            
             return new result3D();
         }
 

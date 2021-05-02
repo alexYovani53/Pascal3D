@@ -234,7 +234,7 @@ namespace CompiPascal.entorno_.simbolos
               POR LO QUE LA PRIMERA DECLARACION EN LA FUNCION COMIENZA EN  
               P = P + 1      Y NO EN         P = P + 0  
              */
-            int posRelativa = 1;
+
             ent.tamano++;
 
 
@@ -249,21 +249,21 @@ namespace CompiPascal.entorno_.simbolos
                     if (item.structGenerador != null)
                     {
                         DeclararStruct declararEstruct = new DeclararStruct(vars,item.structGenerador,linea,columna);
-                        codigo += declararEstruct.getC3(nuevo, arbol);
+                        codigo += declararEstruct.getC3(ent, arbol);
                     }
                     else
                     {
                         Declaracion simple = new Declaracion(vars, item.Tipo);
-                        simple.getC3(nuevo, arbol);
+                        codigo += simple.getC3(ent, arbol);
                     }
 
-                    foreach (Simbolo cambiando in nuevo.TablaSimbolos())
+                    foreach (Simbolo cambiando in ent.TablaSimbolos())
                     {
-                        cambiando.porReferencia = item.porReferencia;
-                        ent.agregarSimbolo(cambiando.Identificador, cambiando);
+                        if (item.Identificador.Equals(cambiando.Identificador))
+                        {
+                            cambiando.porReferencia = item.porReferencia;
+                        }
                     }
-
-
 
                 }
             }

@@ -46,9 +46,9 @@ namespace CompiPascal.AST_.definicion
          * @propiedad       variables   
          * @comentario      Lista de las variables a declarar
          */
-        private LinkedList<Simbolo> variables { get; set; }
+        public LinkedList<Simbolo> variables { get; set; }
 
-        private Simbolo ideUnico { get; set; }
+        public Simbolo ideUnico { get; set; }
 
 
         public int linea { get; set; }
@@ -192,10 +192,6 @@ namespace CompiPascal.AST_.definicion
         }
 
 
-        public LinkedList<Simbolo> varNoramles()
-        {
-            return variables;
-        }
 
         public string getC3(Entorno ent, AST arbol)
         {

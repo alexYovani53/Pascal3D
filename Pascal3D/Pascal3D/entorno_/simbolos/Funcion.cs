@@ -77,6 +77,8 @@ namespace CompiPascal.entorno_.simbolos
             this.nombreStruct = structTipo;
         }
 
+
+
         public string getC3(Entorno ent, AST arbol)
         {
             string etiquetaRetorno = Generador.pedirEtiqueta(); 
@@ -156,6 +158,16 @@ namespace CompiPascal.entorno_.simbolos
             {
                 foreach (Simbolo item in ListaParametros)
                 {
+                    if (item.structGenerador != null)
+                    {
+                        Struct aux = arbol.retornarEstructura(item.structGenerador);
+                        Arreglo aux1 = arbol.retornarArreglo(item.structGenerador);
+
+                        // operación ternaria, validamos primero que haya una estructura, de ser asi el tipo es object de no ser asi, validamos que haya un arreglo 
+                        // de existir el parametro es tipo array de no ser asi el tipo es nulo. 
+                        item.Tipo = aux != null ? TipoDatos.Object : aux1 != null ? TipoDatos.Array : TipoDatos.NULL;
+                    }
+
                     Simbolo parametro = new Simbolo(item.Tipo, item.Identificador, false, 1, posRelativa, item.linea, item.columna);
 
                     /* HACEMOS ESTA VALIDACIÓN PARA CUANDO VIENE UN PARAMETRO POR REFERENCIA, EN EL ENTORNO TAMBIEN APARESCA UNA BANDERA QUE LO INDIQUE
@@ -209,6 +221,58 @@ namespace CompiPascal.entorno_.simbolos
 
             return Generador.tabular(codigo);
         }
+
+
+
+        public string IniciarParametros(Entorno ent, AST arbol)
+        {
+
+            string codigo = "";
+
+            /*PARA EL MANEJO DE LAS FUNCIONES QUE TIENEN UN RETORNO
+              SE MANEJA QUE EL PRIMER ESPACIO EN EL ENTORNO DE LA FUNCION SEA EL QUE GUARDARA EL VALOR A RETORNAR
+              POR LO QUE LA PRIMERA DECLARACION EN LA FUNCION COMIENZA EN  
+              P = P + 1      Y NO EN         P = P + 0  
+             */
+            int posRelativa = 1;
+            ent.tamano++;
+
+
+            if (ListaParametros != null)
+            {
+                foreach (Simbolo item in ListaParametros)
+                {
+                    Entorno nuevo = new Entorno(null, "null");
+                    LinkedList<Simbolo> vars = new LinkedList<Simbolo>();
+                    vars.AddLast(new Simbolo(item.Identificador, item.linea, item.columna));
+
+                    if (item.structGenerador != null)
+                    {
+                        DeclararStruct declararEstruct = new DeclararStruct(vars,item.structGenerador,linea,columna);
+                        codigo += declararEstruct.getC3(nuevo, arbol);
+                    }
+                    else
+                    {
+                        Declaracion simple = new Declaracion(vars, item.Tipo);
+                        simple.getC3(nuevo, arbol);
+                    }
+
+                    foreach (Simbolo cambiando in nuevo.TablaSimbolos())
+                    {
+                        cambiando.porReferencia = item.porReferencia;
+                        ent.agregarSimbolo(cambiando.Identificador, cambiando);
+                    }
+
+
+
+                }
+            }
+
+            return codigo;
+
+        }
+
+
 
         public void anidada(Funcion funcion, Entorno ent)
         {

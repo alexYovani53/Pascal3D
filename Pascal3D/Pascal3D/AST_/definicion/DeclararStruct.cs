@@ -25,12 +25,12 @@ namespace CompiPascal.AST_.definicion
          * @propiedad       variables   
          * @comentario      Lista de las variables a declarar
          */
-        private LinkedList<Simbolo> variables { get; set; }
+        public LinkedList<Simbolo> variables { get; set; }
 
         /* @propiedad       string      structuraNombre
          * @comentario      esta propiedad guarda el identificador con el que se ha guardado la definicion de un struct
          */
-        private string structuraNombre { get; set; }
+        public string structuraNombre { get; set; }
 
 
         public DeclararStruct(LinkedList<Simbolo> variables, string structuraNombre, int linea, int columna)
@@ -138,6 +138,11 @@ namespace CompiPascal.AST_.definicion
                         {
                             ((DeclararStruct)declaracionesInternas).objetoInterno = true;
                             ((DeclararStruct)declaracionesInternas).TemporalCambioEntorno = tempDireccionHeap;
+                        }
+                        else if(declaracionesInternas is DeclaraArray2)
+                        {
+                            ((DeclaraArray2)declaracionesInternas).objetoInterno = true;
+                            ((DeclaraArray2)declaracionesInternas).temporalCambioEntorno = tempDireccionHeap;
                         }
                         codigo += Generador.tabular(declaracionesInternas.getC3(nuevoObjeto,arbol));
                     }

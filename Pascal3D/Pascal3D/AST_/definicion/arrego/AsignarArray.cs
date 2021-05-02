@@ -90,9 +90,8 @@ namespace CompiPascal.AST_.definicion.arrego
                 codigo += valorNuevo.Codigo;
                 codigo += direccionVar.Codigo;
                 codigo += Generador.tabular( cambioDirecto(var, indices, valorNuevo, direccionVar.Temporal, ent));
-
-
             }
+
 
 
             return codigo;

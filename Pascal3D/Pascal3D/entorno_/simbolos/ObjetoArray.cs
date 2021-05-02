@@ -21,12 +21,17 @@ namespace CompiPascal.entorno_.simbolos
 
         public TipoDatos tipoValores { get; set; }
 
+
+        public Objeto objetoParaAcceso { get; set; }
+
         public ObjetoArray(string nombreObjeto, string nombreStructArray,TipoDatos tipoArr,int direccion, List<string[]> niveles,int linea, int columna)
             : base(TipoDatos.Array, nombreObjeto,direccion,linea,columna)
         {
             this.nombreStructArray = nombreStructArray;
             this.niveles = niveles;
             this.tipoValores = tipoArr;
+            this.objetoParaAcceso = null;
+
         }
 
 

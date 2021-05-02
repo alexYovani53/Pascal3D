@@ -281,6 +281,12 @@ namespace Pascal3D
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
                             }
+                            else if(item is DeclaraArray2)
+                            {
+                                string codTemp = item.getC3(GLOBAL, ARBOL);
+                                codTemp = Generador.tabular(codTemp);
+                                codigoDeclaraciones += codTemp;
+                            }
 
                             else if(item is BeginEndPrincipal)
                             {

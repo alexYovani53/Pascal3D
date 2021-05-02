@@ -91,8 +91,8 @@ namespace CompiPascal.AST_.bucles
 
             //DEFINIMOS LA ETIQUETA A LA QUE VUELTE CUANDO TERMINA UN CICLO
             string etiquetaCiclo = Generador.pedirEtiqueta();
-            string etiquetaSalida = Generador.pedirEtiqueta();
             string etiquetaAumento = Generador.pedirEtiqueta();
+            string etiquetaSalida = Generador.pedirEtiqueta();
 
             codigoFor += $"{etiquetaCiclo}:   /*INICIO DEL CICLO*/ \n\n";
 

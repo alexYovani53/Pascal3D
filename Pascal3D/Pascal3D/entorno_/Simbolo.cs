@@ -20,7 +20,7 @@ namespace CompiPascal.entorno_
 
     public class Simbolo
     {
-        private string generador;
+
         private TipoDatos tipoParametros;
 
         /**
@@ -173,7 +173,7 @@ namespace CompiPascal.entorno_
         /*Parametros en funciones del tipo STRUCTU y por referencia o no */
         public Simbolo(string generador, string identificador, bool porReferencia, int linea, int columna)
         {
-            this.generador = generador;
+            this.structGenerador = generador;
             Identificador = identificador;
             this.porReferencia = porReferencia;
             this.linea = linea;

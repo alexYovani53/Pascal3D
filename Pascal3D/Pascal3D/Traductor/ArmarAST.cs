@@ -1175,9 +1175,6 @@ namespace CompiPascal.Traductor
                 }
 
                 return parametros;
-
-
-
             }
             else if (estoyEnEsteNodo(nodo, "PARAMETRO"))
             {

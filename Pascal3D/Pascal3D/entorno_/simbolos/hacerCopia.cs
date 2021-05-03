@@ -286,14 +286,14 @@ namespace Pascal3D.entorno_.simbolos
                     codigo.Temporal = Generador.pedirTemporal();
 
                     codigo.Codigo += $"{direccionString} = {inicio}; /*Ubicacion del valor*/;\n";
-
+                    codigo.Codigo += $"{codigo.Temporal} = HP; /*Capturamos el inicio de la cadena nueva*/\n";
                     codigo.Codigo += $"{EtiquetaCiclo}: /*** Etiqueta para ciclado de lectura ***/ \n\n";
                     codigo.Codigo += $"    {CARACTER} = Heap[(int){direccionString}];   /*Capturamos el caracter a copiar*/\n\n";
 
                     codigo.Codigo += $"    if({CARACTER}==0) goto {EtiquetaSalida}; /*Comparamos si ya se a llegado al final de la cadena */\n\n";
                     codigo.Codigo += $"        Heap[HP] = {CARACTER}; /* Copiamos el caracter en la ultima posicion del HEAP, donde vamos*/\n";
 
-                    codigo.Codigo += $"            {codigo.Temporal} = {codigo.Temporal}+1 ;  /*Aumentamos el contador para seguir leyendo los caracteres*/\n";
+                    codigo.Codigo += $"            {direccionString} = {direccionString}+1 ;  /*Aumentamos el contador para seguir leyendo los caracteres*/\n";
                     codigo.Codigo += $"            HP = HP + 1;\n";
 
                     codigo.Codigo += $"            goto {EtiquetaCiclo}; /*Regresamos al inicio del ciclo para seguir leyendo*/\n";

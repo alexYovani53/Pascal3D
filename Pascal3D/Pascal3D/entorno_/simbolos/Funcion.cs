@@ -223,7 +223,7 @@ namespace CompiPascal.entorno_.simbolos
                      * ESTA BANDERA SERA USADA EN LA ASIGNACIÓN O AL MOMENTO DE ACCEDER A LA VARIABLE */
                     if (item.porReferencia)
                     {
-                        Simbolo cambiarRef =  ent.obtenerSimbolo(item.Identificador);
+                        Simbolo cambiarRef = auxiliar.obtenerSimbolo(item.Identificador);
                         if (cambiarRef != null) cambiarRef.porReferencia = true;
                     }
 

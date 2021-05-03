@@ -211,8 +211,10 @@ namespace CompiPascal.AST_.valoreImplicito
                         {
                             hacerCopia nuevaCopia = new hacerCopia(aux.objetoAuxiliar, null, valorActual.Temporal);
                             result3D copia = nuevaCopia.obtener3D(ent);
-                            codigoParams += Generador.tabular(copia.Codigo);
 
+                            codigoParams += valorActual.Codigo;
+                            codigoParams += "\n\n";
+                            codigoParams += Generador.tabular(copia.Codigo);
                             codigoParams += $"    Stack[(int){temp2}] = {copia.Temporal};\n";
                         }
                         else

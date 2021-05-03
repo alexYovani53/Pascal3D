@@ -177,11 +177,12 @@ namespace CompiPascal.AST_.definicion.arrego
                 codigo += $"{contador} = 1; \n\n";
                 codigo += $"{etiquetaInicio}: \n";
 
-                result3D valpor_defecto = valorDefecto(tipoDatos, tipoObjeto, ent, arbol);
+                result3D valpor_defecto = valorDefecto(tipoDatos, tipoObjeto, posiciones, ent, arbol);
 
-                codigo += Generador.tabular(valpor_defecto.Codigo);
+                codigo += Generador.tabular(valpor_defecto.Codigo + "\n");
 
-                codigo += $"\n\nHeap[(int){posiciones}] = {valpor_defecto.Temporal};\n";
+                if(valpor_defecto.TipoResultado != TipoDatos.Object)  codigo += $"Heap[(int){posiciones}] = {valpor_defecto.Temporal};\n";
+
 
                 codigo += $"if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
                 codigo += $"    {posiciones} = {posiciones} + 1; \n";
@@ -197,7 +198,7 @@ namespace CompiPascal.AST_.definicion.arrego
         }
 
 
-        private result3D valorDefecto(TipoDatos tipo, string nombreObjeto, Entorno ent, AST arbol)
+        private result3D valorDefecto(TipoDatos tipo, string nombreObjeto, string ubicacionGuardarObjeto, Entorno ent, AST arbol)
         {
             result3D codigoDef = new result3D();
 
@@ -239,14 +240,14 @@ namespace CompiPascal.AST_.definicion.arrego
             }
             else if (tipo == TipoDatos.Object)
             {
-                return valorObjeto(nombreObjeto, ent, arbol);
+                return valorObjeto(nombreObjeto, ubicacionGuardarObjeto, ent, arbol);
             }
 
             return codigoDef;
 
         }
 
-        public result3D valorObjeto(string nombreOjbeto, Entorno ent, AST arbol)
+        public result3D valorObjeto(string nombreOjbeto, string ubicacionGuardarObjeto, Entorno ent, AST arbol)
         {
 
             result3D final = new result3D();
@@ -290,14 +291,13 @@ namespace CompiPascal.AST_.definicion.arrego
                 LinkedList<Simbolo> LISTA = new LinkedList<Simbolo>();
 
 
-                // UBICACION DEL OBJETO TIPO STRUCT
-                final.Codigo += $"{tempDireccionHeap} = HP; \n";
                 LISTA.AddLast(new Simbolo("--", 0, 0));
 
                 // DECLARAMOS EL OBJETO 
                 DeclararStruct structEnArray = new DeclararStruct(LISTA, estructura.identificador, linea, columna)
                 {
-                    objetoInterno = true
+                    objetoInterno = true,
+                    TemporalCambioEntorno = ubicacionGuardarObjeto
                 };
 
                 // GENERAMOS EL OBJETO

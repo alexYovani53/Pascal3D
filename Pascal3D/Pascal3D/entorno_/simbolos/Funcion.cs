@@ -56,7 +56,7 @@ namespace CompiPascal.entorno_.simbolos
         {
             this.instrucciones = instrucciones;
             this.ENCABEZADOS = encabezados;
-            this.nombreStruct = string.Empty;
+            this.nombreStruct = "";
         }
 
         /**
@@ -242,15 +242,28 @@ namespace CompiPascal.entorno_.simbolos
 
         public string agregarRetorno(Entorno ent,AST ARBOL)
         {
+            string codigo = "";
             if (Tipo != TipoDatos.Void)
             {
                 LinkedList<Simbolo> param = new LinkedList<Simbolo>();
                 param.AddLast(new Simbolo(Identificador, linea, columna));
-                Declaracion retornoPascal = new Declaracion(param, Tipo);
-                string codigo = retornoPascal.getC3(ent, ARBOL);
-                return codigo;            
+             
+                if(nombreStruct != null && !nombreStruct.Equals(""))
+                {
+                    DeclararStruct nueva = new DeclararStruct(param, nombreStruct, linea, columna);
+                    codigo = nueva.getC3(ent, ARBOL);
+                    return codigo;
+                }
+                else
+                {
+                    Declaracion retornoPascal = new Declaracion(param, Tipo);
+                    codigo = retornoPascal.getC3(ent, ARBOL);
+                    return codigo;
+                }
+                
+          
             }
-            return "";
+            return codigo;
         }
 
         public string RealizarCambioVariable(Entorno ent)

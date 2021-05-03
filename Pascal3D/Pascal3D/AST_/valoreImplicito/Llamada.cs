@@ -111,12 +111,13 @@ namespace CompiPascal.AST_.valoreImplicito
             int i = 0;
             foreach (Expresion item in expresionesValor)
             {
-                if(!(item is Identificador) && funcionLLamada.ListaParametros.ElementAt(i).porReferencia)
-                {
-                    Program.getIntefaz().agregarError("La expresión por referencia debe ser un identificador", linea, columna);
-                    return "";
+                result3D valorExpr = item.obtener3D(ent);
+
+                if (item is Operacion || item is Primitivo &&  funcionLLamada.ListaParametros.ElementAt(i).porReferencia){
+                    Program.getIntefaz().agregarError("La expresión por referencia debe ser un identificador", linea, columna); return "";
                 }
-                parametros.AddLast(item.obtener3D(ent));
+
+                parametros.AddLast(valorExpr);
                 i++;
             }
 

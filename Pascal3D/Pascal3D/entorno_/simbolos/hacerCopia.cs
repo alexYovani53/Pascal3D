@@ -218,7 +218,6 @@ namespace Pascal3D.entorno_.simbolos
 
                 string direAnterior = Generador.pedirTemporal();
                 string posicionesAnteriores = Generador.pedirTemporal();
-                string valorAnterior = Generador.pedirTemporal();
 
                 codigo += $"{direAnterior} = {direccionAnterior};\n";
                 codigo += $"{posicionesAnteriores} = {direAnterior} + 1; /*Nos pasamos a la primera dirección del arreglo*/\n";

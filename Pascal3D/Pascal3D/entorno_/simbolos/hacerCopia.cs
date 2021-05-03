@@ -107,7 +107,6 @@ namespace Pascal3D.entorno_.simbolos
                     codigo += $"/*Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
                     codigo += $"{nuevaUbicacionParam} = {entornoCopia} + {item.direccion}; /*Esta es la nueva ubicacion del parametro {item.Identificador}*/\n";
                     codigo += $"{direccionAnterior} = {entornoUbicacion} + {item.direccion}; /*Esta es la antigua ubicacion del parametro {item.Identificador}*/\n";
-                    codigo += $"{valorAnterior} = Heap[(int){direccionAnterior}]; /*Captura del valor anterior*/\n";
 
                     result3D val = copiarValoresFinales(item.Tipo, null, direccionAnterior);
 
@@ -255,7 +254,7 @@ namespace Pascal3D.entorno_.simbolos
 
         }
 
-        public result3D copiarValoresFinales(TipoDatos tipo,Objeto arregloObjeto, string inicio)
+        public result3D copiarValoresFinales(TipoDatos tipo,Objeto arregloObjeto, string ubicacionValor)
         {
             result3D codigo = new result3D();
             switch (tipo)
@@ -269,7 +268,7 @@ namespace Pascal3D.entorno_.simbolos
                     string anterior = Generador.pedirTemporal();
                     string valor = Generador.pedirTemporal();
 
-                    codigo.Codigo += $"{anterior} = {inicio}; /*Ubicacion del valor*/\n";
+                    codigo.Codigo += $"{anterior} = {ubicacionValor}; /*Ubicacion del valor*/\n";
                     codigo.Codigo += $"{valor} = Heap[(int){anterior}]; /*Ubicacion del valor*/;\n";
 
                     codigo.Temporal = valor;
@@ -282,10 +281,11 @@ namespace Pascal3D.entorno_.simbolos
                     string EtiquetaCiclo = Generador.pedirEtiqueta();
                     string EtiquetaSalida = Generador.pedirEtiqueta();
                     string CARACTER = Generador.pedirTemporal();
+                    string contador = Generador.pedirTemporal();
 
                     codigo.Temporal = Generador.pedirTemporal();
 
-                    codigo.Codigo += $"{direccionString} = {inicio}; /*Ubicacion del valor*/;\n";
+                    codigo.Codigo += $"{direccionString} = Heap[(int){ubicacionValor}]; /*Ubicacion del valor*/;\n";
                     codigo.Codigo += $"{codigo.Temporal} = HP; /*Capturamos el inicio de la cadena nueva*/\n";
                     codigo.Codigo += $"{EtiquetaCiclo}: /*** Etiqueta para ciclado de lectura ***/ \n\n";
                     codigo.Codigo += $"    {CARACTER} = Heap[(int){direccionString}];   /*Capturamos el caracter a copiar*/\n\n";
@@ -306,9 +306,9 @@ namespace Pascal3D.entorno_.simbolos
 
                 case TipoDatos.Object:
                     string direccion = Generador.pedirTemporal();
-                    codigo.Codigo += $"{direccion} = Heap[(int){inicio}];   /*Entrar al entorno del objeto*/\n";
+                    codigo.Codigo += $"{direccion} = Heap[(int){ubicacionValor}];   /*Entrar al entorno del objeto*/\n";
 
-                    result3D result = copiarObjeto(arregloObjeto, inicio);
+                    result3D result = copiarObjeto(arregloObjeto, ubicacionValor);
 
                     codigo.Codigo += result.Codigo;
                     codigo.Temporal = result.Temporal;

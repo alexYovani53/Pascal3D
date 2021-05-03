@@ -14,7 +14,11 @@ namespace CompiPascal.AST_.definicion.arrego
 {
     public class AccesoArreglo : Expresion
     {
-        public int tamanoPadre { get; set; }
+
+        // ESTE SERVIRA CUANDO EN UN ARREGLO, EL TIPO DE DATOS ES UN OBJETO, DEBÍDO A QUE EN 3D NO SE CREA UNA MATRIZ CON LOS OBJETOS
+        // SE GUARDA UN UNIDO OBJETO QUE IDENTIFICA A TODOS LOS DEMAS EN EL ARREGLO, ESO PARA PODER ACCEDER A LOS PARAMETROS DEL MISMO EN UN ACCESO
+        public Objeto objetoAuxiliar { get; set; }
+
         /*
          * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
          *                                                  evalua una expresión condicional
@@ -79,38 +83,6 @@ namespace CompiPascal.AST_.definicion.arrego
         }
 
 
-        public TipoDatos getTipo(Entorno entorno, AST ast)
-        {
-
-            bool existeObjetoArreglo = entorno.existeSimbolo(nombreAcceso);
-
-            if (!existeObjetoArreglo)
-            {
-                return TipoDatos.NULL;
-            }
-
-            Simbolo obtener = entorno.obtenerSimbolo(nombreAcceso);
-
-
-            return obtener.Tipo;
-        }
-
-
-        public string nombre()
-        {
-            return nombreAcceso;
-        }
-
-        public LinkedList<string> accesoArr()
-        {
-            return this.acceso;
-        }
-
-
-        public LinkedList<Expresion> indicesVal()
-        {
-            return this.indices;
-        }
 
         public result3D obtener3D(Entorno ent)
         {
@@ -207,6 +179,7 @@ namespace CompiPascal.AST_.definicion.arrego
                 codigo.Codigo += resultado.Codigo;
                 codigo.Temporal = resultado.Temporal;
                 codigo.TipoResultado = resultado.TipoResultado;
+                if (codigo.TipoResultado == TipoDatos.Object) this.objetoAuxiliar = propiedad_.objetoParaAcceso;
                 return codigo;
 
             }
@@ -258,8 +231,10 @@ namespace CompiPascal.AST_.definicion.arrego
                 return new result3D();
             }
 
+            // OBTENEMOS EL VALOR EN EL OBJETO ARRAY 
             result3D valorEncontrado = variable.valor3D(accesos,ent,0,direccion);
 
+            // RECOPILAMOS LA INFORMACIÓN 
             result3D final = new result3D();
             final.Codigo += codigo;
             final.Codigo += valorEncontrado.Codigo;
@@ -268,6 +243,7 @@ namespace CompiPascal.AST_.definicion.arrego
             final.Temporal = valorEncontrado.Temporal;
             final.TipoResultado = valorEncontrado.TipoResultado;
 
+            if (final.TipoResultado == TipoDatos.Object) this.objetoAuxiliar = variable.objetoParaAcceso;
 
             return final;
         }

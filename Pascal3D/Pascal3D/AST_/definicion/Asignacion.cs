@@ -1,4 +1,5 @@
-﻿using CompiPascal.AST_.interfaces;
+﻿using CompiPascal.AST_.definicion.arrego;
+using CompiPascal.AST_.interfaces;
 using CompiPascal.AST_.valoreImplicito;
 using CompiPascal.entorno_;
 using CompiPascal.entorno_.simbolos;
@@ -23,7 +24,7 @@ namespace CompiPascal.AST_.definicion
          * @comentario      esta bandera dira si la asignación es hacia una variable o a la propiedad 
          *                  de un objeto 
          */
-        private bool esobjeto;
+        private bool estaEnObjeto;
 
 
         /**
@@ -62,7 +63,7 @@ namespace CompiPascal.AST_.definicion
         {
             this.variable = variable;
             this.valor = valor;
-            this.esobjeto = objeto;
+            this.estaEnObjeto = objeto;
             this.linea = linea;
             this.columna = columna;
 
@@ -80,7 +81,7 @@ namespace CompiPascal.AST_.definicion
             this.idObjeto = idObjeto;
             this.propiedades = idPropiedad;
             this.valor = valor;
-            this.esobjeto = true;
+            this.estaEnObjeto = true;
             this.linea = linea;
             this.columna = columna;
 
@@ -97,35 +98,41 @@ namespace CompiPascal.AST_.definicion
             result3D final = valor.obtener3D(ent);
             verificarTipo_Boolean(final);
 
-
-            if (esobjeto)
+            //      Se valida que la asignación en el primer caso sea        OBJETO.param1.param2..paramn := valor;
+            //      Se comprueba que haya una secuencia de accesos delante de la asignación
+            if (estaEnObjeto)
             {
 
                 Simbolo objetoEncontrado = ent.obtenerSimbolo(idObjeto);
 
-                if(objetoEncontrado == null)
+                if(objetoEncontrado != null)
+                {
+                    if (objetoEncontrado is Objeto)
+                    {
+                        string temp1 = Generador.pedirTemporal();
+                        string temp2 = Generador.pedirTemporal();
+
+                        codigo += $"{temp1} = SP + {((Objeto)objetoEncontrado).direccion}; /*Capturamos la direccion de la instancia de objeto*/  \n";
+                        codigo += $"{temp2} = Stack[(int){temp1}]; \n";
+
+                        codigo += cambiarValorRecursivo((Objeto)objetoEncontrado, propiedades, 0, final, temp2);
+                    }
+                    else 
+                    {
+                        Program.getIntefaz().agregarError($"La variable {idObjeto} no es un objeto ", variable.linea, variable.columna);
+                        return "";
+                    }   
+                }
+                else
                 {
                     Program.getIntefaz().agregarError($"La variable {idObjeto} no se encontro instanciada", variable.linea, variable.columna);
                     return "";
                 }
-                
-                if(!(objetoEncontrado is Objeto))
-                {
-                    Program.getIntefaz().agregarError($"La variable {idObjeto} no es un objeto ", variable.linea, variable.columna);
-                    return "";
-                }
-
-                string temp1 = Generador.pedirTemporal();
-                string temp2 = Generador.pedirTemporal();
-
-                codigo += $"{temp1} = SP + {((Objeto)objetoEncontrado).direccion}; /*Capturamos la direccion de la instancia de objeto*/  \n";
-                codigo += $"{temp2} = Stack[(int){temp1}]; \n";
-
-                codigo += cambiarValorRecursivo((Objeto)objetoEncontrado, propiedades, 0, final, temp2 );
 
                 return codigo;
 
             }
+            // Declaración del tipo      IDE:= X valor ;   ya sea un acceso, un primitivo o un idex
             else
             {
 
@@ -149,18 +156,34 @@ namespace CompiPascal.AST_.definicion
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
                 if (!verificarTipos(simboloVar.Tipo, final.TipoResultado)) return "";
 
-                //ASIGNACIÓN DEL TIPO IDE := IDE ; 
+                //   1. ASIGNACIÓN DEL TIPO IDE := IDE ; 
+                //   2. ASIGNACIÓN DEL TIPO IDE := accesoArreglo[x]..[x]   donde el arreglo "accesoArreglo" tiene un tipo de datos OBJETO, en este 
+                //          caso debemos validar que ambas estructuras sean del mismo tipo
+
+
+                codigo += final.Codigo;
+                result3D varAsignar = obtenerPosicionVar(ent, simboloVar.Identificador);
+                codigo += varAsignar.Codigo;
+
                 if (simboloVar.Tipo == TipoDatos.Object)
                 {
+
+                    if(valor is AccesoArreglo)
+                    {
+                        string tipo1 = ((Objeto)simboloVar).nombreStructura.ToLower();
+                        string tipo2 = (((AccesoArreglo)valor).objetoAuxiliar).nombreStructura.ToLower();
+
+                        if (tipo1.Equals(tipo2))
+                        {
+                            codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                        }
+                    }
 
                 }
                 else //ASIGNACIÓN DEL TIPO IDE:= PRIMITIVO
                 {
 
-                    codigo += final.Codigo;
-                    result3D varAsignar = obtenerPosicionVar(ent, simboloVar.Identificador);
 
-                    codigo += varAsignar.Codigo;
                     codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
                 }
 

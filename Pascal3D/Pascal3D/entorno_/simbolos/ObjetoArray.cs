@@ -8,7 +8,7 @@ namespace CompiPascal.entorno_.simbolos
     public class ObjetoArray : Simbolo,ICloneable
     {
 
-        public Objeto valorDEArreglo { get; set; }
+
 
         /* @propiedad    string      nombre
          * @comentario   esta propiedad guardara el nombre de la estructura tipo arreglo que la genero
@@ -83,7 +83,7 @@ namespace CompiPascal.entorno_.simbolos
 
                 final.Codigo = codigo;
                 final.Temporal = valor;
-                final.TipoResultado = TipoDatos.Integer;
+                final.TipoResultado = tipoValores;
 
             }
 
@@ -95,13 +95,6 @@ namespace CompiPascal.entorno_.simbolos
             return niveles;
         }
 
-
-        /* funcion que retorna el nombre (propiedad no accesible desde fuera)
-         */
-        public string getNombreGenerador()
-        {
-            return nombreStructArray;
-        }
 
 
 
@@ -157,5 +150,8 @@ namespace CompiPascal.entorno_.simbolos
             return codigo;
 
         }
+
+
+
     }
 }

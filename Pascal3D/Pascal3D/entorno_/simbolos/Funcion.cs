@@ -194,6 +194,9 @@ namespace CompiPascal.entorno_.simbolos
              */
             ent.tamano++;
 
+            Entorno auxiliar = new Entorno(null, "----");// Creamos un entorno nuevo solo para evitar que se busque la existencia
+                                                         // de las declaraciones hasta el entorno global
+            auxiliar.tamano = 1;
 
             if (ListaParametros != null)
             {
@@ -207,12 +210,12 @@ namespace CompiPascal.entorno_.simbolos
                     {
 
                         DeclararStruct nuevaEstructura = new DeclararStruct(vars, item.structGenerador, linea, columna);
-                        nuevaEstructura.getC3(ent, arbol);
+                        nuevaEstructura.getC3(auxiliar, arbol);
                     }
                     else
                     {
                         Declaracion nuevaDeclaracion = new Declaracion(vars, item.Tipo);
-                        nuevaDeclaracion.getC3(ent, arbol);
+                        nuevaDeclaracion.getC3(auxiliar, arbol);
 
                     }
 
@@ -229,6 +232,11 @@ namespace CompiPascal.entorno_.simbolos
                 Generador.generar = true;
             }
 
+            foreach (Simbolo item in auxiliar.TablaSimbolos())
+            {
+                ent.agregarSimbolo(item.Identificador,item); 
+            }
+            ent.tamano = auxiliar.tamano;
         }
 
 

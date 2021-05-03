@@ -93,7 +93,7 @@ namespace CompiPascal.AST_.definicion.arrego
 
             ObjetoArray instancia = new ObjetoArray(ide, nombreStructArreglo, tipo, posicionRelativa, arrayPropDimension, linea, columna);
 
-            if (defaultTipo != null) instancia.valorDEArreglo = defaultTipo;
+            if (defaultTipo != null) instancia.objetoParaAcceso = defaultTipo;
 
             ent.agregarSimbolo(ide,instancia);
             ent.tamano++;

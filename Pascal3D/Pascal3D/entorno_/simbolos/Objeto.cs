@@ -17,7 +17,7 @@ namespace CompiPascal.entorno_.simbolos
         /* @propiedad    string      nombre
          * @comentario   esta propiedad guardara el nombre de la estructura generadora
          */
-        string nombreStructura { get; set; }
+        public string nombreStructura { get; set; }
 
         public Objeto(string nombreObjeto,string nombreStructura, Entorno entornoPropio,int posicionRelativa,int linea, int columna):base(TipoDatos.Object,nombreObjeto,posicionRelativa,linea,columna)
         {

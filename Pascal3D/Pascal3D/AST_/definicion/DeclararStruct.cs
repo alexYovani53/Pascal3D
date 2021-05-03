@@ -124,6 +124,12 @@ namespace CompiPascal.AST_.definicion
                         codigo += $"Stack[(int){tempDireccionStack}] = {tempDireccionHeap};\n";
 
                     }
+                    else
+                    {
+                        codigo += $" {tempDireccionStack} = {TemporalCambioEntorno} + {ent.tamano};\n";
+                        //ASIGNAMOS EL OBJETO AL HEAP EN LA POSICION GUARDADA EN "tempDireccionStack"
+                        codigo += $"Heap[(int){tempDireccionStack}] = {tempDireccionHeap};\n";
+                    }
 
 
                     Entorno nuevoObjeto = new Entorno(null,$"Objeto {this.structuraNombre}");
@@ -142,6 +148,8 @@ namespace CompiPascal.AST_.definicion
                         }
                         else if(declaracionesInternas is DeclaraArray2)
                         {
+
+
                             ((DeclaraArray2)declaracionesInternas).objetoInterno = true;
                             ((DeclaraArray2)declaracionesInternas).temporalCambioEntorno = tempDireccionHeap;
                         }

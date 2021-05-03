@@ -60,92 +60,97 @@ namespace CompiPascal.AST_.funcionesPrimitivas
 
 
 
-            foreach (Expresion item in expr_imprimir)
+            if(expr_imprimir != null)
             {
-                result3D resultExpr = item.obtener3D(ent);
-
-                codigoWrite += resultExpr.Codigo;
-                if(resultExpr.TipoResultado == Simbolo.TipoDatos.Integer)
+                foreach (Expresion item in expr_imprimir)
                 {
-                    codigoWrite += $"printf(\"%d\", (int){resultExpr.Temporal}); \n";
-                }
-                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Real)
-                {
-                    codigoWrite += $"printf(\"%f\",(float){resultExpr.Temporal});\n";
-                }
-                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Char)
-                {
-                    codigoWrite += $"printf(\"%c\",(char){resultExpr.Temporal});\n";
-                }
-                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.String)
-                {
-                    string indice = Generador.pedirTemporal();
-                    string caracter = Generador.pedirTemporal();
+                    result3D resultExpr = item.obtener3D(ent);
 
-                    string etq1 = Generador.pedirEtiqueta();
-                    string finCad = Generador.pedirEtiqueta();
-
-
-                    codigoWrite += "/*IMPRIMIENDO UNA CADENA*/\n";
-                    codigoWrite += $"{indice} = {resultExpr.Temporal};                  /*Guardamos el inicio de la cadena */ \n";
-
-                    //CAPTURAMOS EL PRIMER CARACTER 
-                    codigoWrite += $"{etq1}:                           /*Inicio de ciclo para impresión*/ \n";
-
-                    codigoWrite += $"   {caracter} = Heap[(int){indice}]; /*Captura del caracter*/ \n";
-
-                    //ESTE IF SIMULA UN CICLO PARA EL RECORRDIO DE LA EXPRESION
-                    codigoWrite += $"   if ({caracter}== 0) goto {finCad}; \n";
-
-                    //IMPRESION DE LOS ASCII
-                    codigoWrite += $"   printf(\"%c\", (char){caracter}); \n\n";
-                    codigoWrite += $"       {indice} = {indice} + 1 ; \n";
-
-                    codigoWrite += $"       goto {etq1}; \n";
-
-                    codigoWrite += $"{finCad}:      \n/*FIN IMPRESION DE CADENA*/ \n\n";
-                }
-                else if(resultExpr.TipoResultado == Simbolo.TipoDatos.Boolean)
-                {
-
-                    if(item is Primitivo)
+                    codigoWrite += resultExpr.Codigo;
+                    if (resultExpr.TipoResultado == Simbolo.TipoDatos.Integer)
                     {
-                        string true_false = resultExpr.Temporal;
-                        string VALOR = true_false == "1" ? "TRUE" : "FALSE";            //OPERADOR TERNARIO
-                        codigoWrite += imprimirTRUE_FALSE(VALOR);
+                        codigoWrite += $"printf(\"%d\", (int){resultExpr.Temporal}); \n";
                     }
-                    else if (item is Identificador)
+                    else if (resultExpr.TipoResultado == Simbolo.TipoDatos.Real)
                     {
-                        string etiqTRUE = Generador.pedirEtiqueta();
-                        string etiqFALSE = Generador.pedirEtiqueta();
-                        string etiquetaSalida = Generador.pedirEtiqueta();
-
-                        codigoWrite += $"if({resultExpr.Temporal}==1) goto {etiqTRUE};\n";
-                        codigoWrite += $"goto {etiqFALSE};\n";
-                        codigoWrite += $"{etiqTRUE}: \n";
-                        codigoWrite += imprimirTRUE_FALSE("TRUE");
-                        codigoWrite += $"goto {etiquetaSalida};\n";
-                        codigoWrite += $"{etiqFALSE}:\n";
-                        codigoWrite += imprimirTRUE_FALSE("FALSE");
-                        codigoWrite += $"{etiquetaSalida}:\n\n";
-
+                        codigoWrite += $"printf(\"%f\",(float){resultExpr.Temporal});\n";
                     }
-                    else
+                    else if (resultExpr.TipoResultado == Simbolo.TipoDatos.Char)
                     {
-                        string tempFinal = Generador.pedirEtiqueta();
-                        codigoWrite += $"{resultExpr.EtiquetaV}: \n";
-                        codigoWrite += imprimirTRUE_FALSE("TRUE");
-
-                        codigoWrite += $"goto {tempFinal}; \n";
-                        codigoWrite += $"{resultExpr.EtiquetaF}: \n";
-                        codigoWrite += imprimirTRUE_FALSE("FALSE");
-                        codigoWrite += $"goto {tempFinal}; \n";
-                        codigoWrite += $"{tempFinal}:\n";
-
+                        codigoWrite += $"printf(\"%c\",(char){resultExpr.Temporal});\n";
                     }
+                    else if (resultExpr.TipoResultado == Simbolo.TipoDatos.String)
+                    {
+                        string indice = Generador.pedirTemporal();
+                        string caracter = Generador.pedirTemporal();
+
+                        string etq1 = Generador.pedirEtiqueta();
+                        string finCad = Generador.pedirEtiqueta();
+
+
+                        codigoWrite += "/*IMPRIMIENDO UNA CADENA*/\n";
+                        codigoWrite += $"{indice} = {resultExpr.Temporal};                  /*Guardamos el inicio de la cadena */ \n";
+
+                        //CAPTURAMOS EL PRIMER CARACTER 
+                        codigoWrite += $"{etq1}:                           /*Inicio de ciclo para impresión*/ \n";
+
+                        codigoWrite += $"   {caracter} = Heap[(int){indice}]; /*Captura del caracter*/ \n";
+
+                        //ESTE IF SIMULA UN CICLO PARA EL RECORRDIO DE LA EXPRESION
+                        codigoWrite += $"   if ({caracter}== 0) goto {finCad}; \n";
+
+                        //IMPRESION DE LOS ASCII
+                        codigoWrite += $"   printf(\"%c\", (char){caracter}); \n\n";
+                        codigoWrite += $"       {indice} = {indice} + 1 ; \n";
+
+                        codigoWrite += $"       goto {etq1}; \n";
+
+                        codigoWrite += $"{finCad}:      \n/*FIN IMPRESION DE CADENA*/ \n\n";
+                    }
+                    else if (resultExpr.TipoResultado == Simbolo.TipoDatos.Boolean)
+                    {
+
+                        if (item is Primitivo)
+                        {
+                            string true_false = resultExpr.Temporal;
+                            string VALOR = true_false == "1" ? "TRUE" : "FALSE";            //OPERADOR TERNARIO
+                            codigoWrite += imprimirTRUE_FALSE(VALOR);
+                        }
+                        else if (item is Identificador)
+                        {
+                            string etiqTRUE = Generador.pedirEtiqueta();
+                            string etiqFALSE = Generador.pedirEtiqueta();
+                            string etiquetaSalida = Generador.pedirEtiqueta();
+
+                            codigoWrite += $"if({resultExpr.Temporal}==1) goto {etiqTRUE};\n";
+                            codigoWrite += $"goto {etiqFALSE};\n";
+                            codigoWrite += $"{etiqTRUE}: \n";
+                            codigoWrite += imprimirTRUE_FALSE("TRUE");
+                            codigoWrite += $"goto {etiquetaSalida};\n";
+                            codigoWrite += $"{etiqFALSE}:\n";
+                            codigoWrite += imprimirTRUE_FALSE("FALSE");
+                            codigoWrite += $"{etiquetaSalida}:\n\n";
+
+                        }
+                        else
+                        {
+                            string tempFinal = Generador.pedirEtiqueta();
+                            codigoWrite += $"{resultExpr.EtiquetaV}: \n";
+                            codigoWrite += imprimirTRUE_FALSE("TRUE");
+
+                            codigoWrite += $"goto {tempFinal}; \n";
+                            codigoWrite += $"{resultExpr.EtiquetaF}: \n";
+                            codigoWrite += imprimirTRUE_FALSE("FALSE");
+                            codigoWrite += $"goto {tempFinal}; \n";
+                            codigoWrite += $"{tempFinal}:\n";
+
+                        }
+                    }
+
                 }
 
             }
+
 
             if (saltoLinea)
             {

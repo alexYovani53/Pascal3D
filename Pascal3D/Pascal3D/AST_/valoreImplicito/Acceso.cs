@@ -86,6 +86,7 @@ namespace CompiPascal.AST_.valoreImplicito
             final.Codigo += valor.Codigo;
             final.Temporal = valor.Temporal;
             final.TipoResultado = valor.TipoResultado;
+            final.Referencia = valor.Referencia;
 
             return final;
         }
@@ -118,6 +119,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 {
                     final.Temporal = temporalDireccion;
                     final.TipoResultado = variableEncontrada.Tipo;
+                    final.Referencia = variableEncontrada;
                 }
                 else
                 {
@@ -144,6 +146,7 @@ namespace CompiPascal.AST_.valoreImplicito
             final.Codigo += codigoSiguiente.Codigo;
             final.TipoResultado = codigoSiguiente.TipoResultado;
             final.Temporal = codigoSiguiente.Temporal;
+            final.Referencia = codigoSiguiente.Referencia;
             return final;
         }
 

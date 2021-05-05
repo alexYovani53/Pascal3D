@@ -70,7 +70,7 @@ namespace Pascal3D.entorno_.simbolos
                     string direccionAnterior = Generador.pedirTemporal();
                     string valorAnterior = Generador.pedirTemporal();
 
-                    codigo += $"/*Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
+                    codigo += $"/**********************Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
                     codigo += $"{nuevaUbicacionParam} = {entornoCopia} + {item.direccion}; /*Esta es la nueva ubicacion del parametro {item.Identificador}*/\n";
                     codigo += $"{direccionAnterior} = {entornoUbicacion} + {item.direccion}; /*Esta es la antigua ubicacion del parametro {item.Identificador}*/\n";
                     codigo += $"{valorAnterior} = Heap[(int){direccionAnterior}]; /*Captura del valor anterior*/\n";
@@ -78,7 +78,7 @@ namespace Pascal3D.entorno_.simbolos
                     result3D subObjeto = copiarObjeto(objeto, valorAnterior);
                     codigo += Generador.tabular(subObjeto.Codigo);
                     codigo += $"Heap[(int){nuevaUbicacionParam}] = {subObjeto.Temporal};  /*Cambio de valor*/\n";
-                    codigo += $"/*Fin declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
+                    codigo += $"/**********************Fin declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n\n";
                 }
                 else if (item is ObjetoArray referencia)
                 {
@@ -86,16 +86,16 @@ namespace Pascal3D.entorno_.simbolos
                     string ubicacionArreglo = Generador.pedirTemporal();
                     string comienzoArreglo = Generador.pedirTemporal();
 
-                    codigo += $"/*Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
+                    codigo += "/****************************Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
                     codigo += $"{nuevaUbicacionParam} = {entornoCopia} + {item.direccion}; /*Esta es la nueva ubicacion del parametro {item.Identificador}*/\n";
                     codigo += $"{ubicacionArreglo} = {entornoUbicacion} + {item.direccion}; /*Esta es la antigua ubicacion del parametro {item.Identificador}*/\n";
-                    codigo += $"{comienzoArreglo} = Heap[(int){ubicacionArreglo}]; /*Captura del valor anterior*/\n";
+                    codigo += $"{comienzoArreglo} = Heap[(int){ubicacionArreglo}]; /*Captura del valor anterior*/\n\n";
 
                     result3D resultado = arreglo(referencia, comienzoArreglo);
 
                     codigo += Generador.tabular( resultado.Codigo);
                     codigo += $"Heap[(int){nuevaUbicacionParam}] = {resultado.Temporal};  /*Cambio de valor*/\n";
-                    codigo += $"/*Fin declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
+                    codigo += $"/****************************Fin declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
 
                 }
                 else
@@ -104,7 +104,7 @@ namespace Pascal3D.entorno_.simbolos
                     string direccionAnterior = Generador.pedirTemporal();
                     string valorAnterior = Generador.pedirTemporal();
 
-                    codigo += $"/*Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
+                    codigo += $"/****************************Declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
                     codigo += $"{nuevaUbicacionParam} = {entornoCopia} + {item.direccion}; /*Esta es la nueva ubicacion del parametro {item.Identificador}*/\n";
                     codigo += $"{direccionAnterior} = {entornoUbicacion} + {item.direccion}; /*Esta es la antigua ubicacion del parametro {item.Identificador}*/\n";
 
@@ -112,7 +112,7 @@ namespace Pascal3D.entorno_.simbolos
 
                     codigo += Generador.tabular(val.Codigo);
                     codigo += $"Heap[(int){nuevaUbicacionParam}] = {val.Temporal};  /*Cambio de valor*/\n";
-                    codigo += $"/*Fin declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n";
+                    codigo += $"/****************************Fin declaración de parametro  {item.Identificador} del objeto tipo {instancia.nombreStructura}*/\n\n";
                 }
 
             }
@@ -220,32 +220,32 @@ namespace Pascal3D.entorno_.simbolos
                 string posicionesAnteriores = Generador.pedirTemporal();
 
                 codigo += $"{direAnterior} = {direccionAnterior};\n";
-                codigo += $"{posicionesAnteriores} = {direAnterior} + 1; /*Nos pasamos a la primera dirección del arreglo*/\n";
+                codigo += $"{posicionesAnteriores} = {direAnterior} + 1; /*Nos pasamos a la primera dirección del arreglo*/\n\n";
 
 
-                codigo += $"{ancho_mas_1} = {ancho} + 1;  /*Ancho del arreglo pas posicion del tamaño*/\n";
-                codigo += $"{posiciones} = {direccionHeap}; /*Capturamos el inico del arreglo*/\n";
-                codigo += $"Heap[(int){posiciones}] = {ancho};  /*El la primera posicion colocamos el tamaño del arreglo*/\n";
-                codigo += $"HP = HP + {ancho_mas_1}; /*Reservamos el espacio para la dimension*/\n";
+                codigo += $"    {ancho_mas_1} = {ancho} + 1;  /*Ancho del arreglo pas posicion del tamaño*/\n";
+                codigo += $"    {posiciones} = {direccionHeap}; /*Capturamos el inico del arreglo*/\n";
+                codigo += $"    Heap[(int){posiciones}] = {ancho};  /*El la primera posicion colocamos el tamaño del arreglo*/\n";
+                codigo += $"    HP = HP + {ancho_mas_1}; /*Reservamos el espacio para la dimension*/\n";
 
-                codigo += $"{posiciones} = {posiciones} + 1;  /*Pasamos a la primera posicion donde iran los valores*/\n";
-                codigo += $"{contador} = 1; \n\n";
-                codigo += $"{etiquetaInicio}: \n";
+                codigo += $"    {posiciones} = {posiciones} + 1;  /*Pasamos a la primera posicion donde iran los valores*/\n";
+                codigo += $"    {contador} = 1; /*Contador*/\n\n";
+                codigo += $"    {etiquetaInicio}: \n";
 
 
                 //RECUPERAMOS EL VALOR DEPENDIENDO DEL TIPO QUE SEA
                 result3D valpor_defecto = copiarValoresFinales(tipoPrimitivo, valorObjeto, posicionesAnteriores);
-                codigo += Generador.tabular(valpor_defecto.Codigo + "\n\n");
+                codigo += Generador.tabular(Generador.tabular(valpor_defecto.Codigo + "\n\n"));
 
-                codigo += $"Heap[(int){posiciones}] = {valpor_defecto.Temporal};\n";
+                codigo += $"    Heap[(int){posiciones}] = {valpor_defecto.Temporal};\n";
 
-                codigo += $"if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
-                codigo += $"    {posiciones} = {posiciones} + 1; \n";
-                codigo += $"    {posicionesAnteriores} = {posicionesAnteriores} + 1; \n";
-                codigo += $"    {contador} = {contador} + 1; \n";
+                codigo += $"    if ( {contador} >= {ancho} ) goto {etiquetaFinal};\n";
+                codigo += $"        {posiciones} = {posiciones} + 1; \n";
+                codigo += $"        {posicionesAnteriores} = {posicionesAnteriores} + 1; \n";
+                codigo += $"        {contador} = {contador} + 1; \n";
 
-                codigo += $"        goto {etiquetaInicio};\n";
-                codigo += $"{etiquetaFinal}:\n";
+                codigo += $"            goto {etiquetaInicio};\n";
+                codigo += $"    {etiquetaFinal}:\n";
 
             }
 
@@ -307,10 +307,10 @@ namespace Pascal3D.entorno_.simbolos
                     string direccion = Generador.pedirTemporal();
                     codigo.Codigo += $"{direccion} = Heap[(int){ubicacionValor}];   /*Entrar al entorno del objeto*/\n";
 
-                    result3D result = copiarObjeto(arregloObjeto, ubicacionValor);
+                    result3D result = copiarObjeto(arregloObjeto, direccion);
 
-                    codigo.Codigo += result.Codigo;
-                    codigo.Temporal = result.Temporal;
+                    codigo.Codigo += Generador.tabular(result.Codigo);
+                    codigo.Temporal = direccion;
 
                     break;
 

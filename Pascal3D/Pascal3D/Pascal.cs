@@ -251,6 +251,7 @@ namespace Pascal3D
                             {
                                 //AGREGAMOS LA FUNCION AL ENTORNO GLOBAL
                                 Funcion funcionDeclarado = (Funcion)item;
+                                funcionDeclarado.validarTipoRetorno(GLOBAL, ARBOL);
                                 GLOBAL.agregarSimbolo(funcionDeclarado.Identificador, funcionDeclarado);
                                 codigoFunciones +=funcionDeclarado.getC3(GLOBAL, ARBOL);
 

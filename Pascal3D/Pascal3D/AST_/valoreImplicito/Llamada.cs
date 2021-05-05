@@ -202,15 +202,15 @@ namespace CompiPascal.AST_.valoreImplicito
                 {
 
                     //VALIDAMOS EL TIPO DEL PARAMETRO
-                    if(tipoParametro == TipoDatos.Object)
+                    if(tipoParametro == TipoDatos.Object || tipoParametro == TipoDatos.Array )
                     {
                         string temp2 = Generador.pedirTemporal();
                         codigoParams += $"/*Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR VALOR*/\n";
                         codigoParams += $"    {temp2} = {temporalEntorno} + {ent.tamano};  /* El parametro va en la ultima posicion del entorno de la funcion*/\n";
 
-                        if (expresionesValor.ElementAt(i) is AccesoArreglo aux )
+                        if ( valorActual.Referencia is Objeto )
                         {
-                            hacerCopia nuevaCopia = new hacerCopia(aux.objetoAuxiliar, null, valorActual.Temporal);
+                            hacerCopia nuevaCopia = new hacerCopia((Objeto)valorActual.Referencia, null, valorActual.Temporal);
                             result3D copia = nuevaCopia.obtener3D(ent);
 
                             codigoParams += valorActual.Codigo;
@@ -218,9 +218,23 @@ namespace CompiPascal.AST_.valoreImplicito
                             codigoParams += Generador.tabular(copia.Codigo);
                             codigoParams += $"    Stack[(int){temp2}] = {copia.Temporal};\n";
                         }
-                        else
+                        else if(valorActual.Referencia is ObjetoArray)
+                        {
+                            hacerCopia nuevaCopia = new hacerCopia(null,(ObjetoArray)valorActual.Referencia, valorActual.Temporal);
+                            result3D copia = nuevaCopia.obtener3D(ent);
+
+                            codigoParams += valorActual.Codigo;
+                            codigoParams += "\n\n";
+                            codigoParams += Generador.tabular(copia.Codigo);
+                            codigoParams += $"    Stack[(int){temp2}] = {copia.Temporal};\n";
+
+                        }
+                        else 
                         {
 
+                            codigoParams += valorActual.Codigo;
+                            codigoParams += "\n\n";
+                            codigoParams += $"    Stack[(int){temp2}] ={valorActual.Temporal};\n";
                         }
 
 
@@ -287,12 +301,14 @@ namespace CompiPascal.AST_.valoreImplicito
                 }
 
                 string temp2 = Generador.pedirTemporal();
+                string temp1 = Generador.pedirTemporal();
 
                 codigo += $"/*Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
 
+                codigo += $"    {temp1} = Stack[(int){ValorRef.Temporal}];\n\n";
 
                 codigo += $"    {temp2} = {temporalCambio} + {ent.tamano};\n";
-                codigo += $"    Stack[(int){temp2}] = {ValorRef.Temporal};\n";
+                codigo += $"    Stack[(int){temp2}] = {temp1};\n";
                 codigo += $"/* FIN Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
                 ent.tamano++;
 

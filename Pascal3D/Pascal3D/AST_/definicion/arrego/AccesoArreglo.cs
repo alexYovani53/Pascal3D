@@ -112,10 +112,11 @@ namespace CompiPascal.AST_.definicion.arrego
             {
                 result3D resultado = new result3D();
                 resultado.Codigo += codigo;
-                result3D val_ =obtenerValor_parametro((Objeto)variableArreglo, acceso, 0,direccion.Temporal, ((Objeto)variableArreglo).getPropiedades(), null);
+                result3D val_ =obtenerValor_parametro((Objeto)variableArreglo, acceso, 0,direccion.Temporal, ((Objeto)variableArreglo).getPropiedades(), ent, null);
                 resultado.Codigo += val_.Codigo;
                 resultado.Temporal = val_.Temporal;
                 resultado.TipoResultado = val_.TipoResultado;
+                resultado.Referencia = val_.Referencia;
                 return resultado;
             }
 
@@ -132,16 +133,17 @@ namespace CompiPascal.AST_.definicion.arrego
             ObjetoArray instanciaArreglo = (ObjetoArray)variableArreglo;
 
             result3D valorFinal = new result3D();
-            result3D valor_ = obtenerValorDirecto(instanciaArreglo, direccion.Temporal, ent, null);
+            result3D valor_ = obtenerValorDirecto(instanciaArreglo, direccion.Temporal, ent,ent, null);
             valorFinal.Codigo += codigo;
             valorFinal.Codigo += valor_.Codigo;
             valorFinal.Temporal = valor_.Temporal;
             valorFinal.TipoResultado = valor_.TipoResultado;
+            valorFinal.Referencia = valor_.Referencia;
 
             return valorFinal;
         }
 
-        public result3D obtenerValor_parametro(Objeto variable, LinkedList<string> acceso, int indice,string direccionObjeto, Entorno ent, AST arbol)
+        public result3D obtenerValor_parametro(Objeto variable, LinkedList<string> acceso, int indice,string direccionObjeto, Entorno ent, Entorno fueraObjeto, AST arbol)
         {
             result3D codigo = new result3D();
             string temp1 = Generador.pedirTemporal();
@@ -174,12 +176,12 @@ namespace CompiPascal.AST_.definicion.arrego
 
                 ObjetoArray propiedad_ = (ObjetoArray)propiedad;
 
-                result3D resultado = obtenerValorDirecto(propiedad_, temp1, ent, arbol);
+                result3D resultado = obtenerValorDirecto(propiedad_, temp1, ent,fueraObjeto, arbol);
 
                 codigo.Codigo += resultado.Codigo;
                 codigo.Temporal = resultado.Temporal;
                 codigo.TipoResultado = resultado.TipoResultado;
-                if (codigo.TipoResultado == TipoDatos.Object) this.objetoAuxiliar = propiedad_.objetoParaAcceso;
+                if (codigo.TipoResultado == TipoDatos.Object) codigo.Referencia = propiedad_.objetoParaAcceso;
                 return codigo;
 
             }
@@ -191,7 +193,7 @@ namespace CompiPascal.AST_.definicion.arrego
             }
 
 
-            result3D siguiente =  obtenerValor_parametro((Objeto)propiedad, acceso, indice + 1, temp1,((Objeto)propiedad).getPropiedades(),arbol);
+            result3D siguiente =  obtenerValor_parametro((Objeto)propiedad, acceso, indice + 1, temp1,((Objeto)propiedad).getPropiedades(),fueraObjeto, arbol);
             codigo.Codigo += Generador.tabular(siguiente.Codigo);
             codigo.Temporal = siguiente.Temporal;
             codigo.TipoResultado = siguiente.TipoResultado;
@@ -200,7 +202,7 @@ namespace CompiPascal.AST_.definicion.arrego
         }
 
         //ACCESODIRECTO OBTIENE EL VALOR DEL ARREGLO EN LA POSICION DADA. PASANDO COMO PARAMETRO EL OBJETO ARRAY EN SI 
-        public result3D obtenerValorDirecto(ObjetoArray variable,string direccion, Entorno ent, AST arbol)
+        public result3D obtenerValorDirecto(ObjetoArray variable,string direccion, Entorno ent, Entorno fueraObjeto, AST arbol)
         {
             //CODIGO DEL ACCESO
             string codigo = "";
@@ -212,7 +214,7 @@ namespace CompiPascal.AST_.definicion.arrego
             // REcorremos los indices de acceso del arreglo
             foreach (Expresion item in indices)
             {
-                result3D resultado = item.obtener3D(ent);
+                result3D resultado = item.obtener3D(fueraObjeto);
 
                 if (resultado.TipoResultado != TipoDatos.Integer)
                 {
@@ -243,7 +245,7 @@ namespace CompiPascal.AST_.definicion.arrego
             final.Temporal = valorEncontrado.Temporal;
             final.TipoResultado = valorEncontrado.TipoResultado;
 
-            if (final.TipoResultado == TipoDatos.Object) this.objetoAuxiliar = variable.objetoParaAcceso;
+            if (final.TipoResultado == TipoDatos.Object) final.Referencia = variable.objetoParaAcceso;
 
             return final;
         }

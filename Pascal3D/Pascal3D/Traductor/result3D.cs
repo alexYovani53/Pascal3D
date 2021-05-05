@@ -35,6 +35,7 @@ namespace Pascal3D.Traductor
          */
         private string etiquetaF { get; set; }
 
+        private object referencia { get; set; }
         public result3D()
         {
             this.tipoResultado = TipoDatos.NULL;
@@ -42,6 +43,7 @@ namespace Pascal3D.Traductor
             this.temporal = "";
             this.etiquetaF = "";
             this.etiquetaV = "";
+            this.referencia = 0;
         }
 
 
@@ -120,6 +122,21 @@ namespace Pascal3D.Traductor
             }
 
         }
+
+        public object Referencia
+        {
+            get
+            {
+                return referencia;
+            }
+
+            set
+            {
+                this.referencia = value;
+            }
+
+        }
+
 
     }
 }

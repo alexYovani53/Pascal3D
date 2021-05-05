@@ -250,15 +250,15 @@ namespace CompiPascal.entorno_.simbolos
              
                 if(nombreStruct != null && !nombreStruct.Equals(""))
                 {
+
                     DeclararStruct nueva = new DeclararStruct(param, nombreStruct, linea, columna);
                     codigo = nueva.getC3(ent, ARBOL);
-                    return codigo;
                 }
                 else
                 {
                     Declaracion retornoPascal = new Declaracion(param, Tipo);
                     codigo = retornoPascal.getC3(ent, ARBOL);
-                    return codigo;
+
                 }
                 
           
@@ -443,6 +443,23 @@ namespace CompiPascal.entorno_.simbolos
 
         }
 
+
+        public void validarTipoRetorno(Entorno ent, AST arbol)
+        {
+            // Si el timpo de la funcion no es un objeto ( ya sea un struct o un arreglo)
+            if (this.Tipo != TipoDatos.Object) return;
+
+            Struct buscando1 = arbol.retornarEstructura(nombreStruct);
+            Arreglo buscando2 = arbol.retornarArreglo(nombreStruct);
+
+            if (buscando1 != null) Tipo = TipoDatos.Object;
+            else if (buscando2 != null) Tipo = TipoDatos.Array;
+
+            // Este tipo se debe a que no se encontro LA ESTRUCTURA ARREGLO O STRUCT con el nombre "nombreStruct"
+            else Tipo = TipoDatos.NULL;
+
+
+        }
 
 
     }

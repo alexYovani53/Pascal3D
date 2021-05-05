@@ -97,7 +97,7 @@ namespace CompiPascal.AST_.definicion
             {
                 string nombreVar = item.Identificador;
 
-                if (ent.existeSimbolo(nombreVar))
+                if (ent.existeSimbolo_Menos_EN_GLOBAL(nombreVar))
                 {
                     Program.getIntefaz().agregarError($"La variable {nombreVar} ya tiene una declaracion",item.linea,item.columna);
                     return "";

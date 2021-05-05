@@ -116,32 +116,37 @@ namespace CompiPascal.entorno_
         }
 
 
+
         /**
-         * @funcion  bool existeFuncion(string identificador)
+         * @funcion  bool existeSimbolo(string identificador)
          * 
-         * @comentario  Esta función busca la funcion nombrada en el parametro y 
+         * @comentario  Esta función busca el identificador en la tabla del entorno actual y 
          *              recorre los entornos anteriores en busqueda del simbolo si no aparece en 
          *              uno de ellos.
          * 
-         * @param   identificador       nombre de la funcion a buscar
-         * @return  devuelve            true -> si se encontro  y false-> si no se encontro
+         * @param   identificador    nombre del simbolo a buscar
+         * @return  devuelve    true -> si se encontro  y false-> si no se encontro
          */
 
-        public bool existeFuncion(string identificador)
+        public bool existeSimbolo_Menos_EN_GLOBAL(string identificador)
         {
             identificador = identificador.ToLower();
 
-            for (Entorno actual = this; actual != null; actual = actual.ent_Anterior)
-            {
+            Entorno pivote = this;
+            bool salida = false;
 
-                foreach (Simbolo item in actual.tabla)
+            while(!salida && pivote != null)
+            {
+                foreach (Simbolo item in pivote.tabla)
                 {
-                    if (item.Identificador.Equals(identificador) && item is Funcion) return true;
+                    if (item.Identificador.Equals(identificador)) return true;
                 }
+
+                if (pivote.ent_Anterior != null && !pivote.ent_Anterior.nombre.Equals("GLOBAL")) pivote = pivote.ent_Anterior;
+                else salida = true;
 
             }
             return false;
-
         }
 
 
@@ -227,46 +232,7 @@ namespace CompiPascal.entorno_
             return null;
         }
 
-        /**
-         *  @funcion   void cambiarValor(string identificador, Simbolo nuevo)
-         *  
-         *  @comentario esta funcion se encarga de cambiar el valor del simbolo con el ide 
-         *              especificado. Es decir. setea un nuevo valor
-         *              
-         *  @param  identificador     nombre del simbolo a buscar
-         *  
-         *  @return nuevo             simbolo con el que se seteara el simbolo a buscar
-         */
-        public void cambiarValor(string identificador, Simbolo nuevo)
-        {
-            identificador = identificador.ToLower();
-            for (Entorno actual =this; actual!=null; actual =  actual.ent_Anterior){
 
-
-                for (int i = 0; i < actual.tabla.Count; i++)
-                {
-                    if (((Simbolo)actual.tabla[i]).Identificador.Equals(identificador))
-                    {
-                        actual.tabla[i] = nuevo;
-                        return;
-                    }
-                }
-
-            }
-
-            Console.WriteLine("el simbolo con el identificador" + identificador + " no se encontro en ningun entorno");
-
-        }
-
-        public Entorno copiarEntorno()
-        {
-            Entorno en = new Entorno(ent_Anterior,ent_Anterior.nombre);
-
-            en.tabla = this.tabla;
-
-            return en;
-
-        }
 
 
         public ArrayList TablaSimbolos()
@@ -278,14 +244,7 @@ namespace CompiPascal.entorno_
         {
             return ent_Anterior;
         }
-
-        public int obtenerUltimaRelativa()
-        {
-            return ((Simbolo)tabla[tabla.Count - 1]).direccion;
-        }
-
-   
-       
+      
 
     }
 }

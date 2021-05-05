@@ -65,6 +65,7 @@ namespace CompiPascal.AST_.cambioFlujo
             if(valorSalida == null)
             {
                 codigo += $"Stack[(int){temp1}]=-1; /* Retorno tipo void*/ \n";
+                codigo += "#EXIT#\n";
             }
             else
             {

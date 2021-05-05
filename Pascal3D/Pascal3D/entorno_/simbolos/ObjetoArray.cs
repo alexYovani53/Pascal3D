@@ -51,7 +51,7 @@ namespace CompiPascal.entorno_.simbolos
 
             if(clonado.Count > 0)
             {
-                codigo += $"{iniNivel} = {niveles[indiceNivel][0]};\n";
+                codigo += $"{iniNivel} = {niveles[indiceNivel][0]}; /*INICIO del nivel DEFINICION EN PASCAL*/\n";
                 codigo += $"{tamano} = Heap[(int){inicioArreglo}]; /*Capturamos el tamaño almacenado del nivel*/ \n";
 
                 codigo += $"{posicion} = {inicioArreglo};\n";

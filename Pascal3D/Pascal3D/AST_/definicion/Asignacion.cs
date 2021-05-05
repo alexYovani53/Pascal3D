@@ -132,7 +132,7 @@ namespace CompiPascal.AST_.definicion
                 return codigo;
 
             }
-            // Declaración del tipo      IDE:= X valor ;   ya sea un acceso, un primitivo o un idex
+            // Declaración del tipo      IDE:= X valor ;   ya sea un acceso, un primitivo o un ide
             else
             {
 
@@ -154,7 +154,7 @@ namespace CompiPascal.AST_.definicion
 
 
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
-                if (!verificarTipos(simboloVar.Tipo, final.TipoResultado)) return "";
+                if (!verificarTipos(simboloVar, final.TipoResultado)) return "";
 
                 //   1. ASIGNACIÓN DEL TIPO IDE := IDE ; 
                 //   2. ASIGNACIÓN DEL TIPO IDE := accesoArreglo[x]..[x]   donde el arreglo "accesoArreglo" tiene un tipo de datos OBJETO, en este 
@@ -171,12 +171,17 @@ namespace CompiPascal.AST_.definicion
                     if(valor is AccesoArreglo)
                     {
                         string tipo1 = ((Objeto)simboloVar).nombreStructura.ToLower();
-                        string tipo2 = (((AccesoArreglo)valor).objetoAuxiliar).nombreStructura.ToLower();
+                        string tipo2 = ((Objeto)final.Referencia).nombreStructura.ToLower();
 
                         if (tipo1.Equals(tipo2))
                         {
                             codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
                         }
+                    }
+                    else if(valor is Identificador)
+                    {
+                        codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+
                     }
 
                 }
@@ -278,19 +283,21 @@ namespace CompiPascal.AST_.definicion
             if (indice == propiedad.Count - 1)
             {
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
-                if (!verificarTipos(tipoParametro, val.TipoResultado)) return "";
+                if (!verificarTipos(encontrado, val.TipoResultado)) return "";
 
                 //YA QUE EL BUSCADO NO FUE AGREGADO, AHORA CREAMOS UN NUEVO SIMBOLO QUE SUSTITUIRA AL NO AGREGADO
-                if (tipoParametro == TipoDatos.Object)
+                if (tipoParametro == TipoDatos.Object || tipoParametro == TipoDatos.Array)
                 {
 
                     if (val.TipoResultado == TipoDatos.Array)
                     {
-                        //nuevoModificado.agregarSimbolo(propiedadBuscada, (ObjetoArray)val);
+                        codigo += val.Codigo;
+                        codigo += $"Heap[(int){etiquetaDireccion}] = {val.Temporal};";
                     }
                     else if (val.TipoResultado == TipoDatos.Object)
                     {
-                        //nuevoModificado.agregarSimbolo(propiedadBuscada, (Objeto)val);
+                        codigo += val.Codigo;
+                        codigo += $"Heap[(int){etiquetaDireccion}] = {val.Temporal};";
                     }
 
                 }
@@ -335,10 +342,11 @@ namespace CompiPascal.AST_.definicion
             }
         }
 
-        public bool verificarTipos(TipoDatos tipoParametro, TipoDatos TipoResultado)
+        public bool verificarTipos(Simbolo parametro, TipoDatos TipoResultado)
         {
             // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
-            if (tipoParametro == TipoDatos.Integer)
+            // LOS TIMPOS INTEGER Y REAL SE PUEDEN CONVERTIR IMPLICITAMENTE (sin casteo) ENTONCES SE VALIDA ESO 
+            if (parametro.Tipo == TipoDatos.Integer)
             {
                 if (TipoResultado != TipoDatos.Integer && TipoResultado != TipoDatos.Real)
                 {
@@ -346,7 +354,7 @@ namespace CompiPascal.AST_.definicion
                     return false;
                 }
             }
-            else if (tipoParametro == TipoDatos.Real)
+            else if (parametro.Tipo == TipoDatos.Real)
             {
                 if (TipoResultado != TipoDatos.Integer && TipoResultado != TipoDatos.Real)
                 {
@@ -354,11 +362,13 @@ namespace CompiPascal.AST_.definicion
                     return false;
                 }
             }
+            // SI EL TIPO DEL PARAMETRO QUE SERA ASIGNADO NO ES INTEGER O REAL SE VALIDAN LAS SIGUIENTES CONDICIONES
             else
             {
-                if (tipoParametro !=  TipoResultado)
+                // SI SE INTENTA SETEAR UN OBJETO STRUCT A UN OBJETO STRUCT     IDE (struct):= IDE (struct);
+                if (parametro.Tipo !=  TipoResultado)
                 {
-                    Program.getIntefaz().agregarError("Error de tipos, Asignacion", linea, columna);
+                    Program.getIntefaz().agregarError($"Error de tipos, Asignacion   {TipoDatos.Object} intenta setear un tipo {TipoResultado}", linea, columna);
                     return false;
                 }
 

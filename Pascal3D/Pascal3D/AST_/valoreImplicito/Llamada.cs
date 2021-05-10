@@ -113,7 +113,8 @@ namespace CompiPascal.AST_.valoreImplicito
             {
                 result3D valorExpr = item.obtener3D(ent);
 
-                if (item is Operacion || item is Primitivo &&  funcionLLamada.ListaParametros.ElementAt(i).porReferencia){
+                
+                if ((item is Operacion || item is Primitivo) &&  funcionLLamada.ListaParametros.ElementAt(i).porReferencia){
                     Program.getIntefaz().agregarError("La expresión por referencia debe ser un identificador", linea, columna); return "";
                 }
 
@@ -321,11 +322,9 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 codigo += $"/*Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
                 
-                codigo += $"    {temp1} = Stack[(int){ValorRef.Temporal}];\n\n";
-
-
+                //codigo += $"    {temp1} = Stack[(int){ValorRef.Temporal}];\n\n";
                 codigo += $"    {temp2} = {temporalCambio} + {ent.tamano};\n";
-                codigo += $"    Stack[(int){temp2}] = {temp1};\n";
+                codigo += $"    Stack[(int){temp2}] = {ValorRef.Temporal};\n";
 
                 codigo += $"/* FIN Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
                 ent.tamano++;

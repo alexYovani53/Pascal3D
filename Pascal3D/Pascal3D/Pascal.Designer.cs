@@ -41,6 +41,7 @@ namespace Pascal3D
             this.panel1 = new System.Windows.Forms.Panel();
             this.button1 = new System.Windows.Forms.Button();
             this.traducir = new System.Windows.Forms.Button();
+            this.tablaSimbolos = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -53,7 +54,9 @@ namespace Pascal3D
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).BeginInit();
+            this.tabPage2.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tablaSimbolos)).BeginInit();
             this.SuspendLayout();
             // 
             // AreaTexto
@@ -158,10 +161,11 @@ namespace Pascal3D
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.tablaSimbolos);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(996, 155);
+            this.tabPage2.Size = new System.Drawing.Size(1014, 170);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Simbolos";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -196,6 +200,16 @@ namespace Pascal3D
             this.traducir.UseVisualStyleBackColor = true;
             this.traducir.Click += new System.EventHandler(this.traducir_Click);
             // 
+            // tablaSimbolos
+            // 
+            this.tablaSimbolos.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tablaSimbolos.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tablaSimbolos.Location = new System.Drawing.Point(3, 3);
+            this.tablaSimbolos.Name = "tablaSimbolos";
+            this.tablaSimbolos.RowTemplate.Height = 25;
+            this.tablaSimbolos.Size = new System.Drawing.Size(1008, 164);
+            this.tablaSimbolos.TabIndex = 0;
+            // 
             // Pascal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -217,7 +231,9 @@ namespace Pascal3D
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tablaErrores)).EndInit();
+            this.tabPage2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tablaSimbolos)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -236,6 +252,7 @@ namespace Pascal3D
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.DataGridView tablaErrores;
+        private System.Windows.Forms.DataGridView tablaSimbolos;
     }
 }
 

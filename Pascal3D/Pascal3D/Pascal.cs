@@ -37,6 +37,8 @@ namespace Pascal3D
         /// </summary>
         private const int BACK_COLOR = 0x1E1E1E;
 
+
+
         /// <summary>
         /// default text color of the text area
         /// </summary>
@@ -65,17 +67,20 @@ namespace Pascal3D
 
         #endregion
 
-        public static LinkedList<Error> Errores= null;
+        public static LinkedList<Error> Errores = null;
 
         DataTable modeloErrores = null;
+        DataTable modeloVars = null;
 
         public Pascal()
         {
             InitializeComponent();
-            
+
             iniciar();
-            iniciarModeloErrores();
+            iniciarModeloErrores(); 
+            iniciarModeloVars();
             Errores = new LinkedList<Error>();
+
 
             ConsolaSalida.iniciar(SalidaTexto);
         }
@@ -90,7 +95,21 @@ namespace Pascal3D
             modeloErrores.Columns.Add("Linea");
             modeloErrores.Columns.Add("Columna");
 
-            this.tablaErrores.DataSource=modeloErrores;
+            this.tablaErrores.DataSource = modeloErrores;
+        }
+
+        public void iniciarModeloVars()
+        {
+
+            modeloVars = new DataTable();
+            modeloVars.Columns.Add("Nombre");
+            modeloVars.Columns.Add("Tipo");
+            modeloVars.Columns.Add("Ambito");
+            modeloVars.Columns.Add("Fila");
+            modeloVars.Columns.Add("Columna");
+            modeloVars.Columns.Add("nivel");
+
+            this.tablaSimbolos.DataSource = modeloVars;
         }
 
         private void iniciar()
@@ -209,7 +228,7 @@ namespace Pascal3D
         private void button1_Click(object sender, EventArgs e)
         {
             string texto = Abrir.cargarArchivo();
-            if (texto.Equals(""))return;
+            if (texto.Equals("")) return;
 
             this.AreaTexto.Text = texto;
         }
@@ -218,10 +237,12 @@ namespace Pascal3D
         {
 
             Errores = new LinkedList<Error>();
+            modeloErrores.Clear();
+            modeloVars.Clear();
             Generador.reiniciar();
             SalidaTexto.Text = "";
 
-            if(!AreaTexto.Text.Equals(""))
+            if (!AreaTexto.Text.Equals(""))
             {
 
                 //INSTANCIA DE LA GRAMATICA
@@ -237,13 +258,13 @@ namespace Pascal3D
                 {
 
                     ArmarAST armado = new ArmarAST();
-                    AST ARBOL =  armado.generarAST(arbolIrony);
+                    AST ARBOL = armado.generarAST(arbolIrony);
 
                     Entorno GLOBAL = new Entorno(null, "GLOBAL");
                     string codigoDeclaraciones = "";
                     string codigoMain = "";
                     string codigoFunciones = "";
-                    if(ARBOL != null)
+                    if (ARBOL != null)
                     {
                         foreach (Instruccion item in ARBOL.obtenerInstrucciones())
                         {
@@ -253,7 +274,7 @@ namespace Pascal3D
                                 Funcion funcionDeclarado = (Funcion)item;
                                 funcionDeclarado.validarTipoRetorno(GLOBAL, ARBOL);
                                 GLOBAL.agregarSimbolo(funcionDeclarado.Identificador, funcionDeclarado);
-                                codigoFunciones +=funcionDeclarado.getC3(GLOBAL, ARBOL);
+                                codigoFunciones += funcionDeclarado.getC3(GLOBAL, ARBOL);
 
                             }
                             else if (item is Declaracion)
@@ -264,32 +285,32 @@ namespace Pascal3D
                                 codigoDeclaraciones += codTemp;
 
                             }
-                            else if(item is DeclararStruct)
+                            else if (item is DeclararStruct)
                             {
                                 string codTemp = item.getC3(GLOBAL, ARBOL);
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
                             }
-                            else if(item is GuardarStruct)
+                            else if (item is GuardarStruct)
                             {
                                 string codTemp = item.getC3(GLOBAL, ARBOL);
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
                             }
-                            else if(item is GuardaArray)
+                            else if (item is GuardaArray)
                             {
                                 string codTemp = item.getC3(GLOBAL, ARBOL);
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
                             }
-                            else if(item is DeclaraArray2)
+                            else if (item is DeclaraArray2)
                             {
                                 string codTemp = item.getC3(GLOBAL, ARBOL);
                                 codTemp = Generador.tabular(codTemp);
                                 codigoDeclaraciones += codTemp;
                             }
 
-                            else if(item is BeginEndPrincipal)
+                            else if (item is BeginEndPrincipal)
                             {
 
 
@@ -329,13 +350,13 @@ namespace Pascal3D
                 }//FIN HAY ERRORES
 
             }//FIN DE TRADUCCIÓN
-            
 
-            if(Errores != null && Errores.Count > 0)
+
+            if (Errores != null && Errores.Count > 0)
             {
 
-                DialogResult mostrarErrores = MessageBox.Show("Existen errores, Quiere verlos?","Errores",MessageBoxButtons.YesNo);
-                if(mostrarErrores == DialogResult.Yes)
+                DialogResult mostrarErrores = MessageBox.Show("Existen errores, Quiere verlos?", "Errores", MessageBoxButtons.YesNo);
+                if (mostrarErrores == DialogResult.Yes)
                 {
                     tabControl1.SelectedIndex = 0;
                     generarTablaErrores();
@@ -363,6 +384,18 @@ namespace Pascal3D
                 modeloErrores.Rows.Add(item.TipoE, item.descripcion, item.fila, item.Columna);
             }
         }
+        public void agregarLocales(LinkedList<reporteVar> modelo)
+        {
 
+            tabControl1.SelectedIndex = 2;
+
+            modeloVars.Clear();
+            foreach (reporteVar item in modelo)
+            {
+                modeloVars.Rows.Add(item.nombre, item.Tipo, item.Ambito, item.Fila, item.Columna, item.Nivel);
+            }
+
+
+        }
     }
 }

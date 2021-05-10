@@ -122,6 +122,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 i++;
             }
 
+
             //  GENERAMOS UN TEMPORAL PARA QUE LAS DECLARACIONES SE HAGAN DESPUES DEL ENTORNO ACTUAL 
             //  esto porque SP esta en el entorno actual y para no moverlo, se crea un temporal con la nueva posicion (stacK) del entorno
             //  de la funcion a llamar
@@ -322,7 +323,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 codigo += $"/*Declaración de parametro {parametroActual.Identificador} ---------<>>>> POR REFERENCIA*/\n";
                 
-                //codigo += $"    {temp1} = Stack[(int){ValorRef.Temporal}];\n\n";
+                //codigo += $"    {temp1} = Stack[(int){ValorRef.Temporal}];\n\n";  esta linea no es necesaria debido a que si se hace esto al pasar la referencia no funciona correctamente
                 codigo += $"    {temp2} = {temporalCambio} + {ent.tamano};\n";
                 codigo += $"    Stack[(int){temp2}] = {ValorRef.Temporal};\n";
 

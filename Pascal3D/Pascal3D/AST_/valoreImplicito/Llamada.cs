@@ -16,19 +16,26 @@ namespace CompiPascal.AST_.valoreImplicito
 {
     public class Llamada : Expresion, Instruccion
     {
-        public int tamanoPadre { get; set; }
+
         /*
          * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
          *                                                  evalua una expresión condicional
          */
         public string etiquetaFalsa { get; set; }
+
         /*
          * @param   string      etiquetaVerdadera           Guarda la etiqueta verdadera para una instrucción donde se 
          *                                                  evalua una expresión condicional
          */
         public string etiquetaVerdadera { get; set; }
+
+
+
+
         public int linea { get; set ;}
         public int columna { get; set; }
+
+
 
         /* @parametro   string      nombreLlamada       nombre del la funcion o  procedimiento al que se llama
          **/
@@ -62,6 +69,7 @@ namespace CompiPascal.AST_.valoreImplicito
             result3D retorno = new result3D();
             retorno.Codigo = getC3(ent,null);
 
+
             if (funcionLlamada.Tipo == TipoDatos.Void)
             {
                 retorno.TipoResultado = TipoDatos.Void;
@@ -90,7 +98,8 @@ namespace CompiPascal.AST_.valoreImplicito
         {
             Funcion funcionLLamada = ent.obtenerFuncion(nombreLlamada);
             Entorno entornoFuncion = new Entorno(ent, nombreLlamada);
-            entornoFuncion.tamano = 1; //HACEMOS ESTO PARA RECERBAR EL ESPACIO DEL RETORNO AL INICIO DE LAS VARIABLES 
+            entornoFuncion.tamano = 1; //HACEMOS ESTO PARA RESERVAR EL ESPACIO DEL RETORNO AL INICIO DE LAS VARIABLES 
+            // HEAP_FUNCION [ --retorno--  , -- param1--, -- param2--, -- paramN--, -- VariableFuncion ( PASCAL )--  ]
 
             if (funcionLLamada == null)
             {
@@ -381,7 +390,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
 
-        public void buscarReferencia(Funcion llamada)
+        public void buscarReferencia(Funcion llamada) 
         {
             //  comprobar cuantos parametros tiene la llamada
             if (expresionesValor.Count != llamada.ListaParametros.Count) return;
@@ -397,6 +406,7 @@ namespace CompiPascal.AST_.valoreImplicito
                 if(llamada.ListaParametros.ElementAt(i).porReferencia && expresionesValor.ElementAt(i) is Identificador)
                 {
                     ((Identificador)expresionesValor.ElementAt(i)).buscarSoloDireccion = true;
+
                 }
             }
         }

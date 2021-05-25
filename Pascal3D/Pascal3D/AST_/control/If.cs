@@ -15,14 +15,16 @@ namespace CompiPascal.AST_.control
     class If:Condicional, Instruccion
     {
 
-        public int tamanoPadre { get; set; }
+
         public int linea { get; set; }
+        
         public int columna { get; set; }
 
         /* @propiedad       instruccionesElse
          * @comentario      Esta propiedad almacena las instrucciones que se ejecutan condo el if principal no se cumple
          */
         LinkedList<Instruccion> instruccionesElse;
+
 
         /* @propiedad       instruccionesElse_If
          * @comentario      Esta propiedad almacena las instrucciones que se ejecutan para los demas if en la secuencia -> if, else if, else if...... else 
@@ -62,6 +64,7 @@ namespace CompiPascal.AST_.control
             this.linea = linea;
             this.columna = columna;
         }
+
 
         public string getC3(Entorno ent, AST arbol)
         {
@@ -118,7 +121,7 @@ namespace CompiPascal.AST_.control
             /* SI HAY ALGUNA INSTRUCCIÓN PARA EL ELSE DEL IF, SE RECUPERAN  */
             if (instruccionesElse.Count > 0)
             {
-                result.Codigo += "//INSTRUCCIONES DEL ELSE \n";
+                result.Codigo += "/* INSTRUCCIONES DEL ELSE */\n";
                 result.Codigo += generarCodigoInstrucciones(instruccionesElse, ent,arbol);        
             }
 
@@ -128,6 +131,7 @@ namespace CompiPascal.AST_.control
 
             return result.Codigo;
         }
+
 
         public string generarCodigoInstrucciones(LinkedList<Instruccion> instrucciones,Entorno ent, AST arbol)
         {

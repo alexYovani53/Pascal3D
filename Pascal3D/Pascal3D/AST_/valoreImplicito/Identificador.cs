@@ -41,7 +41,6 @@ namespace CompiPascal.AST_.valoreImplicito
         private string ide { get; set; }
         public int linea { get; set; }
         public int columna { get; set; }
-        public int tamanoPadre { get ; set; }
 
         public bool buscarSoloDireccion { get; set; }
 
@@ -64,15 +63,18 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D ide_buscando; 
 
-            // UN PUNTERO SE REFIERE A UNA VARIABLE POR REFERENCIA 
+            // OBTENER SOLO LA DIRECCIÓN DE UN IDE ES PARA USARLA COMO REFERENCIA Y NO COMO VALOR
             if (buscarSoloDireccion)
             {
                 ide_buscando = buscando_Direccion(ent, ide);
             }
+            // TAMBIEN CABE LA POSIBILIDAD DE QUE UNA VARIABLE NO ESTE EN EL STACK SI NO EN EL HEAP
+            // ES EL CASO DE UNA VARIABLE DENTRO DE UN STRUCT EJ:     OBJETO.variable1 
             else if (etiquetaEntornoHeap !=null)
             {
-                ide_buscando = buscando_Direccion_Heap(ent, ide);
+                ide_buscando = Buscando_Direccion_Heap(ent, ide);
             }
+            // ULTIMO CASO, BUSCAR EN EL STACK
             else 
             {
                 ide_buscando = buscandoId(ent, ide);
@@ -84,15 +86,16 @@ namespace CompiPascal.AST_.valoreImplicito
         private result3D buscandoId(Entorno ent,string identificador)
         {
 
-            result3D regresos = new result3D();
+            result3D VALOR_ID = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"/*BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
-            regresos.Codigo += $"{tempora1} = SP;\n";
+            VALOR_ID.Codigo += $"/*BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
+            VALOR_ID.Codigo += $"{tempora1} = SP;\n";
 
             /* RECORREMOS TODOS LOS ENTORNOS POR EL CASO DE QUE LA VARIABLE SEA EXTERNA
-             * ES POR ESO QUE SI EN EL ENTORNO ACTUAL NO ESTA LA VARIABLE, RESTAMOS EL TAMAÑO DEL ENTORNO ACTUAL 
-             * PARA OBTENER CORRECTAMENTE LOS VALORES*/
+             * ES POR ESO QUE SI EN EL ENTORNO ACTUAL NO ESTA LA VARIABLE, EL UNICO ENTORNO ACCESIBLE 
+             * DESDE CUALQUIER FUNCION O PROCEDIMIENTO ES EL ENTORNO GLOBAL
+             */
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
             {
 
@@ -102,30 +105,35 @@ namespace CompiPascal.AST_.valoreImplicito
                     if (item.Identificador.Equals(identificador.ToLower()))
                     {
                         string tempora2 = Generador.pedirTemporal();
-                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
-                        regresos.Codigo += $"{tempora2} = Stack[(int){tempora1}];                    /*CAPTURAMOS EL VALOR ALMACENADO EN STACK*/\n";
+                        VALOR_ID.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
+                        VALOR_ID.Codigo += $"{tempora2} = Stack[(int){tempora1}];                    /*CAPTURAMOS EL VALOR ALMACENADO EN STACK*/\n";
 
 
                         /* CUANDO ES UNA REFERENCIA (PASADO EN UN PARAMETRO DENTRO DE UNA FUNCION O PROCEDIMIENTO)
-                         * EN ESTE CASO NO SE NECESITA EL VALOR SI NO LA DIRECCIÓN DEL STACK DONDE ESTA*/
+                         * EL VALOR DE LA VARIABLE SE ENCUENTRA EN LA POSICION DEL STACK CONTENIDA EN EL PRIMER ACCESO AL STACK
+                         * SERIA ASÍ:   
+                         *              i =  a(referencia en funcion) ;    i = Stack[Stack[a.posicion]];
+                         */
                         if (item.porReferencia)
                         {
                             string tempora3 = Generador.pedirTemporal();
-                            regresos.Codigo += $"{tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
-                            regresos.Temporal = tempora3;
+                            VALOR_ID.Codigo += $"{tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
+                            VALOR_ID.Temporal = tempora3;
                         }
-                        else regresos.Temporal = tempora2;
+                        else VALOR_ID.Temporal = tempora2;
 
-                        regresos.Codigo += "/*IDENTIFICADOR ENCONTRADO*/\n\n\n";
+                        VALOR_ID.Codigo += "/*IDENTIFICADOR ENCONTRADO*/\n\n\n";
+                        VALOR_ID.TipoResultado = item.Tipo;
 
-                        regresos.TipoResultado = item.Tipo;
-                        return regresos;
+                        return VALOR_ID;
                     }
                 }
 
+                // SI NO SE  ENCONTRADO LA VARIABLE, SOLO CUANDO LLEGAMOS AL ENTORNO GLOBAL (cuando este no tiene un entorno anterior)
+                // ES QUE IGUALAMOS A 0 LA VARIABLE QUE CONTIENE EL PUNTERO AL ENTORNO ACTUAL 
                 if (actual.entAnterior() != null)
                 {
-                    regresos.Codigo += $"{tempora1} = 0;             /*Retrocedemos al entorno global*/\n";
+                    VALOR_ID.Codigo += $"{tempora1} = 0;             /*Retrocedemos al entorno global*/\n";
                 }
             }
 
@@ -137,16 +145,18 @@ namespace CompiPascal.AST_.valoreImplicito
         private result3D buscando_Direccion(Entorno ent, string identificador)
         {
 
-            result3D regresos = new result3D();
+            result3D DIRECCION = new result3D();
 
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
-            regresos.Codigo += $"{tempora1} = SP;\n";
+            DIRECCION.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
+            DIRECCION.Codigo += $"{tempora1} = SP;\n";
 
-            /* RECORREMOS TODOS LOS ENTORNOS POR EL CASO DE QUE LA VARIABLE SEA EXTERNA
-             * ES POR ESO QUE SI EN EL ENTORNO ACTUAL NO ESTA LA VARIABLE, RESTAMOS EL TAMAÑO DEL ENTORNO ACTUAL 
-             * PARA OBTENER CORRECTAMENTE LOS VALORES*/
+            /* RECORREMOS TODOS LOS ENTORNOS POR EL CASO DE QUE LA VARIABLE SEA EXTERNA...........
+             * ES POR ESO QUE SI EN EL ENTORNO ACTUAL NO ESTA LA VARIABLE, SETEAMOS EN 0 EL TEMPORAL QUE CONTIENE LA REFERENCIA 
+             * DEL ENTORNO ACTUAL
+             *                     { temporal1} ver arriba;
+             */
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
             {
 
@@ -157,35 +167,39 @@ namespace CompiPascal.AST_.valoreImplicito
                     {
                         string tempora2 = Generador.pedirTemporal();
 
-                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
-                        regresos.Temporal = tempora1;
+                        // SE PUEDE VER QUE NO SE ACCEDE AL STACK SI NO SOLO A SU POSICIÓN QUE APUNTA A UNA POSICION EN EL STACK
+                        DIRECCION.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
+                        DIRECCION.Temporal = tempora1;
        
-                        regresos.Codigo += "/***********************IDENTIFICADOR ENCONTRADO*/\n\n\n";
+                        DIRECCION.Codigo += "/***********************IDENTIFICADOR ENCONTRADO*/\n\n\n";
 
-                        regresos.TipoResultado = item.Tipo;
-                        return regresos;
+                        DIRECCION.TipoResultado = item.Tipo;
+                        return DIRECCION;
                     }
                 }
 
+                // SI NO SE  ENCONTRADO LA VARIABLE, SOLO CUANDO LLEGAMOS AL ENTORNO GLOBAL (cuando este no tiene un entorno anterior)
+                // ES QUE IGUALAMOS A 0 LA VARIABLE QUE CONTIENE EL PUNTERO AL ENTORNO ACTUAL 
                 if (actual.entAnterior() != null)
                 {
-                    regresos.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
+                    DIRECCION.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
                 }
             }
 
             return new result3D();
         }
 
-        private result3D buscando_Direccion_Heap(Entorno ent, string identificador)
+        private result3D Buscando_Direccion_Heap(Entorno ent, string identificador)
         {
 
-            result3D regresos = new result3D();
+            result3D DIRECCION_EN_HEAP = new result3D();
 
-            if (etiquetaEntornoHeap == null) return regresos;
+            // DEVEMOS TENER UN APUNTADOR AL ENTORNO DE UN OBJETO 
+            if (etiquetaEntornoHeap == null) return DIRECCION_EN_HEAP;
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
-            regresos.Codigo += $"{tempora1} = {etiquetaEntornoHeap};\n";
+            DIRECCION_EN_HEAP.Codigo += $"/***********************BUSCANDO UN IDENTIFICADOR  >>>----- {identificador}----<<<*/\n";
+            DIRECCION_EN_HEAP.Codigo += $"{tempora1} = {etiquetaEntornoHeap};\n";
 
 
             foreach (Simbolo item in ent.TablaSimbolos())
@@ -193,14 +207,14 @@ namespace CompiPascal.AST_.valoreImplicito
                 //COMPARAMOS CADA VARIABLE PARA COMPROBAR SI ESTA EN EL ENTORNO ACTUAL
                 if (item.Identificador.Equals(identificador.ToLower()))
                 {
-                    string tempora2 = Generador.pedirTemporal();
-                    regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
-                    regresos.Temporal = tempora1;
 
-                    regresos.Codigo += "/***********************IDENTIFICADOR ENCONTRADO*/\n\n\n";
+                    DIRECCION_EN_HEAP.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*CAPTURAMOS LA DIRECCION RELATIVA DEL PARAMETRO*/\n";
+                    DIRECCION_EN_HEAP.Temporal = tempora1;
 
-                    regresos.TipoResultado = item.Tipo;
-                    return regresos;
+                    DIRECCION_EN_HEAP.Codigo += "/***********************IDENTIFICADOR ENCONTRADO*/\n\n\n";
+
+                    DIRECCION_EN_HEAP.TipoResultado = item.Tipo;
+                    return DIRECCION_EN_HEAP;
                 }
             }
             

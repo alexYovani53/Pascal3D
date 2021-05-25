@@ -11,15 +11,13 @@ namespace CompiPascal.AST_.control
     public class Case:Instruccion
     {
 
-
-        public int tamanoPadre { get; set; }
         public Expresion expresionCase { get; set; }
 
         LinkedList<Instruccion> instrucciones;
         public int linea { get; set; }
         public int columna { get; set; }
 
-        public Case(Expresion caso, LinkedList<Instruccion> instrucciones,int linea, int columa)
+        public Case(Expresion caso, LinkedList<Instruccion> instrucciones,int linea, int columna)
         {
             this.expresionCase = caso;
             this.instrucciones = instrucciones;
@@ -30,15 +28,12 @@ namespace CompiPascal.AST_.control
         public string getC3(Entorno ent, AST arbol)
         {
 
-
             string codigo = "";
 
             foreach (Instruccion item in instrucciones)
             {
                 codigo += item.getC3(ent,arbol);
             }
-
-
 
             return Generador.tabular(codigo);
         }

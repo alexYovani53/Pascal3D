@@ -94,6 +94,8 @@ namespace CompiPascal.AST_.definicion
 
         public string getC3(Entorno ent, AST arbol)
         {
+
+
             string codigo = "/*************************************** INICIO ASIGNACION *********/\n\n";
             result3D final = valor.obtener3D(ent);
             verificarTipo_Boolean(final);
@@ -107,15 +109,15 @@ namespace CompiPascal.AST_.definicion
 
                 if(objetoEncontrado != null)
                 {
-                    if (objetoEncontrado is Objeto)
+                    if (objetoEncontrado is Objeto objeto)
                     {
                         string temp1 = Generador.pedirTemporal();
                         string temp2 = Generador.pedirTemporal();
 
-                        codigo += $"{temp1} = SP + {((Objeto)objetoEncontrado).direccion}; /*Capturamos la direccion de la instancia de objeto*/  \n";
+                        codigo += $"{temp1} = SP + {objeto.direccion}; /* Capturamos la direccion de la instancia de objeto */\n";
                         codigo += $"{temp2} = Stack[(int){temp1}]; \n";
+                        codigo += cambiarValorRecursivo(objeto, propiedades, 0, final, temp2);
 
-                        codigo += cambiarValorRecursivo((Objeto)objetoEncontrado, propiedades, 0, final, temp2);
                     }
                     else 
                     {
@@ -154,7 +156,7 @@ namespace CompiPascal.AST_.definicion
 
 
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
-                if (!verificarTipos(simboloVar, final.TipoResultado)) return "";
+                if (!igualdadTipos(simboloVar, final.TipoResultado)) return "";
 
                 //   1. ASIGNACIÓN DEL TIPO IDE := IDE ; 
                 //   2. ASIGNACIÓN DEL TIPO IDE := accesoArreglo[x]..[x]   donde el arreglo "accesoArreglo" tiene un tipo de datos OBJETO, en este 
@@ -283,7 +285,7 @@ namespace CompiPascal.AST_.definicion
             if (indice == propiedad.Count - 1)
             {
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
-                if (!verificarTipos(encontrado, val.TipoResultado)) return "";
+                if (!igualdadTipos(encontrado, val.TipoResultado)) return "";
 
                 //YA QUE EL BUSCADO NO FUE AGREGADO, AHORA CREAMOS UN NUEVO SIMBOLO QUE SUSTITUIRA AL NO AGREGADO
                 if (tipoParametro == TipoDatos.Object || tipoParametro == TipoDatos.Array)
@@ -342,7 +344,7 @@ namespace CompiPascal.AST_.definicion
             }
         }
 
-        public bool verificarTipos(Simbolo parametro, TipoDatos TipoResultado)
+        public bool igualdadTipos(Simbolo parametro, TipoDatos TipoResultado)
         {
             // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
             // LOS TIMPOS INTEGER Y REAL SE PUEDEN CONVERTIR IMPLICITAMENTE (sin casteo) ENTONCES SE VALIDA ESO 

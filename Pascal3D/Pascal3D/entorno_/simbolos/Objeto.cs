@@ -19,20 +19,14 @@ namespace CompiPascal.entorno_.simbolos
          */
         public string nombreStructura { get; set; }
 
+
         public Objeto(string nombreObjeto,string nombreStructura, Entorno entornoPropio,int posicionRelativa,int linea, int columna):base(TipoDatos.Object,nombreObjeto,posicionRelativa,linea,columna)
         {
             this.nombreStructura = nombreStructura;
             this.entornoPropio = entornoPropio;
         }
 
-
-        /* funcion que retorna el nombre (propiedad no accesible desde fuera)
-         */
-        public string getNombreGenerador()
-        {
-            return nombreStructura;
-        }
-
+               
         public Entorno getPropiedades()
         {
             return entornoPropio;

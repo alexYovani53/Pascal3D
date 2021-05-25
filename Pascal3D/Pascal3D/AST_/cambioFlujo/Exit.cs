@@ -93,9 +93,21 @@ namespace CompiPascal.AST_.cambioFlujo
         /* MODIFICA EL RESULTADO CUANDO LA EXPRESIÓN A RETORNAR ES UNA OPERACIÓN QUE DEVUELVE UN IF (COMPARACIÓN --> TIPO BOOLEANO)  */
         public result3D validarRetorno(Entorno ent)
         {
+            if(valorSalida is Operacion && ((Operacion)valorSalida).buscarLLamada_En_Operacion())
+            {
+                ((Operacion)valorSalida).guardarTemporales = true;
+            }
             result3D resultExpresion = valorSalida.obtener3D(ent);
 
-            // COMPROBAMOS QUE LA OPERACIÓN HAYA GENERADO CODIGO DE UN IF Y "NO DEVUELVE NADA EN EL TEMPORAL"
+            /**
+             * Esta validación es cuando se retorna una operación booleana es decir
+             *         true & true = true
+             *         true & false = false
+             *         En este caso el resultado de la expresión es el codigo de un IF
+             *         por lo que hay que definir la parte verdadera y falsa del if, designando un valor 1 o 0 al temporal
+             *         de la expresión resultante. 
+             */
+
             if(valorSalida is Operacion && resultExpresion.TipoResultado == TipoDatos.Boolean && resultExpresion.Temporal.Equals(""))
             {
                 string temporal = Generador.pedirTemporal();

@@ -54,6 +54,10 @@ namespace CompiPascal.AST_.valoreImplicito
         public int linea { get; set; }
         public int columna { get; set; }
 
+
+        public bool guardarTemporales { get; set; }
+
+
         /*
          * @param   string      etiquetaFalsa              Guarda la siguiente etiqueta para una instrucción donde se 
          *                                                  evalua una expresión condicional
@@ -74,6 +78,7 @@ namespace CompiPascal.AST_.valoreImplicito
          * @param   operando2   Expresion derecha de la operacion.
          * @param   operador    Tipo de operación que se esta realizando.
          */
+
 
 
         public Operacion(Expresion op1, Expresion op2, Operador operador_ , int linea, int columna)
@@ -218,6 +223,9 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
+
+            expreIzq.Codigo += GUARDAR_TEMPORALES(true,false, expreIzq,ent);
+            expreDer.Codigo += GUARDAR_TEMPORALES(false,true, expreIzq,ent);
 
             result3D resultado = new result3D(); 
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede sumar con " + expreDer.TipoResultado;
@@ -497,6 +505,10 @@ namespace CompiPascal.AST_.valoreImplicito
 
             result3D expreIzq = opIzq.obtener3D(ent);
             result3D expreDer = opDer.obtener3D(ent);
+
+
+            expreIzq.Codigo += GUARDAR_TEMPORALES(true, false, expreIzq, ent);
+            expreDer.Codigo += GUARDAR_TEMPORALES(false, true, expreIzq, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede MULTIPLICAR con " + expreDer.TipoResultado;
@@ -1221,5 +1233,105 @@ namespace CompiPascal.AST_.valoreImplicito
                 operando2.obtenerListasAnidadas(variablesUsadas);
             }
         }
+
+
+        private string GUARDAR_TEMPORALES(bool GUARDAR,bool DEVOLVER,result3D izquierda,Entorno ent)
+        {
+
+            string codigo = "";
+            return "";
+
+            if ( !LLamadaDerecha() ) return codigo;
+
+            if (GUARDAR)
+            {
+                string temp1 = Generador.pedirTemporal();
+                string temp2 = Generador.pedirTemporal();
+
+                codigo += $"/* INICIO GUARDANDO TEMPORALES*/\n";
+                codigo += $"{temp1} = SP; \n";
+                codigo += $"{temp2} = {temp1} +  {ent.tamano}; \n";
+                codigo += $"Stack[(int){temp2}] = {izquierda.Temporal};\n";
+                codigo += $"/* FIN GUARDANDO TEMPORALES*/\n";
+
+                ent.tamano++;
+            }
+            else if(DEVOLVER)
+            {
+                ent.tamano--;
+                string temp1 = Generador.pedirTemporal();
+                string temp2 = Generador.pedirTemporal();
+                string temp3 = Generador.pedirTemporal();
+
+
+                codigo += $"/* INICIO RECUPERANDO TEMPORALES*/\n";
+                codigo += $"{temp1} = SP; \n";
+                codigo += $"{temp2} = {temp1} + {ent.tamano};\n";
+                codigo += $"{izquierda.Temporal} =  Stack[(int){temp3}] ;\n";
+                codigo += $"/* FIN RECUPERANDO TEMPORALES*/\n";
+
+                ent.tamano++;
+            }
+
+            return codigo;
+
+        }
+
+
+        private string GUARDAR_TEMPORALES_VOLVER_TAMANO(result3D izquierda,Entorno ent)
+        {
+
+            if (!LLamadaDerecha()) return "";
+
+            string codigo = "";
+
+            return codigo = $"{codigo}";
+
+        }
+
+
+
+        /*
+         * Este metodo busca una llamada en una expresión cualesquiera
+         * con la condición que la llamada tenga algo del lado izquierdo 
+         * de lo contrario no se acepta. 
+         *      Ej:
+         *          x = 5 + 8 + n * factorial(n);     Valido 
+         *          x = factorial(n) * 5 + 8 + n;     No Valido 
+         *          x = 5 + factorial(n) + n * 8;     Valido 
+         * 
+         */
+        public bool buscarLLamada_En_Operacion()
+        {
+
+            if (operandoU != null) return false;
+
+            if (operando1 != null && operando2 != null && this.operando2 is Llamada) return true;
+
+            else if (operando1 is Operacion && ((Operacion)operando1).buscarLLamada_En_Operacion()) return true;
+            else if(operando2 is Operacion && ((Operacion)operando2).buscarLLamada_En_Operacion()) return true;
+
+            return false;
+        }
+
+        /*
+         * Este metodo busca una llamada en una expresión cualesquiera
+         * con la condición que la llamada tenga algo del lado izquierdo 
+         * de lo contrario no se acepta. 
+         *      Ej:
+         *          x = 5 + factorial(n);     Valido 
+         *          x = factorial(n) + n;     No Valido 
+         * 
+         */
+        public bool LLamadaDerecha()
+        {
+
+            if (operandoU != null) return false;
+
+            if (operando1 != null && operando2 != null && this.operando2 is Llamada) return true;
+
+            return false;
+        }
+
     }
 }

@@ -220,10 +220,6 @@ namespace Pascal3D
             AreaTexto.SetSelectionBackColor(true, IntToColor(0x114D9C));
         }
 
-        private void process1_Exited(object sender, EventArgs e)
-        {
-
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -395,6 +391,16 @@ namespace Pascal3D
                 modeloVars.Rows.Add(item.nombre, item.Tipo, item.Ambito, item.Fila, item.Columna, item.Nivel);
             }
 
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+
+            Optimizar op = new Optimizar(SalidaTexto.Text);
+            op.Show();
+            
 
         }
     }

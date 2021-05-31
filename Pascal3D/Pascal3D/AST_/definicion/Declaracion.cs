@@ -311,7 +311,7 @@ namespace CompiPascal.AST_.definicion
                 { 
                     if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
                     {
-                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        Program.getIntefaz().agregarError($"Error de tipos {tipo_variables} --> {valAsignacion.TipoResultado}, declaracion", linea, columna);
                         return "";
                     }
                 }
@@ -319,7 +319,16 @@ namespace CompiPascal.AST_.definicion
                 {
                     if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
                     {
-                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        Program.getIntefaz().agregarError($"Error de tipos {tipo_variables} --> {valAsignacion.TipoResultado}, declaracion ", linea, columna);
+                        return "";
+                    }
+                }
+                else if(tipo_variables == TipoDatos.String)
+                {
+                    if (valAsignacion.TipoResultado == TipoDatos.Char) convertirChar_String(valAsignacion);
+                    else if(valAsignacion.TipoResultado != TipoDatos.String)
+                    {
+                        Program.getIntefaz().agregarError($"Error de tipos {tipo_variables} --> {valAsignacion.TipoResultado}, declaracion ", linea, columna);
                         return "";
                     }
                 }
@@ -327,7 +336,7 @@ namespace CompiPascal.AST_.definicion
                 {
                     if(tipo_variables != valAsignacion.TipoResultado)
                     {
-                        Program.getIntefaz().agregarError("Error de tipos, declaracion", linea, columna);
+                        Program.getIntefaz().agregarError($"Error de tipos {tipo_variables} --> {valAsignacion.TipoResultado}, declaracion", linea, columna);
                         return "";
                     }
 
@@ -425,6 +434,21 @@ namespace CompiPascal.AST_.definicion
             }
 
             return TipoDatos.NULL;
+        }
+
+        private void convertirChar_String(result3D expr)
+        {
+            string codigo = "";
+            string temp1 = Generador.pedirTemporal();
+
+            codigo += $"{temp1} = HP;\n";
+            codigo += $"Heap[HP] = {expr.Temporal};\n";
+            codigo += $"HP = HP + 1;\n";
+            codigo += $"Heap[HP] = 0;\n";
+            codigo += $"HP = HP + 1;\n";
+
+            expr.Temporal = temp1;
+            expr.Codigo += codigo;
         }
         
     }

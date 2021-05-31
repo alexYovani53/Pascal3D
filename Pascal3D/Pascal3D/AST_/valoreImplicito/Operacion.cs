@@ -222,10 +222,10 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D expreIzq = opIzq.obtener3D(ent);
+            expreIzq.Codigo += GUARDAR_TEMPORALES(true, false, expreIzq, ent);
             result3D expreDer = opDer.obtener3D(ent);
-
-            expreIzq.Codigo += GUARDAR_TEMPORALES(true,false, expreIzq,ent);
             expreDer.Codigo += GUARDAR_TEMPORALES(false,true, expreIzq,ent);
+
 
             result3D resultado = new result3D(); 
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede sumar con " + expreDer.TipoResultado;
@@ -396,7 +396,9 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D expreIzq = opIzq.obtener3D(ent);
+            expreIzq.Codigo += GUARDAR_TEMPORALES(true, false, expreIzq, ent);
             result3D expreDer = opDer.obtener3D(ent);
+            expreDer.Codigo += GUARDAR_TEMPORALES(false, true, expreIzq, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede RESTAR con " + expreDer.TipoResultado;
@@ -504,11 +506,11 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D expreIzq = opIzq.obtener3D(ent);
-            result3D expreDer = opDer.obtener3D(ent);
-
-
             expreIzq.Codigo += GUARDAR_TEMPORALES(true, false, expreIzq, ent);
+            result3D expreDer = opDer.obtener3D(ent);
             expreDer.Codigo += GUARDAR_TEMPORALES(false, true, expreIzq, ent);
+
+
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede MULTIPLICAR con " + expreDer.TipoResultado;
@@ -616,7 +618,9 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D expreIzq = opIzq.obtener3D(ent);
+            expreIzq.Codigo += GUARDAR_TEMPORALES(true, false, expreIzq, ent);
             result3D expreDer = opDer.obtener3D(ent);
+            expreDer.Codigo += GUARDAR_TEMPORALES(false, true, expreIzq, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede RESTAR con " + expreDer.TipoResultado;
@@ -730,7 +734,9 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             result3D expreIzq = opIzq.obtener3D(ent);
+            expreIzq.Codigo += GUARDAR_TEMPORALES(true, false, expreIzq, ent);
             result3D expreDer = opDer.obtener3D(ent);
+            expreDer.Codigo += GUARDAR_TEMPORALES(false, true, expreIzq, ent);
 
             result3D resultado = new result3D();
             string er = "El tipo " + expreIzq.TipoResultado + " no se puede MODULAR con " + expreDer.TipoResultado;
@@ -864,7 +870,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
 
                 resultado.Codigo =  resultadoIz.Codigo + resultadoDe.Codigo +"\n";
-                resultado.Codigo += "if (" + resultadoIz.Temporal + relacion + resultadoDe.Temporal + ") goto "+ etiquetaV + "; \n";
+                resultado.Codigo += "if (" + resultadoIz.Temporal +" "+ relacion + " " +  resultadoDe.Temporal + ") goto "+ etiquetaV + "; \n";
                 resultado.Codigo += Generador.tabularLinea("goto " + etiquetaF + ";\n",2);
 
                 resultado.EtiquetaV = etiquetaV;
@@ -901,6 +907,7 @@ namespace CompiPascal.AST_.valoreImplicito
 
             return resultado;
         }
+
         public result3D LOGIC_AND(Expresion opIzq, Expresion opDer, Entorno ent)
         {
             /*
@@ -1239,9 +1246,26 @@ namespace CompiPascal.AST_.valoreImplicito
         {
 
             string codigo = "";
-            return "";
 
-            if ( !LLamadaDerecha() ) return codigo;
+            /*   En PASCAL el returno tiene 2 sintaxis.
+             *      1) utilizando exit
+             *      2) utilizando la variable con el nombre de la funcion
+             *         
+             *      En lenguajes como java, el return solo tiene una forma de ejecutarse y 
+             *      solo cuando se hace un return con una llada en un operando derecho de una operación, 
+             *      es que se necesita guardar los temporales para no perder los valores en funciones recursivas
+             *      
+             *   if (!guardarTemporales || !LLamadaDerecha()) return codigo;
+             *   
+             *     si se usa otro lenguaje similar a java, descomentar esta linea y comentar la 1261;
+             */
+
+
+            /*
+             * En pascal se valida en cualquier operación que cumpla con lo necesario para guardar temporales
+             * ya que no se sabe si se esta retornando de la forma 1) o 2) 
+             */
+            if (!LLamadaDerecha()) return codigo;
 
             if (GUARDAR)
             {
@@ -1261,13 +1285,12 @@ namespace CompiPascal.AST_.valoreImplicito
                 ent.tamano--;
                 string temp1 = Generador.pedirTemporal();
                 string temp2 = Generador.pedirTemporal();
-                string temp3 = Generador.pedirTemporal();
 
 
                 codigo += $"/* INICIO RECUPERANDO TEMPORALES*/\n";
                 codigo += $"{temp1} = SP; \n";
                 codigo += $"{temp2} = {temp1} + {ent.tamano};\n";
-                codigo += $"{izquierda.Temporal} =  Stack[(int){temp3}] ;\n";
+                codigo += $"{izquierda.Temporal} =  Stack[(int){temp2}] ;\n";
                 codigo += $"/* FIN RECUPERANDO TEMPORALES*/\n";
 
                 ent.tamano++;

@@ -93,10 +93,24 @@ namespace CompiPascal.AST_.cambioFlujo
         /* MODIFICA EL RESULTADO CUANDO LA EXPRESIÓN A RETORNAR ES UNA OPERACIÓN QUE DEVUELVE UN IF (COMPARACIÓN --> TIPO BOOLEANO)  */
         public result3D validarRetorno(Entorno ent)
         {
-            if(valorSalida is Operacion && ((Operacion)valorSalida).buscarLLamada_En_Operacion())
-            {
-                ((Operacion)valorSalida).guardarTemporales = true;
-            }
+
+            /*  
+             *      Descomentar si se usa lenguajes como Java. 
+             *      
+             *      Pascal puede retornar de dos forma por lo que solo cuando se usara Exit, en una funcion, entraria
+             *      en esta validación. 
+             *      
+             *      Si se usa el retorno con nombre de la función (PASCAL) no se entraria acá. 
+             *      
+             *      if(valorSalida is Operacion && ((Operacion)valorSalida).buscarLLamada_En_Operacion())
+             *      {
+             *          ((Operacion)valorSalida).guardarTemporales = true;
+             *      }
+             * 
+             */
+
+
+
             result3D resultExpresion = valorSalida.obtener3D(ent);
 
             /**

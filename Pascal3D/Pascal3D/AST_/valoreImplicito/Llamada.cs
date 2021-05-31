@@ -45,6 +45,7 @@ namespace CompiPascal.AST_.valoreImplicito
          */
         public LinkedList<Expresion> expresionesValor { get; set; }
 
+        public AST arbolAST { get; set; }
 
         public Llamada(string nombreLlamada, LinkedList<Expresion> expresiones,int linea, int columna)
         {
@@ -53,6 +54,7 @@ namespace CompiPascal.AST_.valoreImplicito
             this.linea = linea;
             this.columna = columna;
         }
+
 
 
         public result3D obtener3D(Entorno ent)
@@ -67,7 +69,7 @@ namespace CompiPascal.AST_.valoreImplicito
             }
 
             result3D retorno = new result3D();
-            retorno.Codigo = getC3(ent,null);
+            retorno.Codigo = getC3(ent, arbolAST);
 
 
             if (funcionLlamada.Tipo == TipoDatos.Void)
@@ -197,7 +199,12 @@ namespace CompiPascal.AST_.valoreImplicito
                     tipoParametro = aux1 != null ? TipoDatos.Object : TipoDatos.Array;
                 }
 
-                if(tipoParametro != tipoExpresion ) {
+                if (tipoParametro == TipoDatos.String && tipoExpresion == TipoDatos.Char) tipoExpresion = TipoDatos.String;
+                if (tipoParametro == TipoDatos.Integer && tipoExpresion == TipoDatos.Real) tipoExpresion = TipoDatos.Integer;
+                if (tipoParametro == TipoDatos.Real && tipoExpresion == TipoDatos.Integer) tipoExpresion = TipoDatos.Real;
+
+
+                if (tipoParametro != tipoExpresion ) {
                     Program.getIntefaz().agregarError($"Error de tipos {tipoParametro} -> {tipoExpresion} " + numeroRecibe, linea, columna);
                     return "";
                 }
@@ -411,6 +418,39 @@ namespace CompiPascal.AST_.valoreImplicito
             }
         }
 
+
+        //public LinkedList<result3D> ejecutarLlamadas(Entorno ent)
+        //{
+        //    LinkedList<result3D> parametros = new LinkedList<result3D>();
+
+        //    IList<Expresion> expresiones = new List<Expresion>(expresionesValor);
+        //    IList<result3D> resultados = new List<result3D>(expresiones.Count);
+
+        //    for (int x = 0; x < expresiones.Count; x++)
+        //    {
+        //        if(expresiones[x] is Llamada)
+        //        {
+        //            resultados[x] = expresiones[x].obtener3D(ent);
+        //        }
+        //    }
+
+
+        //    int i = 0;
+        //    foreach (Expresion item in expresionesValor)
+        //    {
+        //        result3D valorExpr = item.obtener3D(ent);
+
+
+        //        if ((item is Operacion || item is Primitivo) && funcionLLamada.ListaParametros.ElementAt(i).porReferencia)
+        //        {
+        //            Program.getIntefaz().agregarError("La expresión por referencia debe ser un identificador", linea, columna); return "";
+        //        }
+
+        //        parametros.AddLast(valorExpr);
+        //        i++;
+        //    }
+
+        //}
 
         public void obtenerListasAnidadas(LinkedList<string> variablesUsadas)
         {

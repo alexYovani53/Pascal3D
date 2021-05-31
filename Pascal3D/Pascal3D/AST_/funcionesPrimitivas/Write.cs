@@ -64,6 +64,7 @@ namespace CompiPascal.AST_.funcionesPrimitivas
             {
                 foreach (Expresion item in expr_imprimir)
                 {
+                    if (item is Llamada) ((Llamada)item).arbolAST = arbol;
                     result3D resultExpr = item.obtener3D(ent);
 
                     codigoWrite += resultExpr.Codigo;

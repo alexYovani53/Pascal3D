@@ -123,7 +123,7 @@ namespace CompiPascal.entorno_
          * @param       identificador   Identificador del Simbolo.
          */
 
-
+        public string Temp_auxiliar_referencias { get; set; }
 
         public Simbolo(string Identificador,int linea, int columna)
         {

@@ -35,7 +35,7 @@ namespace CompiPascal.entorno_.simbolos
         }
 
 
-        public result3D valor3D(List<string> accesos, Entorno entorno ,  int indiceNivel, string inicioArreglo)
+        public result3D valor3D(List<string> accesos, Entorno entorno ,  int indiceNivel, string inicioArreglo,bool soloDireccion)
         {
             result3D final = new result3D(); 
             string codigo = "";
@@ -60,7 +60,7 @@ namespace CompiPascal.entorno_.simbolos
                 codigo += $"{posicion} = {posicion} + 1; /*Sumamos 1 porque el la posicion 0 esta el tamaño del arreglo*/\n";
                 codigo += $"{valor} = Heap[(int){posicion}];\n";
 
-                result3D subnivel = valor3D(clonado, entorno, indiceNivel + 1, valor);
+                result3D subnivel = valor3D(clonado, entorno, indiceNivel + 1, valor,soloDireccion);
                 codigo += Generador.tabular(subnivel.Codigo);
 
                 final.Codigo = codigo;
@@ -79,10 +79,20 @@ namespace CompiPascal.entorno_.simbolos
                 codigo += $"{posicion} = {posicion} + {index}; /* Capturamos el indice*/ \n";
                 codigo += $"{posicion} = {posicion} - {iniNivel}; /*Restamos el inicio del nivel, ya que pascal permite no Iniciar en 0*/\n";
                 codigo += $"{posicion} = {posicion} + 1; /*Sumamos 1 porque el la posicion 0 esta el tamaño del arreglo*/\n";
-                codigo += $"{valor} = Heap[(int){posicion}];\n";
+
+
+                if (!soloDireccion)
+                {
+                    codigo += $"{valor} = Heap[(int){posicion}];\n";
+                    final.Temporal = valor;
+                }
+                else
+                {
+                    codigo += "";
+                    final.Temporal = posicion;
+                }
 
                 final.Codigo = codigo;
-                final.Temporal = valor;
                 final.TipoResultado = tipoValores;
 
             }

@@ -161,6 +161,7 @@ namespace CompiPascal.AST_.definicion
                 codigoDef.Temporal = temp1;
                 codigoDef.TipoResultado = TipoDatos.String;
                 return codigoDef;
+
             }
             else if (tipo == TipoDatos.Char)
             {
@@ -210,6 +211,13 @@ namespace CompiPascal.AST_.definicion
                  *      HEAP y solo hace falta usarla. 
                  */
                 puntero_Ambito = TemporalCambioEntorno;
+
+                // ES DECIR. 
+                /*          
+                 *          ENTORNO ACTUAL   -> STACK[ 0 , 10]      ESTAMOS ACÁ, Y QUEREMOS PASARA A
+                 *          ENTORNO FUNCION  -> STACK[ 11,...]      ESTE PUNTO.        Generamos un temporal que guarde el valor 11
+                 *                                                 
+                 */
             }
             if (declara_EN_Objeto)
             {
@@ -225,8 +233,8 @@ namespace CompiPascal.AST_.definicion
             }
 
 
+            #region declaracion de constantes
             //DECLARACION DE CONSTANTES
-
             if (ideUnico != null)
             {
 
@@ -260,10 +268,9 @@ namespace CompiPascal.AST_.definicion
 
                 return declaracionConstante;
             }
-            
+            #endregion
 
-
-            if(esInicializado() && variables.Count > 1)
+            if (esInicializado() && variables.Count > 1)
             {
                 Program.getIntefaz().agregarError("Pascal solo permite la declaracion inicializada de una variable a la vez", linea, columna);
                 return "";
@@ -272,6 +279,7 @@ namespace CompiPascal.AST_.definicion
             string codigoSalida = "";
             if (!esInicializado())
             {
+                // EN ESTA CLASE SOLO SE DECLARAN TIPOS PRIMITIVOS. 
                 result3D def = valorDefecto(tipo_variables);
 
                 int posicionRelativa = ent.tamano;
@@ -307,7 +315,7 @@ namespace CompiPascal.AST_.definicion
                 else valAsignacion = valor;
 
                 /* ESTAS VALIDACIONES SON PARA VER QUE LOS TIPOS COICIDAN, SON LAS POSIBILIDADES QUE PASCAL PERMITE */
-                if (tipo_variables == TipoDatos.Integer)
+                if (tipo_variables == TipoDatos.Integer)  // ASIGNAR UN REAL A UN INTEGER
                 { 
                     if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
                     {
@@ -315,7 +323,7 @@ namespace CompiPascal.AST_.definicion
                         return "";
                     }
                 }
-                else if (tipo_variables == TipoDatos.Real)
+                else if (tipo_variables == TipoDatos.Real)  // ASIGNAR UN INT A UN REAL
                 {
                     if (valAsignacion.TipoResultado != TipoDatos.Integer && valAsignacion.TipoResultado != TipoDatos.Real)
                     {
@@ -323,7 +331,7 @@ namespace CompiPascal.AST_.definicion
                         return "";
                     }
                 }
-                else if(tipo_variables == TipoDatos.String)
+                else if(tipo_variables == TipoDatos.String) // ASIGNAR UN CHAR A UN STRING
                 {
                     if (valAsignacion.TipoResultado == TipoDatos.Char) convertirChar_String(valAsignacion);
                     else if(valAsignacion.TipoResultado != TipoDatos.String)

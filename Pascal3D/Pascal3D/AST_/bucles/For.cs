@@ -131,7 +131,11 @@ namespace CompiPascal.AST_.bucles
             if (aumentar) aumentoDecremento = Operacion.Operador.MAS;
             else aumentoDecremento = Operacion.Operador.MENOS;
 
-            Expresion aumentando = new Operacion(new Identificador(nombreContador, valfinal.linea, valfinal.columna), new Primitivo(1, valfinal.linea, valfinal.columna), aumentoDecremento, linea, columna);
+            Expresion aumentando = new Operacion(
+                new Identificador(nombreContador, valfinal.linea, valfinal.columna), 
+                new Primitivo(1, valfinal.linea, valfinal.columna), aumentoDecremento, linea, columna);
+
+            // EJECUTAMOS LA INSTRUCCION DE AUMENTO
             Asignacion asignacion = new Asignacion(new Simbolo(nombreContador, linea, columna), aumentando, false, linea, columna);
             codigoFor += asignacion.getC3(ent,arbol);
 

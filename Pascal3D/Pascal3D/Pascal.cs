@@ -378,7 +378,7 @@ namespace Pascal3D
             foreach (Error item in Errores)
             {
                 modeloErrores.Rows.Add(item.TipoE, item.descripcion, item.fila, item.Columna);
-            }
+            } 
         }
         public void agregarLocales(LinkedList<reporteVar> modelo)
         {

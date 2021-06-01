@@ -56,7 +56,7 @@ namespace CompiPascal.AST_.control
 
             foreach (Case item in casos)
             {
-
+                // HAREMOS UNA CONDICION PARA COMPARAR SI LA EXPRESION A VALIDAR ES IGUAL A LA DEL CASE ACTUAL
                 Operacion condicion = new Operacion(exprValidar,item.expresionCase,Operacion.Operador.IGUAL,item.linea,item.columna);
 
                 codigo += $"{etiqueta1}: \n";

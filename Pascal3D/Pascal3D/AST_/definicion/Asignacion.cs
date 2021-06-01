@@ -54,6 +54,8 @@ namespace CompiPascal.AST_.definicion
         private Expresion valor { get; set; }
 
 
+        private string enHeap { get; set; }
+
         /*
          *  Asignación a variables de cualquier tipo pero que no cuente con acceso 
          *  es decir    variable.param1.param2...   esto va en el otro constructor
@@ -104,7 +106,7 @@ namespace CompiPascal.AST_.definicion
             //      Se comprueba que haya una secuencia de accesos delante de la asignación
             if (estaEnObjeto)
             {
-
+                // BUSCAMOS EL OBJETO en el entorno. 
                 Simbolo objetoEncontrado = ent.obtenerSimbolo(idObjeto);
 
                 if(objetoEncontrado != null)
@@ -117,7 +119,8 @@ namespace CompiPascal.AST_.definicion
                         codigo += $"{temp1} = SP + {objeto.direccion}; /* Capturamos la direccion de la instancia de objeto */\n";
                         codigo += $"{temp2} = Stack[(int){temp1}]; \n";
                         codigo += cambiarValorRecursivo(objeto, propiedades, 0, final, temp2);
-
+                        //
+                        // EJ:  casa.tamano = 10;
                     }
                     else 
                     {
@@ -164,34 +167,90 @@ namespace CompiPascal.AST_.definicion
 
 
                 codigo += final.Codigo;
+
+                //PARA ASIGNAR UNA VARIABLE DEBEMOS OBTENER LA POSICION EN EL STACK DE ESTE
                 result3D varAsignar = obtenerPosicionVar(ent, simboloVar.Identificador);
                 codigo += varAsignar.Codigo;
 
+                // COMPROBAMOS DE QUE TIPO ES LA VARIBALE QUE ASIGNAREMOS
                 if (simboloVar.Tipo == TipoDatos.Object)
                 {
-
+                    // SI ENTRO ACÁ, LA VARIABLE ES UN STRUCT Y DEBE SER ASIGNADO POR UN VALOR STRUCT
                     if(valor is AccesoArreglo)
                     {
+                        // UN ACCESO A UN ARREGLO PUEDE RETORNAR UN STRUCT SI EL TIPO ES UN STRUCT
                         string tipo1 = ((Objeto)simboloVar).nombreStructura.ToLower();
                         string tipo2 = ((Objeto)final.Referencia).nombreStructura.ToLower();
+                        // ACÁ VALIDAMOS QUE EL TIPO DEL OBJETO QUE RETORNA EL ARREGLO SEA IGUAL AL DE LA VARIABLE
+                        // 
+                        //      casa =  arreglo[x][x];
+                        //      (struct) = (struct) 
 
                         if (tipo1.Equals(tipo2))
                         {
-                            codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                            if(enHeap == null)  codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                            else
+                            {
+                                string etiq1 = Generador.pedirEtiqueta();
+                                string etiq2 = Generador.pedirEtiqueta();
+                                codigo += $"if( {enHeap} == 1) goto {etiq1};\n";
+                                codigo += $"    Stack[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                                codigo += $"    goto {etiq2};\n";
+                                codigo += $"{etiq1}:\n";
+                                codigo += $"    Heap[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                                codigo += $"{etiq2}:\n";
+                            }
                         }
                     }
                     else if(valor is Identificador)
                     {
-                        codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                        if (enHeap == null) codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                        else
+                        {
+                            string etiq1 = Generador.pedirEtiqueta();
+                            string etiq2 = Generador.pedirEtiqueta();
+                            codigo += $"if( {enHeap} == 1) goto {etiq1};\n";
+                            codigo += $"    Stack[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                            codigo += $"    goto {etiq2};\n";
+                            codigo += $"{etiq1}:\n";
+                            codigo += $"    Heap[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                            codigo += $"{etiq2}:\n";
+                        }
 
+                    }
+                    else if(valor is Acceso)
+                    {
+                        // casa =  condominio.casa;
+                        if (enHeap == null) codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                        else
+                        {
+                            string etiq1 = Generador.pedirEtiqueta();
+                            string etiq2 = Generador.pedirEtiqueta();
+                            codigo += $"if( {enHeap} == 1) goto {etiq1};\n";
+                            codigo += $"    Stack[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                            codigo += $"    goto {etiq2};\n";
+                            codigo += $"{etiq1}:\n";
+                            codigo += $"    Heap[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                            codigo += $"{etiq2}:\n";
+                        }
                     }
 
                 }
                 else //ASIGNACIÓN DEL TIPO IDE:= PRIMITIVO
                 {
 
-
-                    codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                    if (enHeap == null) codigo += $"Stack[(int){varAsignar.Temporal}] = {final.Temporal}; \n";
+                    else
+                    {
+                        string etiq1 = Generador.pedirEtiqueta();
+                        string etiq2 = Generador.pedirEtiqueta();
+                        codigo += $"if( {enHeap} == 1) goto {etiq1};\n";
+                        codigo += $"    Stack[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                        codigo += $"    goto {etiq2};\n";
+                        codigo += $"{etiq1}:\n";
+                        codigo += $"    Heap[(int){varAsignar.Temporal}] = {final.Temporal};\n";
+                        codigo += $"{etiq2}:\n";
+                    }
                 }
 
             }
@@ -204,11 +263,11 @@ namespace CompiPascal.AST_.definicion
         public result3D obtenerPosicionVar(Entorno ent,string identificador)
         {
 
-            result3D regresos = new result3D();
+            result3D codigo = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR   >>>>------ {identificador} <<<<----*/\n";
-            regresos.Codigo += $"{tempora1} = SP; \n";
+            codigo.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR   >>>>------ {identificador} <<<<----*/\n";
+            codigo.Codigo += $"{tempora1} = SP; \n";
 
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
             {
@@ -218,7 +277,7 @@ namespace CompiPascal.AST_.definicion
                     if (item.Identificador.Equals(identificador))
                     {
                                             
-                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n" ;
+                        codigo.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n" ;
 
                         /* CUANDO LA ASIGNACIÓN ES A UNA VARIABLE POR REFERENCIA EN UNA FUNCION, LA VARIABLE GUARDA LA REFERENCIA
                          * HACIA EL STACK 
@@ -227,31 +286,41 @@ namespace CompiPascal.AST_.definicion
                         if (item.porReferencia)
                         {
                             string temporal2 = Generador.pedirTemporal();
-                            regresos.Codigo += $"{temporal2} = Stack[(int) {tempora1}];             /* Variable por referencia, puntero*/ \n";
-                            regresos.Temporal = temporal2;
+                            codigo.Codigo += $"{temporal2} = Stack[(int) {tempora1}];             /* Variable por referencia, puntero*/ \n";
+                            codigo.Temporal = temporal2;
+
+                            // CUANDO UNA VARIABLE ES POR REFERENCIA, EL SIMBOLO CONTIENE UN TEMPORAL QUE IDENTIFICA SI LA VARIABLE ESTA EN 
+                            // EL HEAP temp = 1 o Stack  temp=0;
+                            // ESTA ETIQUETA SE GENERA AL GENERAR EL CODIGO DE LOS PARAMETROS DE UNA FUNCION
+                            this.enHeap = item.Temp_auxiliar_referencias;
                         }
-                        else regresos.Temporal = tempora1;
+                        else codigo.Temporal = tempora1;
 
 
-                        regresos.Codigo += $"/*BUSCANDO DIRECCION DE UN IDENTIFICADOR -> ENCONTRADO*/\n\n";
+                        codigo.Codigo += $"/*BUSCANDO DIRECCION DE UN IDENTIFICADOR -> ENCONTRADO*/\n\n";
 
 
-                        regresos.TipoResultado = item.Tipo;
-                        return regresos;
+                        codigo.TipoResultado = item.Tipo;
+                        return codigo;
                     }
                 }
 
                 if (actual.entAnterior() != null)
                 {
-                    regresos.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
+                    codigo.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
                 }
             }
 
-            return regresos;
+            return codigo;
         }
 
         public void verificarTipo_Boolean(result3D reBooleano)
         {
+
+            // SE VALIDA UNA CONDICION DE LA FORMA
+            //  
+            //      var = true and false;   -> lo cual genera una condicion if y no retorna un termporal
+            //      por lo tanto generamos el codigo para obtener el valor true(1) o false(0)
 
             if (reBooleano.Temporal.Equals("") && reBooleano.TipoResultado == TipoDatos.Boolean)
             {
@@ -265,29 +334,32 @@ namespace CompiPascal.AST_.definicion
 
         }
 
+
+
         string cambiarValorRecursivo(Objeto instancia, LinkedList<string> propiedad, int indice, result3D val,string etiquetaDireccion)
         {
             string codigo = "";
 
             string propiedadBuscada = propiedad.ElementAt(indice);          //nombre de la propiedad buscada en este nivel
-            Entorno entornoNoModificado = instancia.getPropiedades();
-            bool existeParametro = entornoNoModificado.existeEnEntornoActual(propiedadBuscada);
+            Entorno ENTORNO_OBJETO = instancia.getPropiedades();
+            bool existeParametro = ENTORNO_OBJETO.existeEnEntornoActual(propiedadBuscada);
 
             if (!existeParametro) return "";                                                      //SI EN ALGUN NIVEL NO SE ENCUENTRA EL PARAMETRO SE RETORNA NULL
 
             //TIPO DE DATOS DEL PARAMETRO BUSCADO
-            TipoDatos tipoParametro = entornoNoModificado.obtenerSimbolo(propiedadBuscada).Tipo;    
+            TipoDatos tipoParametro = ENTORNO_OBJETO.obtenerSimbolo(propiedadBuscada).Tipo;    
        
             //CAPTURAMOS EL SIMBOLO QUE BUSCAMOS
-            Simbolo encontrado = entornoNoModificado.obtenerSimbolo(propiedadBuscada);
+            Simbolo encontrado = ENTORNO_OBJETO.obtenerSimbolo(propiedadBuscada);
             codigo += $"{etiquetaDireccion} = {etiquetaDireccion} + {encontrado.direccion}; \n";
 
+            // ESTA VALIDACION SE HACE PARA VALIDAR QUE LLEGAMOS AL ULTIMO ACCESO QUE QUEREMOS EJ:   casa.habitacion.escritorio
             if (indice == propiedad.Count - 1)
             {
                 // VERIFICAMOS LOS TIPOS DE LA VARIABLE A ASIGNAR Y SU VALOR
                 if (!igualdadTipos(encontrado, val.TipoResultado)) return "";
 
-                //YA QUE EL BUSCADO NO FUE AGREGADO, AHORA CREAMOS UN NUEVO SIMBOLO QUE SUSTITUIRA AL NO AGREGADO
+                // OPERACIONES DEPENDIENDO DEL TIPO DE LA VARIABLE
                 if (tipoParametro == TipoDatos.Object || tipoParametro == TipoDatos.Array)
                 {
 
@@ -315,6 +387,8 @@ namespace CompiPascal.AST_.definicion
             }
             else
             {
+                // MIENTRAS NO ESTEMOS EN EL FINAL, GENERAMOS CODIGO RECURSIVAMENTE SI Y SOLO SI
+                // ESTAMOS EN UN OBJETO
                 if (tipoParametro != TipoDatos.Object)
                 {
 

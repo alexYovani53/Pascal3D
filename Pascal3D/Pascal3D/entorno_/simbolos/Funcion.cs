@@ -200,7 +200,9 @@ namespace CompiPascal.entorno_.simbolos
 
             if (ListaParametros != null)
             {
-                Generador.generar = false;
+                Generador.generar = false;          // negamos la generación de etiquetas, ya que en este punto solo necesitamos los simbolos en la tabla
+                                                    // esto porque en la llamda declaramos las variables con un valor. y en el cuerpo de la funcion no declaramos los 
+                                                    // parametros
                 foreach (Simbolo item in ListaParametros)
                 {
                     LinkedList<Simbolo> vars = new LinkedList<Simbolo>();
@@ -224,7 +226,12 @@ namespace CompiPascal.entorno_.simbolos
                     if (item.porReferencia)
                     {
                         Simbolo cambiarRef = auxiliar.obtenerSimbolo(item.Identificador);
-                        if (cambiarRef != null) cambiarRef.porReferencia = true;
+                        if (cambiarRef != null)
+                        {
+                            cambiarRef.Temp_auxiliar_referencias = Generador.pedirTemporalForzado();
+                            item.Temp_auxiliar_referencias = cambiarRef.Temp_auxiliar_referencias;
+                            cambiarRef.porReferencia = true;
+                        }
                     }
 
  

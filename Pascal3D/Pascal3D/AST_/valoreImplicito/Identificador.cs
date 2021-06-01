@@ -117,7 +117,25 @@ namespace CompiPascal.AST_.valoreImplicito
                         if (item.porReferencia)
                         {
                             string tempora3 = Generador.pedirTemporal();
-                            VALOR_ID.Codigo += $"{tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
+                            if (item.Temp_auxiliar_referencias == null)
+                            {
+                                VALOR_ID.Codigo += $"{tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
+                            }
+                            else
+                            {
+                                string etiq1 = Generador.pedirEtiqueta();
+                                string etiq2 = Generador.pedirEtiqueta();
+
+                                // SI LA ETIQUETA ES IGUAL A 1, EL VALOR ESTA EN EL HEAP, DE LO CONTRARIO ESTA EN EL sTACK
+                                VALOR_ID.Codigo += $"if( {item.Temp_auxiliar_referencias} == 1) goto {etiq1};\n";
+                                VALOR_ID.Codigo += $"   {tempora3} = Stack[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
+                                VALOR_ID.Codigo += $"    goto {etiq2};\n";
+                                VALOR_ID.Codigo += $"{etiq1}:\n";
+                                VALOR_ID.Codigo += $"   {tempora3} = Heap[(int){tempora2}]; /* variable por referencia, ahora si tenemos el valor*/\n";
+                                VALOR_ID.Codigo += $"{etiq2}:\n";
+                            }
+
+                          
                             VALOR_ID.Temporal = tempora3;
                         }
                         else VALOR_ID.Temporal = tempora2;

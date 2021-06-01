@@ -41,6 +41,8 @@ namespace CompiPascal.AST_.definicion.arrego
 
         public bool arregloEn_Struct { get; set; }
 
+        public bool retornarSoloDireccion { get; set; }
+
         public AccesoArreglo(string ide,LinkedList<Expresion> indices,int linea, int columna)
         {
             this.nombreAcceso = ide;
@@ -234,7 +236,7 @@ namespace CompiPascal.AST_.definicion.arrego
             }
 
             // OBTENEMOS EL VALOR EN EL OBJETO ARRAY 
-            result3D valorEncontrado = variable.valor3D(accesos,ent,0,direccion);
+            result3D valorEncontrado = variable.valor3D(accesos,ent,0,direccion,retornarSoloDireccion);
 
             // RECOPILAMOS LA INFORMACIÓN 
             result3D final = new result3D();
@@ -254,11 +256,11 @@ namespace CompiPascal.AST_.definicion.arrego
         public result3D obtenerPosicionVar(Entorno ent, string identificador)
         {
 
-            result3D regresos = new result3D();
+            result3D codigo = new result3D();
             string tempora1 = Generador.pedirTemporal();
 
-            regresos.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR*/\n";
-            regresos.Codigo += $"{tempora1} = SP; \n";
+            codigo.Codigo += $"\n/*BUSCANDO DIRECCION DE UN IDENTIFICADOR*/\n";
+            codigo.Codigo += $"{tempora1} = SP; \n";
 
             for (Entorno actual = ent; actual != null; actual = actual.entAnterior())
             {
@@ -268,7 +270,7 @@ namespace CompiPascal.AST_.definicion.arrego
                     if (item.Identificador.Equals(identificador))
                     {
 
-                        regresos.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n";
+                        codigo.Codigo += $"{tempora1} = {tempora1} + {item.direccion};           /*Capturamos la direccion donde se encuentra el ide, tomado de la tabla de simbolos*/\n";
 
                         /* CUANDO LA ASIGNACIÓN ES A UNA VARIABLE POR REFERENCIA EN UNA FUNCION, LA VARIABLE GUARDA LA REFERENCIA
                          * HACIA EL STACK 
@@ -277,27 +279,27 @@ namespace CompiPascal.AST_.definicion.arrego
                         if (item.porReferencia)
                         {
                             string temporal2 = Generador.pedirTemporal();
-                            regresos.Codigo += $"{temporal2} = Stack[(int) {tempora1}];             /* Variable por referencia, puntero*/ \n";
-                            regresos.Temporal = temporal2;
+                            codigo.Codigo += $"{temporal2} = Stack[(int) {tempora1}];             /* Variable por referencia, puntero*/ \n";
+                            codigo.Temporal = temporal2;
                         }
-                        else regresos.Temporal = tempora1;
+                        else codigo.Temporal = tempora1;
 
 
-                        regresos.Codigo += $"/*BUSCANDO DIRECCION DE UN IDENTIFICADOR -> ENCONTRADO*/\n\n";
+                        codigo.Codigo += $"/*BUSCANDO DIRECCION DE UN IDENTIFICADOR -> ENCONTRADO*/\n\n";
 
 
-                        regresos.TipoResultado = item.Tipo;
-                        return regresos;
+                        codigo.TipoResultado = item.Tipo;
+                        return codigo;
                     }
                 }
 
                 if (actual.entAnterior() != null)
                 {
-                    regresos.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
+                    codigo.Codigo += $"{tempora1} = 0;             /*Retrocedemos entre los entornos*/\n";
                 }
             }
 
-            return regresos;
+            return codigo;
         }
 
 

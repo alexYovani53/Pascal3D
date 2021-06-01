@@ -55,6 +55,8 @@ namespace CompiPascal.AST_.definicion
 
             string codigoDeclaraStruct = "" ;
 
+            // ANTES DE DECLARAR UN OBJETO
+            // VALIDAMOS SI ES UN --OBJETO STRUCT O  un --OBJETO ARREGLO
             Struct encontrarStructPlantilla = arbol.retornarEstructura(this.structuraNombre);
             Arreglo encontrarArreglo = arbol.retornarArreglo(this.structuraNombre);
 
@@ -148,8 +150,6 @@ namespace CompiPascal.AST_.definicion
                         }
                         else if(declaracionesInternas is DeclaraArray2)
                         {
-
-
                             ((DeclaraArray2)declaracionesInternas).objetoInterno = true;
                             ((DeclaraArray2)declaracionesInternas).temporalCambioEntorno = tempDireccionHeap;
                         }

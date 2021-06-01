@@ -43,6 +43,10 @@ namespace CompiPascal.AST_.valoreImplicito
          * @param       string                  acceso              nombre del objeto
          * @param       LinkedList<string>      parametros          ista de parametros
          */
+
+
+        public bool retornarSoloDireccion { get; set; }
+
         public Acceso(string acceso, LinkedList<string> parametro, int linea, int columna)
         {
             this.idObjeto = acceso;
@@ -117,14 +121,31 @@ namespace CompiPascal.AST_.valoreImplicito
 
                 if(variableEncontrada is Objeto || variableEncontrada is ObjetoArray)
                 {
-                    final.Temporal = temporalDireccion;
+                    if (retornarSoloDireccion)
+                    {
+                        final.Temporal = temporalDireccion;
+                    }
+                    else
+                    {
+
+                        final.Codigo += $"{temp1} = Heap[(int){temporalDireccion}];\n";
+                        final.Temporal = temp1;
+                    }
                     final.TipoResultado = variableEncontrada.Tipo;
                     final.Referencia = variableEncontrada;
                 }
                 else
                 {
-                    final.Codigo += $"{temp1} = Heap[(int){temporalDireccion}];\n";
-                    final.Temporal = temp1;
+                    if (retornarSoloDireccion)
+                    {
+                        final.Temporal = temporalDireccion;
+                    }
+                    else
+                    {
+
+                        final.Codigo += $"{temp1} = Heap[(int){temporalDireccion}];\n";
+                        final.Temporal = temp1;
+                    }
                     final.TipoResultado = variableEncontrada.Tipo;
                 }
 

@@ -73,8 +73,10 @@ namespace CompiPascal.AST_.control
             result3D condicion = new result3D();
             string etiquetaSalida = Generador.pedirEtiqueta();
 
+            // PARA UN IF, LAS ETIQUETAS VERDADERAS Y FALSAS DE TODA LA CONDICION SE GENERA ANTES DE COMENZAR LA TRADUCCION
             if (exprCondicional is Operacion)
             {
+                
                 ((Operacion)exprCondicional).etiquetaFalsa = Generador.pedirEtiqueta();
                 ((Operacion)exprCondicional).etiquetaVerdadera = Generador.pedirEtiqueta();
                 condicion = exprCondicional.obtener3D(ent);
@@ -82,6 +84,8 @@ namespace CompiPascal.AST_.control
             }
             else if (exprCondicional is Llamada)
             {
+                // SI ES UNA LLAMADA DEVEMOS HACER LO SIGUIENTE
+                // if ( llamada() == true )  
                 Operacion comparacion = new Operacion(exprCondicional, new Primitivo(true, linea, columna), Operacion.Operador.IGUAL, linea, columna);
                 comparacion.etiquetaFalsa = Generador.pedirEtiqueta();
                 comparacion.etiquetaVerdadera = Generador.pedirEtiqueta();
@@ -101,9 +105,12 @@ namespace CompiPascal.AST_.control
 
             foreach (Instruccion item in instruccionesElse_if)
             {
+                // ACÁ OBTENEMOS EL CODIGO DE LOS DEMÁS IF'S
                 If pivote = (If)item;
                 pivote.exprCondicional.etiquetaFalsa = Generador.pedirEtiqueta();
                 pivote.exprCondicional.etiquetaVerdadera = Generador.pedirEtiqueta();
+
+                // OBTENEMOS EL C3D DE LA CONDICION
                 result3D ifElse_result = pivote.exprCondicional.obtener3D(ent);
 
                 result.Codigo += ifElse_result.Codigo;
@@ -114,7 +121,7 @@ namespace CompiPascal.AST_.control
                 result.Codigo += $" goto {etiquetaSalida} ; /*etiqueta salida*/ \n\n\n";           
 
 
-                result.Codigo += ifElse_result.EtiquetaF + " : \t";
+                result.Codigo += ifElse_result.EtiquetaF + " :\t";
 
             }
 

@@ -28,6 +28,16 @@ namespace Pascal3D.Traductor
             return temp;
         }
 
+        public static string pedirTemporalForzado()
+        {
+
+            string temp = "";
+            temp += "t" + temporales.ToString();
+            temporales++;
+            return temp;
+        }
+
+
         public static string pedirEtiqueta()
         {
             if (!generar) return "  "; 

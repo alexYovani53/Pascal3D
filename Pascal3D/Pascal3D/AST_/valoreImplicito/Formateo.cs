@@ -65,16 +65,6 @@ namespace CompiPascal.AST_.valoreImplicito
             this.columna = columna;
         }
 
-        public TipoDatos getTipo(Entorno entorno, AST ast)
-        {
-
-            return TipoDatos.String;
-        }
-
-        public string getC3()
-        {
-            throw new NotImplementedException();
-        }
 
 
         /* @funcion     agregarEspacios
